@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<layers>
+  <layer name="libertic.event-theme" interface="libertic.event.interfaces.IThemeSpecific"/>
+  <layer name="libertic.event" interface="libertic.event.interfaces.ILayer"/>
+</layers>

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<object name="portal_skins" allow_any="False" cookie_persistence="False" default_skin="libertic.event">
+
+  <object name="libertic_event_custom"
+      meta_type="Filesystem Directory View"
+      directory="libertic.event:skins/libertic_event_custom"/>
+  <skin-path name="libertic.event" based-on="Sunburst Theme">
+    <layer name="libertic_event_custom"
+        insert-after="custom"/>
+  </skin-path>
+
+</object> 

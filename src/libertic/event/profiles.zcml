@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    i18n_domain="libertic.event">
+  <!-- Include direct package dependencies -->
+  <genericsetup:registerProfile
+      name="qi"
+      title="libertic Policy QI"
+      directory="profiles/qi"
+      description="Turn a Plone site into the libertic QIINFO site."
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+    />
+  <genericsetup:registerProfile
+      name="default"
+      title="libertic.event"
+      directory="profiles/default"
+      description="Install the libertic.event addon on this plone site."
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+    />
+  <genericsetup:registerProfile
+      title="libertic.event uninstall" 
+      name="uninstall"
+      description="Uninstall the libertic.event addon on tbis plone site."
+      directory="profiles/uninstall"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      />
+  <genericsetup:importStep
+      name="libertic_event setupVarious"
+      title="various setup for libertic.event "
+      description="description"
+      handler="libertic.event.setuphandlers.setupVarious">
+    <depends name="content"/>
+  </genericsetup:importStep>
+  <!-- migration steps -->
+  <genericsetup:importStep
+      name="libertic_event setupQi"
+      title="Quick Installer products dependencies setup for libertic.event"
+      description="description"
+      handler="libertic.event.setuphandlers.setupQi">
+    <depends name="content"/>
+  </genericsetup:importStep> 
+  <!-- -->
+  <utility factory=".app_config.HiddenProducts" name="libertic_event.hiddenproducts"/>
+  <utility factory=".app_config.HiddenProfiles" name="libertic_event.hiddenprofiles"/> 
+  <include package=".upgrades"/>
+</configure> 

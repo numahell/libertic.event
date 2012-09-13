@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<object name="portal_controlpanel"
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    i18n:domain="libertic.event"
+    purge="False">
+<!--
+    <configlet 
+        title="libertic.event Settings"
+        action_id="event"
+        appId="libertic.event"
+        category="Products"
+        condition_expr=""
+        url_expr="string:${portal_url}/@@libertic.event-settings"
+        icon_expr="string:${portal_url}/++resource++libertic.event/libertic.event_icon.png"
+        visible="True"
+        i18n:attributes="title">
+        <permission>Manage portal</permission>
+    </configlet>
+-->
+</object>

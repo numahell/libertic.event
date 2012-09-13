@@ -1,24 +1,27 @@
 <?xml version="1.0"?>
 <metadata>
-  <version>10</version>
+  <version>1000</version>
   <dependencies>
   <!-- QuickInstalled dependencies -->
       <dependency>profile-libertic.event:qi</dependency>
   <!-- GenericSetup dependencies -->
       <dependency>profile-collective.js.datatables:default</dependency>
       <dependency>profile-Products.CMFPlacefulWorkflow:CMFPlacefulWorkflow</dependency>
+      <dependency>profile-collective.cron:default</dependency>
       <dependency>profile-collective.ckeditor:default</dependency>
       <dependency>profile-collective.configviews:default</dependency>
+      <dependency>profile-archetypes.multilingual:default</dependency>
+      <dependency>profile-plone.app.multilingual:default</dependency>
       <dependency>profile-plone.app.theming:default</dependency>
       <dependency>profile-collective.seo:default</dependency>
       <dependency>profile-collective.oembed:default</dependency>
+      <dependency>profile-plone.multilingualbehavior:default</dependency>
       <dependency>profile-plone.app.dexterity:default</dependency>
       <dependency>profile-collective.masonry:default</dependency>
-      <dependency>profile-plone.app.event.ploneintegration:default</dependency>
+      <dependency>profile-eea.tags:default</dependency>
       <dependency>profile-collective.addthis:default</dependency>
       <dependency>profile-collective.portlet.oembed:default</dependency>
       <dependency>profile-collective.googleanalytics:default</dependency>
-      <dependency>profile-Products.CMFPlomino:default</dependency>
       <dependency>profile-collective.js.jqueryui:default</dependency>
  </dependencies>
 </metadata>

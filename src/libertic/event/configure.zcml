@@ -19,31 +19,21 @@
   <include package="plone.app.transmogrifier" file="configure.zcml"/>
   <!--with_ploneproduct_patransmo -->
   <include package="transmogrify.filesystem" file="configure.zcml"/>
-  <!--with_ploneproduct_patransmo -->
-  <include package="transmogrify.sqlalchemy" file="configure.zcml"/>
   <!--with_ploneproduct_datatables -->
   <include package="collective.js.datatables" file="configure.zcml"/>
   <!--with_ploneproduct_patheming -->
   <include package="plone.app.theming" file="configure.zcml"/>
   <!--with_ploneproduct_patheming -->
   <include package="plone.app.themingplugins" file="configure.zcml"/>
-  <!--with_ploneproduct_addthis -->
-  <include package="collective.addthis" file="configure.zcml"/>
   <!--with_ploneproduct_ckeditor -->
   <include package="collective.ckeditor" file="configure.zcml"/>
   <!--with_ploneproduct_cpwkf -->
   <!--with_ploneproduct_ploneboard -->
   <include package="Products.CMFPlacefulWorkflow" file="configure.zcml"/>
-  <!--with_ploneproduct_cjqui -->
-  <include package="collective.js.jqueryui" file="configure.zcml"/>
   <!--with_ploneproduct_dexterity -->
   <include package="plone.app.dexterity" file="meta.zcml"/>
   <!--with_ploneproduct_dexterity -->
   <include package="plone.app.dexterity" file="configure.zcml"/>
-  <!--with_ploneproduct_paevent -->
-  <include package="plone.app.event [archetypes,dexterity]" file="configure.zcml"/>
-  <!--with_ploneproduct_plomino -->
-  <include package="Products.CMFPlomino" file="configure.zcml"/>
   <!--with_ploneproduct_masonry -->
   <include package="collective.masonry" file="configure.zcml"/>
   <!--with_ploneproduct_cga -->
@@ -54,8 +44,18 @@
   <include package="collective.portlet.oembed" file="configure.zcml"/>
   <!--with_ploneproduct_seo -->
   <include package="collective.seo" file="configure.zcml"/>
+  <!--with_ploneproduct_eeatags -->
+  <include package="eea.tags" file="configure.zcml"/>
   <!--with_ploneproduct_configviews -->
   <include package="collective.configviews" file="configure.zcml"/>
+  <!--with_ploneproduct_ccron -->
+  <include package="collective.cron" file="configure.zcml"/>
+  <!--with_ploneproduct_pamultilingual -->
+  <include package="plone.app.multilingual" file="configure.zcml"/>
+  <!--with_ploneproduct_cjqui -->
+  <include package="collective.js.jqueryui" file="configure.zcml"/>
+  <!--with_ploneproduct_addthis -->
+  <include package="collective.addthis" file="configure.zcml"/>
   <five:registerPackage package="." initialize=".initialize" />
   <!-- activate to customize the dashboard-->
   <!-- <adapter factory=".dashboard.MyPortalDefaultDashboard"/>-->

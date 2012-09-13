@@ -13,42 +13,48 @@ from Products.CMFCore.utils import getToolByName
 from Products.ATContentTypes.interface.image import IATImage
 from Products.ATContentTypes.content.image import ATImage
 import transaction
+
+
+from Products.CMFCore.utils import getToolByName
+from Products.CMFPlone.utils import _createObjectByType
               
+PROFILE =  'profile-libertic.event:default'
+PROFILEID = 'profile-%s' % PROFILE
 
 def log(message):
     logger = logging.getLogger('libertic.event.upgrades')
     logger.warn(message)
 
-def recook_resources(portal_setup):
+def recook_resources(context):
     """
     """
-    portal = site = portal_setup.aq_parent
+    site = getToolByName(context, 'portal_url').getPortalObject()
     jsregistry = getToolByName(site, 'portal_javascripts')
     cssregistry = getToolByName(site, 'portal_css')
     jsregistry.cookResources()
     cssregistry.cookResources()
     log('Recooked css/js')
 
-def import_js(portal_setup):
+def import_js(context):
     """
     """
-    portal = site = portal_setup.aq_parent
-    portal_setup.runImportStepFromProfile('profile-libertic.event:default', 'jsregistry', run_dependencies=False)
-    transaction.commit()
+    site = getToolByName(context, 'portal_url').getPortalObject()
+    portal_setup = getToolByName(context, 'portal_setup')
+    portal_setup.runImportStepFromProfile(PROFILEID, 'jsregistry', run_dependencies=False)
+    log('Imported js')
 
-def import_css(portal_setup):
+def import_css(context):
     """
     """
-    portal = site = portal_setup.aq_parent
-    portal_setup.runImportStepFromProfile('profile-libertic.event:default', 'cssregistry', run_dependencies=False)
-    transaction.commit()
+    site = getToolByName(context, 'portal_url').getPortalObject()
+    portal_setup = getToolByName(context, 'portal_setup')
+    portal_setup.runImportStepFromProfile(PROFILEID, 'cssregistry', run_dependencies=False)
+    log('Imported css')
 
-
-
-def upgrade_1000(portal_setup):
+def upgrade_1000(context):
     """
     """
-    site = portal_setup.aq_parent
+    site = getToolByName(context, 'portal_url').getPortalObject()
     portal_setup = site.portal_setup
     
     # install Products.PloneSurvey and dependencies
@@ -58,7 +64,5 @@ def upgrade_1000(portal_setup):
     #portal_setup.runImportStepFromProfile('profile-libertic.event:default', 'cssregistry', run_dependencies=False)
     #portal_setup.runImportStepFromProfile('profile-libertic.event:default', 'portlets', run_dependencies=False)
     #portal_setup.runImportStepFromProfile('profile-libertic.event:default', 'propertiestool', run_dependencies=False)
-    #portal_setup.runImportStepFromProfile('profile-libertic.event:default', 'propertiestool', run_dependencies=False)
-    transaction.commit() 
     log('v1000 applied')
 

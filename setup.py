@@ -30,7 +30,7 @@ setup(
     namespace_packages=[         'libertic',
     ],
     version=version,
-    description='Project %s',
+    description='Project libertic.event',
     long_description=long_description,
     classifiers=classifiers,
     keywords='',
@@ -46,13 +46,32 @@ setup(
         'z3c.autoinclude',
         'Plone',
         'plone.app.upgrade',
+        # with_ploneproduct_ccron
+        'collective.cron',
+        # with_binding_bsoup
+        'BeautifulSoup',
+        # with_ploneproduct_patransmo
+        'collective.transmogrifier',
+        'plone.app.transmogrifier',
+        'transmogrify.filesystem',
+        # with_ploneproduct_datatables
+        'collective.js.datatables',
         # with_ploneproduct_dexterity
         'z3c.blobfile',
         'plone.app.dexterity',
-        # with_ploneproduct_paasync
-        'zc.z3monitor',
-        'plone.app.async',
-        'zope.app.keyreference',
+        # with_database_sa
+        'sqlalchemy',
+        # with_ploneproduct_pamultilingual
+        'plone.app.multilingual [dexterity,archetypes]',
+        # with_binding_pil
+        'Pillow',
+        # with_ploneproduct_seo
+        'collective.seo',
+        # with_ploneproduct_eeatags
+        'eea.tags',
+        # with_ploneproduct_patheming
+        'plone.app.theming',
+        'plone.app.themingplugins',
         # with_ploneproduct_cjqui
         'collective.js.jqueryui',
         # with_binding_json
@@ -60,42 +79,25 @@ setup(
         'simplejson',
         # with_ploneproduct_addthis
         'collective.addthis',
-        # with_ploneproduct_configviews
-        'collective.configviews',
         # with_ploneproduct_ckeditor
         'collective.ckeditor',
-        # with_ploneproduct_paevent
-        'plone.app.event [archetypes,dexterity]',
-        'z3c.unconfigure',
-        # with_binding_bsoup
-        'BeautifulSoup',
-        # with_ploneproduct_cga
-        'collective.googleanalytics',
         # with_binding_lxml
         'lxml',
-        # with_ploneproduct_patransmo
-        'collective.transmogrifier',
-        'plone.app.transmogrifier',
-        'transmogrify.filesystem',
-        'transmogrify.sqlalchemy',
-        # with_ploneproduct_datatables
-        'collective.js.datatables',
+        # with_ploneproduct_masonry
+        'collective.masonry',
+        # with_ploneproduct_cpwkf
+        'Products.CMFPlacefulWorkflow',
+        # with_ploneproduct_paasync
+        'zc.z3monitor',
+        'plone.app.async',
+        'zope.app.keyreference',
+        # with_ploneproduct_cga
+        'collective.googleanalytics',
         # with_ploneproduct_oembed
         'collective.oembed',
         'collective.portlet.oembed',
-        # with_binding_pil
-        'Pillow',
-        # with_ploneproduct_seo
-        'collective.seo',
-        # with_ploneproduct_masonry
-        'collective.masonry',
-        # with_ploneproduct_patheming
-        'plone.app.theming',
-        'plone.app.themingplugins',
-        # with_ploneproduct_plomino
-        'Plomino',
-        # with_ploneproduct_cpwkf
-        'Products.CMFPlacefulWorkflow',
+        # with_ploneproduct_configviews
+        'collective.configviews',
         # -*- Extra requirements: -*-
     ],
     extras_require = {

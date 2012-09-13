@@ -17,8 +17,6 @@ from plone.app.testing.selenium_layers import SELENIUM_FUNCTIONAL_TESTING as SEL
 from plone.testing import zodb, zca, z2
 
 TESTED_PRODUCTS = (\
-#with_ploneproduct_plomino
-    'CMFPlomino',
 #with_ploneproduct_cpwkf
     'CMFPlacefulWorkflow',
 )
@@ -76,24 +74,24 @@ class LiberticEventLayer(PloneSandboxLayer):
         #with_ploneproduct_cjqui
         import collective.js.jqueryui
         self.loadZCML('configure.zcml', package=collective.js.jqueryui)
-        #with_ploneproduct_addthis
-        import collective.addthis
-        self.loadZCML('configure.zcml', package=collective.addthis)
-        #with_ploneproduct_configviews
-        import collective.configviews
-        self.loadZCML('configure.zcml', package=collective.configviews)
+        #with_ploneproduct_ccron
+        import collective.cron
+        self.loadZCML('configure.zcml', package=collective.cron)
         #with_ploneproduct_ploneboard
         import Products.CMFPlacefulWorkflow
         self.loadZCML('configure.zcml', package=Products.CMFPlacefulWorkflow)
         #with_ploneproduct_ckeditor
         import collective.ckeditor
         self.loadZCML('configure.zcml', package=collective.ckeditor)
+        #with_ploneproduct_pamultilingual
+        import plone.app.multilingual
+        self.loadZCML('configure.zcml', package=plone.app.multilingual)
         #with_ploneproduct_cga
         import collective.googleanalytics
         self.loadZCML('configure.zcml', package=collective.googleanalytics)
-        #with_ploneproduct_paevent
-        import plone.app.event [archetypes,dexterity]
-        self.loadZCML('configure.zcml', package=plone.app.event [archetypes,dexterity])
+        #with_ploneproduct_addthis
+        import collective.addthis
+        self.loadZCML('configure.zcml', package=collective.addthis)
         #with_ploneproduct_patransmo
         import collective.transmogrifier
         self.loadZCML('configure.zcml', package=collective.transmogrifier)
@@ -101,8 +99,6 @@ class LiberticEventLayer(PloneSandboxLayer):
         self.loadZCML('configure.zcml', package=plone.app.transmogrifier)
         import transmogrify.filesystem
         self.loadZCML('configure.zcml', package=transmogrify.filesystem)
-        import transmogrify.sqlalchemy
-        self.loadZCML('configure.zcml', package=transmogrify.sqlalchemy)
         #with_ploneproduct_datatables
         import collective.js.datatables
         self.loadZCML('configure.zcml', package=collective.js.datatables)
@@ -114,6 +110,9 @@ class LiberticEventLayer(PloneSandboxLayer):
         #with_ploneproduct_seo
         import collective.seo
         self.loadZCML('configure.zcml', package=collective.seo)
+        #with_ploneproduct_eeatags
+        import eea.tags
+        self.loadZCML('configure.zcml', package=eea.tags)
         #with_ploneproduct_masonry
         import collective.masonry
         self.loadZCML('configure.zcml', package=collective.masonry)
@@ -122,9 +121,9 @@ class LiberticEventLayer(PloneSandboxLayer):
         self.loadZCML('configure.zcml', package=plone.app.theming)
         import plone.app.themingplugins
         self.loadZCML('configure.zcml', package=plone.app.themingplugins)
-        #with_ploneproduct_plomino
-        import Products.CMFPlomino
-        self.loadZCML('configure.zcml', package=Products.CMFPlomino)
+        #with_ploneproduct_configviews
+        import collective.configviews
+        self.loadZCML('configure.zcml', package=collective.configviews)
 
         # -----------------------------------------------------------------------
         # Load our own event

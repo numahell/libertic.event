@@ -31,7 +31,7 @@
       title="various setup for libertic.event "
       description="description"
       handler="libertic.event.setuphandlers.setupVarious">
-    <depends name="content"/>
+    <depends name="plone-content"/>
   </genericsetup:importStep>
   <!-- migration steps -->
   <genericsetup:importStep
@@ -39,7 +39,7 @@
       title="Quick Installer products dependencies setup for libertic.event"
       description="description"
       handler="libertic.event.setuphandlers.setupQi">
-    <depends name="content"/>
+    <depends name="plone-content"/>
   </genericsetup:importStep> 
   <!-- -->
   <utility factory=".app_config.HiddenProducts" name="libertic_event.hiddenproducts"/>

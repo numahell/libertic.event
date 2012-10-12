@@ -4,10 +4,11 @@
   <dependencies>
   <!-- QuickInstalled dependencies -->
       <dependency>profile-libertic.event:qi</dependency>
+      <dependency>profile-collective.cron:default</dependency>
   <!-- GenericSetup dependencies -->
       <dependency>profile-collective.js.datatables:default</dependency>
+      <dependency>profile-plonetheme.sunburst:default</dependency>
       <dependency>profile-Products.CMFPlacefulWorkflow:CMFPlacefulWorkflow</dependency>
-      <dependency>profile-collective.cron:default</dependency>
       <dependency>profile-collective.ckeditor:default</dependency>
       <dependency>profile-collective.configviews:default</dependency>
       <dependency>profile-archetypes.multilingual:default</dependency>

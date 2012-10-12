@@ -31,6 +31,8 @@
   <!--with_ploneproduct_ploneboard -->
   <include package="Products.CMFPlacefulWorkflow" file="configure.zcml"/>
   <!--with_ploneproduct_dexterity -->
+  <include package="plone.multilingualbehavior" file="configure.zcml"/>
+  <!--with_ploneproduct_dexterity -->
   <include package="plone.app.dexterity" file="meta.zcml"/>
   <!--with_ploneproduct_dexterity -->
   <include package="plone.app.dexterity" file="configure.zcml"/>
@@ -62,11 +64,13 @@
   <include package=".browser" />
   <include file="profiles.zcml" />
   <i18n:registerTranslations directory="locales" />
-  
+
   <cmf:registerDirectory
        name="libertic_event_custom"/>
-  
+
   <include package="plone.resource" file="meta.zcml"/>
   <plone:static directory="static" type="theme" name="libertic.event" />
+
+  <includeOverrides package=".members"/>
 </configure>
 <!-- vim:set ft=xml: -->

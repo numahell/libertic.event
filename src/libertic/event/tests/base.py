@@ -1,6 +1,7 @@
 import unittest2 as unittest
 
 from libertic.event.testing import (
+    LIBERTIC_EVENT_SIMPLE as SIMPLE,
     LIBERTIC_EVENT_FIXTURE as UNIT_TESTING,
     LIBERTIC_EVENT_INTEGRATION_TESTING as INTEGRATION_TESTING,
     LIBERTIC_EVENT_FUNCTIONAL_TESTING as FUNCTIONAL_TESTING,
@@ -31,8 +32,9 @@ class TestCase(unittest.TestCase):
 
     def setUp(self):
         super(TestCase, self).setUp()
-        self.portal = self.layer['portal']
         self.app = self.layer['app']
+        self.portal = self.layer['portal']
+        self.folder = self.layer['test-folder']
 
     def add_user(self, id, username, password, roles=None):
         self.layer.add_user( id, username, password, roles=None)
@@ -50,6 +52,9 @@ class TestCase(unittest.TestCase):
     def loginAsManager(self):
         self.login(PLONE_MANAGER_NAME)
 
+    def setRoles(self, roles=None, id=None):
+        self.layer.setRoles(roles, id)
+
 class IntegrationTestCase(TestCase):
     """Integration base TestCase."""
     layer = INTEGRATION_TESTING
@@ -63,5 +68,9 @@ class FunctionalTestCase(TestCase):
 class SeleniumTestCase(TestCase):
     """Functionnal base TestCase."""
     layer = SELENIUM_TESTING
+
+
+class SimpleTestCase(unittest.TestCase):
+    layer = SIMPLE
 
 # vim:set ft=python:

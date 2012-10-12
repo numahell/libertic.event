@@ -27,8 +27,7 @@ classifiers = [
 name = 'libertic.event'
 setup(
     name=name,
-    namespace_packages=[         'libertic',
-    ],
+    namespace_packages=[         'libertic',    ],
     version=version,
     description='Project libertic.event',
     long_description=long_description,
@@ -47,7 +46,7 @@ setup(
         'Plone',
         'plone.app.upgrade',
         # with_ploneproduct_ccron
-        'collective.cron',
+        'collective.cron > 2.0',
         # with_binding_bsoup
         'BeautifulSoup',
         # with_ploneproduct_patransmo
@@ -57,6 +56,7 @@ setup(
         # with_ploneproduct_datatables
         'collective.js.datatables',
         # with_ploneproduct_dexterity
+        'plone.multilingualbehavior',
         'z3c.blobfile',
         'plone.app.dexterity',
         # with_database_sa
@@ -101,7 +101,7 @@ setup(
         # -*- Extra requirements: -*-
     ],
     extras_require = {
-        'test': ['plone.app.testing',]
+        'test': ['plone.app.testing', 'ipython',]
     },
     entry_points = {
         'z3c.autoinclude.plugin': ['target = plone',],

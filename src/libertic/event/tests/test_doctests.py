@@ -4,22 +4,15 @@ Launching all doctests in the tests directory using:
     - the base layer in testing.py
 
 """
-
-from libertic.event.tests.base import FunctionalTestCase
-
-################################################################################
 # GLOBALS avalaible in doctests
 # IMPORT/DEFINE objects there or inside ./user_globals.py (better)
 # globals from the testing product are also available.
-################################################################################
 # example:
 # from for import bar
 # and in your doctests, you can do:
 # >>> bar.something
 from libertic.event.tests.globals import *
 from libertic.event.testing import LIBERTIC_EVENT_FUNCTIONAL_TESTING as FUNCTIONAL_TESTING
-################################################################################
-
 
 import unittest2 as unittest
 import glob
@@ -36,8 +29,11 @@ def test_suite():
     cwd = os.path.dirname(__file__)
     files = []
     try:
-        files = glob.glob(os.path.join(cwd, '*txt'))
-        files += glob.glob(os.path.join(cwd, '*rst'))
+        files = []
+        for e in ['*rst', '*txt']:
+            for d in [cwd, 
+                      os.path.dirname(cwd)]:
+                files += glob.glob(os.path.join(d, e))
     except Exception,e:
         logger.warn('No doctests for libertic.event')
     suite = unittest.TestSuite()
@@ -56,6 +52,4 @@ def test_suite():
         ])
     return suite
     
-
-
 # vim:set ft=python:

@@ -18,7 +18,7 @@ import transaction
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.utils import _createObjectByType
               
-PROFILE =  'profile-libertic.event:default'
+PROFILE =  'libertic.event:default'
 PROFILEID = 'profile-%s' % PROFILE
 
 def log(message):
@@ -51,6 +51,33 @@ def import_css(context):
     portal_setup.runImportStepFromProfile(PROFILEID, 'cssregistry', run_dependencies=False)
     log('Imported css')
 
+def upgrade_profile(context, profile_id, steps=None):
+    """
+    >>> upgrade_profile(context, 'foo:default')
+    """
+    portal_setup = getToolByName(context.aq_parent, 'portal_setup')
+    gsteps = portal_setup.listUpgrades(profile_id)
+    class fakeresponse(object):
+        def redirect(self, *a, **kw): pass
+    class fakerequest(object):
+        RESPONSE = fakeresponse()
+        def __init__(self):
+            self.form = {}
+            self.get = self.form.get
+    fr = fakerequest()
+    if steps is None:
+        steps = []
+        for col in gsteps:
+            if not isinstance(col, list):
+                col = [col]
+            for ustep in col:
+                steps.append(ustep['id'])
+        fr.form.update({
+            'profile_id': profile_id,
+            'upgrades': steps,
+        })
+    portal_setup.manage_doUpgrades(fr)
+  
 def upgrade_1000(context):
     """
     """
@@ -65,4 +92,5 @@ def upgrade_1000(context):
     #portal_setup.runImportStepFromProfile('profile-libertic.event:default', 'portlets', run_dependencies=False)
     #portal_setup.runImportStepFromProfile('profile-libertic.event:default', 'propertiestool', run_dependencies=False)
     log('v1000 applied')
+
 

@@ -2,7 +2,7 @@
 <site>
 
   <property name="title">libertic</property>
-  <property name="description">Welcome to the libertic website</property> 
+  <property name="description">Welcome to the libertic website</property>
   <property name="email_from_address"
       type="string">testeur@makina-corpus.com</property>
   <property name="email_from_name"

@@ -47,14 +47,7 @@ from Acquisition import aq_inner, aq_parent, aq_self
 from Products.CMFCore.utils import getToolByName
 from Products.statusmessages.interfaces import IStatusMessage
 
-from libertic.event.testing import print_contents, Browser
-
-
 zope.component.provideAdapter(DefaultTraversable, [None])
-
-FF2_USERAGENT =  'Mozilla/5.0 (Windows; U; Windows NT 5.1; fr; rv:1.8.1.14) Gecko/20080404 Firefox/2.0.0.14'
-GENTOO_FF_UA = 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.1.3) Gecko/20090912 Gentoo Shiretoko/3.5.3'
-
 cwd = os.path.dirname(__file__)
 
 def get_interfaces(o):
@@ -68,7 +61,6 @@ def errprint(msg):
 def pstriplist(s):
     print '\n'.join([a.rstrip() for a in s.split('\n') if a.strip()])
 
-
 class Request(zope.publisher.browser.TestRequest):
     def __setitem__(self, name, value):
         self._environ[name] = value
@@ -79,42 +71,16 @@ def make_request(url='http://nohost/@@myview',form=None, *args,  **kwargs):
     zope.interface.alsoProvides(r, zope.annotation.interfaces.IAttributeAnnotatable)
     return r
 
-# if you have plone.reload out there add an helper to use in doctests while programming
-# just use preload(module) in pdb :)
-# it would be neccessary for you to precise each module to reload, this method is also not recursive.
-# eg: (pdb) from foo import bar;preload(bar)
-def preload(modules_or_module, excludelist=None):
-    try:
-        modules = modules_or_module
-        if not (isinstance(modules_or_module, list)
-                or isinstance(modules_or_module, tuple)):
-            modules = [modules_or_module]
-        if not excludelist:
-            excludelist = []
-        import sys
-        if not modules:
-            modules = sys.modules
-        from plone.reload.xreload import Reloader
-        for module in modules:
-            if not module in excludelist:
-                try:
-                    Reloader(module).reload()
-                except Exception, e:
-                    pass
-    except Exception, e:
-        print "Cant reload code: %s " % e
-
 from libertic.event.testing import (
-    login,
-    logout,
-    TEST_USER_NAME,
-    TEST_USER_ROLES,
-    TEST_USER_ID,
-    SITE_OWNER_NAME,
-    print_contents,
+    Browser,
     PLONE_MANAGER_ID,
     PLONE_MANAGER_NAME,
     PLONE_MANAGER_PASSWORD,
+    SITE_OWNER_NAME,
+    SITE_OWNER_PASSWORD,
+    TEST_USER_ID,
+    TEST_USER_NAME,
+    TEST_USER_ROLES,
 )
 # load user specific globals
 try: from libertic.event.tests.user_globals import *

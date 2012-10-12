@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<rolemap>
+  <roles>
+    <role name="LiberticSupplier"/>
+    <role name="LiberticOperator"/>
+  </roles>
+  <permissions>
+    <!-- self registration -->
+    <permission name="Add portal member" acquire="False">
+      <role name="Anonymous"/>
+      <role name="Manager"/>
+      <role name="Owner"/>
+      <role name="Site Administrator"/>
+    </permission>
+  </permissions>
+</rolemap>

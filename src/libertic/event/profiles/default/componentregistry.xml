@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<componentregistry>
+  <utilities>
+    <!-- always reinstall the utility-->
+    <utility remove="true"
+        interface="plone.app.users.userdataschema.IUserDataSchemaProvider"
+        factory="libertic.event.members.profile.UserDataSchemaProvider" />
+    <utility
+        interface="plone.app.users.userdataschema.IUserDataSchemaProvider"
+        factory="libertic.event.members.profile.UserDataSchemaProvider" />
+  </utilities>
+</componentregistry>

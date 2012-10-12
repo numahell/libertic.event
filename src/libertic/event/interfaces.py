@@ -13,5 +13,19 @@ class IThemeSpecific(IDefaultPloneLayer):
 
 class ILayer(interface.Interface):
     """Marker interface that defines a Zope 3 browser layer.
-    """ 
+    """
 
+groups = {
+    'operator' : {
+        'id': 'libertic_event_operator',
+        'roles': ['LiberticOperator'],
+        'title':'Libertic event operator',
+        'description':'Libertic event operator',
+    },
+    'supplier': {
+        'id': 'libertic_event_supplier',
+        'roles': ['LiberticSupplier'],
+        'title':'Libertic event supplier',
+        'description':'Libertic event supplier',
+    },
+}

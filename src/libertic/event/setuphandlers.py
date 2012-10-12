@@ -2,14 +2,12 @@ import logging
 import transaction
 from Products.CMFCore.utils import getToolByName
 
-from libertic.event import app_config
-from Products.CMFPlone.utils import _createObjectByType
-from libertic.event.app_config import PRODUCT_DEPENDENCIES, EXTENSION_PROFILES
 from plone.app.multilingual.browser.setup import SetupMultilingualSite
 from plone.app.multilingual.browser.controlpanel import MultiLanguageControlPanelAdapter
 from plone.app.multilingual.browser.controlpanel import MultiLanguageOptionsControlPanelAdapter
 from plone.app.multilingual.browser.controlpanel import MultiLanguageExtraOptionsAdapter
 
+from Products.CMFPlone.utils import _createObjectByType
 BASE_CONTENTS_TO_INIT = [
 #    {'id':'fr', 'title':"FR", 'type':'Folder', 'language':'fr', 'nav':False},
 ]
@@ -53,6 +51,44 @@ def full_reindex(portal):
     cat = getToolByName(portal, 'portal_catalog')
     cat.refreshCatalog()
 
+def install_pamultilingual(portal):
+    existing = set(portal.objectIds())
+    if not 'fr' in existing:
+        #create_content(portal, BASE_CONTENTS_TO_INIT)
+        adapter1 = MultiLanguageControlPanelAdapter(portal)
+        adapter2 = MultiLanguageOptionsControlPanelAdapter(portal)
+        adapter3 = MultiLanguageExtraOptionsAdapter(portal)
+        adapter1.set_default_language('fr')
+        adapter1.set_available_languages([u'fr', u'en'])
+        adapter2.set_use_content_negotiation(True)
+        adapter2.set_use_cookie_negotiation(True)
+        adapter2.set_set_cookie_everywhere(True)
+        adapter2.set_use_request_negotiation(True)
+        adapter2.set_use_path_negotiation(True)
+        SetupMultilingualSite(portal).setupSite(portal)
+        SetupMultilingualSite(portal).set_default_language_content()
+        SetupMultilingualSite(portal).move_default_language_content()
+
+from libertic.event import interfaces as i
+
+def install_groups(portal):
+    l = logging.getLogger('libertic.install_groups')
+    portal_groups = getToolByName(portal, 'portal_groups')
+    for ig in i.groups:
+        infos = i.groups[ig]
+        g = infos['id']
+        group = portal_groups.getGroupById(g)
+        l.info('Adding/reseting %s' % g)
+        if not group:
+            portal_groups.addGroup(g)
+        portal_groups.editGroup(g,
+            roles=infos['roles'],
+            **{
+                'title': infos['title'],
+                'description': infos['description'],
+            })
+
+
 def setupVarious(context):
     """Miscellanous steps import handle.
     """
@@ -66,26 +102,11 @@ def setupVarious(context):
     portal = getToolByName(
         context.getSite(), 'portal_url'
     ).getPortalObject()
-    wftool = getToolByName(portal, "portal_workflow")
-    existing = set(portal.objectIds())
-    #create_content(portal, BASE_CONTENTS_TO_INIT)
-    adapter1 = MultiLanguageControlPanelAdapter(portal)
-    adapter2 = MultiLanguageOptionsControlPanelAdapter(portal)
-    adapter3 = MultiLanguageExtraOptionsAdapter(portal)
-    adapter1.set_default_language('fr')
-    adapter1.set_available_languages([u'fr', u'en'])
-    adapter2.set_use_content_negotiation(True)
-    adapter2.set_use_cookie_negotiation(True)
-    adapter2.set_set_cookie_everywhere(True)
-    adapter2.set_use_request_negotiation(True)
-    adapter2.set_use_path_negotiation(True)
-    if not 'fr' in existing:
-        SetupMultilingualSite(portal).setupSite(portal)
-        SetupMultilingualSite(portal).set_default_language_content()
-        SetupMultilingualSite(portal).move_default_language_content()
-        #create_content(portal, EN_BASE_CONTENTS_TO_INIT)
-    full_reindex(portal)
+    install_pamultilingual(portal)
     publish_all(portal)
+    install_groups(portal)
+    full_reindex(portal)
+    #create_content(portal, EN_BASE_CONTENTS_TO_INIT)
 
 def setupQi(context):
     """Miscellanous steps import handle.
@@ -104,10 +125,4 @@ def setupQi(context):
     portal_quickinstaller = getToolByName(portal, 'portal_quickinstaller')
     portal_setup = getToolByName(portal, 'portal_setup')
     logger = logging.getLogger('libertic.event.Install')
-
-    for product in PRODUCT_DEPENDENCIES:
-        logger.info('(RE)Installing %s.' % product)
-        if not portal_quickinstaller.isProductInstalled(product):
-            portal_quickinstaller.installProduct(product)
-            transaction.savepoint()
 

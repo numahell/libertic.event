@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<object name="portal_workflow" meta_type="Plone Workflow Tool">
+ <property
+    name="title">Contains workflow definitions for your portal</property>
+ <object name="libertic_database_workflow" meta_type="Workflow"/>
+ <object name="libertic_event_workflow" meta_type="Workflow"/>
+ <object name="libertic_source_workflow" meta_type="Workflow"/>
+ <bindings>
+  <type type_id="libertic_database">
+   <bound-workflow workflow_id="libertic_database_workflow"/>
+  </type>
+  <type type_id="libertic_event">
+   <bound-workflow workflow_id="libertic_event_workflow"/>
+  </type>
+  <type type_id="libertic_source">
+   <bound-workflow workflow_id="libertic_source_workflow"/>
+  </type>
+ </bindings>
+</object>

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2010-04-15 23:45+0000\n"
+"POT-Creation-Date: 2012-10-13 16:12+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -13,4 +13,209 @@ msgstr ""
 "Language-Name: English\n"
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: DOMAIN\n"
+
+#: ./members/profile.py:33
+msgid "Accept terms of use"
+msgstr ""
+
+#: ./content/source.py:27
+msgid "Activated to be parsed"
+msgstr ""
+
+#: ./content/liberticevent.py:36
+msgid "Address"
+msgstr ""
+
+#: ./content/liberticevent.py:37
+msgid "Address details"
+msgstr ""
+
+#: ./content/liberticevent.py:74
+msgid "Audio license"
+msgstr ""
+
+#: ./content/liberticevent.py:73
+msgid "Audio url"
+msgstr ""
+
+#: ./content/liberticevent.py:60
+msgid "Author email"
+msgstr ""
+
+#: ./content/liberticevent.py:58
+msgid "Author firstname"
+msgstr ""
+
+#: ./content/liberticevent.py:57
+msgid "Author lastname"
+msgstr ""
+
+#: ./content/liberticevent.py:59
+msgid "Author telephone"
+msgstr ""
+
+#: ./content/liberticevent.py:40
+msgid "Country"
+msgstr ""
+
+#: ./content/liberticevent.py:45
+msgid "Event end"
+msgstr ""
+
+#: ./content/liberticevent.py:26
+msgid "Event id"
+msgstr ""
+
+#: ./content/liberticevent.py:44
+msgid "Event start"
+msgstr ""
+
+#: ./content/liberticevent.py:77
+msgid "Events contained"
+msgstr ""
+
+#: ./content/liberticevent.py:78
+msgid "Events related"
+msgstr ""
+
+#: ./content/liberticevent.py:63
+msgid "Gallery"
+msgstr ""
+
+#: ./content/liberticevent.py:64
+msgid "Gallery license"
+msgstr ""
+
+#: ./content/source.py:19
+msgid "Ical"
+msgstr ""
+
+#: ./content/source.py:18
+msgid "Json"
+msgstr ""
+
+#: ./members/profile.py:45
+msgid "Libertic event operator"
+msgstr ""
+
+#: ./members/profile.py:40
+msgid "Libertic event supplier"
+msgstr ""
+
+#: ./content/liberticevent.py:20
+msgid "No license provided"
+msgstr ""
+
+#: ./content/liberticevent.py:66
+msgid "Photos1 license"
+msgstr ""
+
+#: ./content/liberticevent.py:65
+msgid "Photos1 url"
+msgstr ""
+
+#: ./content/liberticevent.py:68
+msgid "Photos2 license"
+msgstr ""
+
+#: ./content/liberticevent.py:67
+msgid "Photos2 url"
+msgstr ""
+
+#: ./content/liberticevent.py:70
+msgid "Photos3 license"
+msgstr ""
+
+#: ./content/liberticevent.py:69
+msgid "Photos3 url"
+msgstr ""
+
+#: ./content/liberticevent.py:75
+msgid "Press url"
+msgstr ""
+
+#: ./content/source.py:26
+msgid "Source url"
+msgstr ""
+
+#: ./content/liberticevent.py:38
+msgid "Street"
+msgstr ""
+
+#: ./content/liberticevent.py:39
+msgid "Town"
+msgstr ""
+
+#: ./content/source.py:28
+msgid "Type"
+msgstr ""
+
+#: ./content/liberticevent.py:72
+msgid "Video license"
+msgstr ""
+
+#: ./content/liberticevent.py:71
+msgid "Video url"
+msgstr ""
+
+#: ./content/source.py:20
+msgid "XML"
+msgstr ""
+
+#: ./content/source.py:21
+msgid "csv"
+msgstr ""
+
+#: ./content/liberticevent.py:53
+msgid "email"
+msgstr ""
+
+#: ./content/liberticevent.py:51
+msgid "firstname"
+msgstr ""
+
+#. Default: "Tick this box to indicate that you are an event operator"
+#: ./members/profile.py:46
+msgid "help_libertic_event_operator"
+msgstr ""
+
+#. Default: "Tick this box to indicate that you are an even supplier "
+#: ./members/profile.py:41
+msgid "help_libertic_event_supplier"
+msgstr ""
+
+#. Default: "Tick this box to indicate that you have found, read and accepted the terms of use for this site. "
+#: ./members/profile.py:34
+msgid "help_libertic_tgu"
+msgstr ""
+
+#. Default: "Source"
+#: ./content/liberticevent.py:24
+msgid "help_source"
+msgstr ""
+
+#. Default: "Source id"
+#: ./content/liberticevent.py:25
+msgid "help_source_id"
+msgstr ""
+
+#: ./content/liberticevent.py:27
+msgid "label_audience"
+msgstr ""
+
+#: ./content/liberticevent.py:50
+msgid "lastname"
+msgstr ""
+
+#: ./content/liberticevent.py:41
+msgid "latlong"
+msgstr ""
+
+#: ./content/liberticevent.py:54
+msgid "organiser"
+msgstr ""
+
+#: ./content/liberticevent.py:52
+msgid "telephone"
+msgstr ""
 

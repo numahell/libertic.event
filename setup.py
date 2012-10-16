@@ -98,6 +98,12 @@ setup(
         'collective.portlet.oembed',
         # with_ploneproduct_configviews
         'collective.configviews',
+        # dexterity
+        'five.grok',
+        'collective.z3cform.keywordwidget',
+        'plone.directives.dexterity',
+        'collective.dexteritytextindexer',
+        'plone.directives.form',
         # -*- Extra requirements: -*-
     ],
     extras_require = {

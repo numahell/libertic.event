@@ -32,5 +32,12 @@
       class=".profile.AddUserForm"
       permission="plone.app.controlpanel.UsersAndGroups"
     />
+  <browser:page
+      for="plone.app.layout.navigation.interfaces.INavigationRoot"
+      name="user-information"
+      layer="libertic.event.interfaces.ILayer"
+      class=".profile.CustomizedUserDataConfiglet"
+      permission="plone.app.controlpanel.UsersAndGroups"
+    />
 </configure>
 <!-- vim:set ft=xml: -->

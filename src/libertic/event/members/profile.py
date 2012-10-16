@@ -13,7 +13,7 @@ from plone.app.users.browser.personalpreferences import UserDataPanelAdapter
 from Products.CMFCore.utils import getToolByName
 
 from plone.app.users.browser import register
-from plone.app.users.browser.personalpreferences import UserDataPanel
+from plone.app.users.browser.personalpreferences import UserDataPanel, UserDataConfiglet
 
 from plone.app.users.userdataschema import (
     IUserDataSchemaProvider,
@@ -117,7 +117,7 @@ class LiberticPanelAdapter(UserDataPanelAdapter):
 
     @property
     def groups(self):
-        return getToolByName(self.context, 'portal_groups') 
+        return getToolByName(self.context, 'portal_groups')
 
     def get_libertic_event_supplier(self):
         return self.context.getProperty('libertic_event_supplier', '')
@@ -151,4 +151,8 @@ class CustomizedUserDataPanel(UserDataPanel):
         super(CustomizedUserDataPanel, self).__init__(context, request)
         self.form_fields = self.form_fields.omit('tgu')
 
+class CustomizedUserDataConfiglet(UserDataConfiglet):
+    def __init__(self, context, request):
+        super(CustomizedUserDataConfiglet, self).__init__(context, request)
+        self.form_fields = self.form_fields.omit('tgu')
 # vim:set et sts=4 ts=4 tw=80:

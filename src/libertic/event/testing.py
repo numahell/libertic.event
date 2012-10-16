@@ -29,9 +29,17 @@ from plone.testing import Layer, zodb, zca, z2
 from collective.cron import testing as base
 from plone.app.async import testing as asynctesting
 
+from libertic.event import interfaces as lei
+
 PLONE_MANAGER_NAME = 'Plone_manager'
 PLONE_MANAGER_ID = 'plonemanager'
 PLONE_MANAGER_PASSWORD = 'plonemanager'
+SUPPLIER_NAME = 'Plone_supplier'
+SUPPLIER_ID = 'plonesupplier'
+SUPPLIER_PASSWORD = 'plonesupplier'
+OPERATOR_NAME = 'Plone_operator'
+OPERATOR_ID = 'ploneoperator'
+OPERATOR_PASSWORD = 'ploneoperator'
 GENTOO_FF_UA = 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.1.3) Gecko/20090912 Gentoo Shiretoko/3.5.3'
 
 class LiberticEventLayer(base.CollectiveCronLayer):
@@ -149,7 +157,24 @@ class LayerMixin(base.LayerMixin):
                 PLONE_MANAGER_NAME,
                 PLONE_MANAGER_PASSWORD,
                 ['Manager']+TEST_USER_ROLES)
+        if not self['portal']['acl_users'].getUser(OPERATOR_NAME):
+            self.add_user(
+                self['portal'],
+                OPERATOR_ID,
+                OPERATOR_NAME,
+                OPERATOR_PASSWORD,
+                TEST_USER_ROLES)
+        if not self['portal']['acl_users'].getUser(SUPPLIER_NAME):
+            self.add_user(
+                self['portal'],
+                SUPPLIER_ID,
+                SUPPLIER_NAME,
+                SUPPLIER_PASSWORD,
+                TEST_USER_ROLES)
             self.logout()
+        portal_groups = self['portal'].portal_groups
+        portal_groups.addPrincipalToGroup(OPERATOR_ID, lei.groups['operator']['id'])
+        portal_groups.addPrincipalToGroup(SUPPLIER_ID, lei.groups['supplier']['id'])
         self.login(TEST_USER_NAME)
         self.setRoles(['Manager'])
         if not 'test-folder' in self['portal'].objectIds():

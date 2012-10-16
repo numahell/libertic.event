@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:five="http://namespaces.zope.org/five"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    xmlns:i18n="http://namespaces.zope.org/i18n"
+    xmlns:grok="http://namespaces.zope.org/grok"
+    xmlns:cmf="http://namespaces.zope.org/cmf"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    i18n_domain="libertic.event">
+  <include package="five.grok"/>
+  <include package="plone.behavior" file="meta.zcml" />
+  <include package="plone.directives.form" file="meta.zcml" />
+  <include package="plone.directives.form" />
+  <include package="zope.annotation" />
+  <permission id="libertic.source.View"           title="View libertic source"/>
+  <permission id="libertic.source.Edit"           title="Edit libertic source"/>
+  <permission id="libertic.source.Add"            title="Add libertic source"/>
+  <permission id="libertic.source.Delete"         title="Delete libertic source"/>
+  <permission id="libertic.event.View"            title="View libertic event"/>
+  <permission id="libertic.event.Edit"            title="Edit libertic event"/>
+  <permission id="libertic.event.Add"             title="Add libertic event"/>
+  <permission id="libertic.event.Delete"          title="Delete libertic event"/>
+  <permission id="libertic.eventsdatabase.View"    title="View libertic eventsdatabase"/>
+  <permission id="libertic.eventsdatabase.Edit"    title="Edit libertic eventsdatabase"/>
+  <permission id="libertic.eventsdatabase.Add"     title="Add libertic eventsdatabase"/>
+  <permission id="libertic.eventsdatabase.Delete"  title="Delete libertic eventsdatabase"/>
+  <grok:grok package="."/>
+</configure>
+<!-- vim:set ft=xml: -->

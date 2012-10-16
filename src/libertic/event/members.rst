@@ -21,12 +21,10 @@ We will have groups mapped to roles::
     >>> 'LiberticOperator' in operators.getRoles()
     True
 
-
 The user role (Member (simple) & anonymous)
 --------------------------------------------
 He can see the website pages.
 He can't do anything the others can like viewving events database or publishing events.
-
 
 The supplier role
 ----------------------
@@ -63,8 +61,8 @@ With supplier role, i can promote myself to operator
     >>> navig = browser.new('http://foo/plone/@@personal-information', 'foosupplier', 'foofoo')
     >>> navig.getControl(name='form.libertic_event_operator').value = True
     >>> navig.getControl(name="form.actions.save").click()
-    >>> [a.getId() for a in operators.getAllGroupMembers()]
-    ['foosupplier']
+    >>> 'foosupplier' in [a.getId() for a in operators.getAllGroupMembers()]
+    True
 
 With supplier role, i can demote myself from operator role
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -73,8 +71,8 @@ With supplier role, i can demote myself from operator role
     >>> navig = browser.new('http://foo/plone/@@personal-information', 'foosupplier', 'foofoo')
     >>> navig.getControl(name='form.libertic_event_operator').value = False
     >>> navig.getControl(name="form.actions.save").click()
-    >>> [a.getId() for a in operators.getAllGroupMembers()]
-    []
+    >>> 'foosupplier' in [a.getId() for a in operators.getAllGroupMembers()]
+    False
 
 Operator role
 ---------------------
@@ -105,9 +103,8 @@ With operator role, we can promote to supplier
     >>> navig = browser.new('http://foo/plone/@@personal-information', 'foooperator', 'foofoo')
     >>> navig.getControl(name='form.libertic_event_supplier').value = True
     >>> navig.getControl(name="form.actions.save").click()
-    >>> [a.getId() for a in suppliers.getAllGroupMembers()]
-    ['foooperator', 'foosupplier']
- 
+    >>> 'foooperator' in [a.getId() for a in suppliers.getAllGroupMembers()]
+    True
 
 With operator role, we can demote from supplier
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -116,7 +113,6 @@ With operator role, we can demote from supplier
     >>> navig = browser.new('http://foo/plone/@@personal-information', 'foooperator', 'foofoo')
     >>> navig.getControl(name='form.libertic_event_supplier').value = False
     >>> navig.getControl(name="form.actions.save").click()
-    >>> [a.getId() for a in suppliers.getAllGroupMembers()]
-    ['foosupplier']
-
+    >>> 'foooperator' in [a.getId() for a in suppliers.getAllGroupMembers()]
+    False
 

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import logging
 import transaction
 from Products.CMFCore.utils import getToolByName
@@ -7,14 +8,50 @@ from plone.app.multilingual.browser.controlpanel import MultiLanguageControlPane
 from plone.app.multilingual.browser.controlpanel import MultiLanguageOptionsControlPanelAdapter
 from plone.app.multilingual.browser.controlpanel import MultiLanguageExtraOptionsAdapter
 
+from plone.dexterity.utils import createContentInContainer
 from Products.CMFPlone.utils import _createObjectByType
+from libertic.event import interfaces as i
+
 BASE_CONTENTS_TO_INIT = [
-#    {'id':'fr', 'title':"FR", 'type':'Folder', 'language':'fr', 'nav':False},
+    {'path':'/fr',
+     'title':u"ODE",
+     'type':'Folder', 'language':'fr', 'nav':False},
+    {'path':'/en',
+     'title':u"ODE",
+     'type':'Folder', 'language':'en', 'nav':False},
+    {'path':'/fr/database',
+     'title':u"Base de données des évenements",
+     'type':'libertic_database', 'language':'fr', 'nav':False},
+    {'path':'/en/database',
+     'title':u"Event database",
+     'type':'libertic_database', 'language':'en', 'nav':False},
 ]
 
-EN_BASE_CONTENTS_TO_INIT = [
-#    {'id':'en', 'title':"EN", 'type':'Folder', 'language':'en', 'nav':False},
+INDEXES = {
+    'FieldIndex': [
+        'sid', 'eid', 'source',
+        'town', 'country',
+        'author_lastname', 'author_firstname',
+        'author_telephone', 'author_email',
+        'lastname', 'firstname', 'telephone', 'email',
+        'organiser',
+    ],
+    'KeywordIndex' : [
+        'latlong',
+        'contained', 'related',
+    ],
+    'ZCTextIndex' : [
+        'address',
+    ],
+    'DateIndex' : [
+        'event_start', 'event_end',
+    ],
+}
+
+METADATAS = [
+    'sid', 'eid','latlong','related', 'contained',
 ]
+
 
 def publish_all(context):
     url = getToolByName(context, 'portal_url')
@@ -31,21 +68,32 @@ def publish_all(context):
         wftool.doActionFor(fp.getObject(), 'publish')
 
 def create_content(context, structure):
-    existing = set(context.objectIds())
+    portal = getToolByName(context, 'portal_url').getPortalObject()
+    ppath = '/'.join(portal.getPhysicalPath())
     # Initialize some contents
     for item_page in structure:
-        item_page_id = item_page['id']
-        if item_page_id not in existing:
-            page = _createObjectByType(
-                item_page['type'],
-                context,
-                id=item_page_id,
-            )
-            page.processForm()
-            page.setTitle(item_page['title'])
-            page.setExcludeFromNav(not item_page.get('nav', False))
-            page.setLanguage(item_page['language'])
-            page.reindexObject()
+        parts = item_page['path'].split('/')
+        id = parts[-1]
+        parent_path = ppath + '/'.join(parts[:-1])
+        parent = portal.restrictedTraverse(parent_path)
+        existing = set(parent.objectIds())
+        typ = item_page['type']
+        exclnav = item_page.get('nav', False)
+        title = item_page['title']
+        lang = item_page['language']
+        if id not in existing:
+            if typ in ['libertic_database', 
+                       'libertic_event', 
+                       'libertic_source']:
+                page = createContentInContainer(parent, typ, id=id)
+            else:
+                page = _createObjectByType(typ, context, id=id)
+                page.processForm()
+            page.setTitle(title)
+            page.setExcludeFromNav(exclnav)
+            page.setLanguage(lang)
+        page = parent[id]
+        page.reindexObject()
 
 def full_reindex(portal):
     cat = getToolByName(portal, 'portal_catalog')
@@ -69,7 +117,6 @@ def install_pamultilingual(portal):
         SetupMultilingualSite(portal).set_default_language_content()
         SetupMultilingualSite(portal).move_default_language_content()
 
-from libertic.event import interfaces as i
 
 def install_groups(portal):
     l = logging.getLogger('libertic.install_groups')
@@ -88,6 +135,31 @@ def install_groups(portal):
                 'description': infos['description'],
             })
 
+# Define custom indexes
+class ZCTextIndex_extra:
+    lexicon_id = 'plone_lexicon'
+    index_type = 'Okapi BM25 Rank'
+
+ZCTextIndex_extra = ZCTextIndex_extra()
+SelectedTextIndex_type = 'ZCTextIndex'
+SelectedTextIndex_extra = ZCTextIndex_extra
+
+def setup_catalog(portal):
+    log = logging.getLogger('libertic.event.catalog')
+    portal_catalog = getToolByName(portal, 'portal_catalog')
+    for typ in INDEXES:
+        for idx in INDEXES[typ]:
+            e = None
+            if typ == 'ZCTextIndex':
+                e= SelectedTextIndex_extra
+            if not idx in portal_catalog.indexes():
+                log.info('Adding index: %s' % idx)
+                portal_catalog.manage_addIndex(idx, typ, e)
+
+    for column in METADATAS:
+        if not column in portal_catalog.schema():
+            log.info('Adding metadata: %s' % column)
+            portal_catalog.manage_addColumn(column)
 
 def setupVarious(context):
     """Miscellanous steps import handle.
@@ -103,10 +175,11 @@ def setupVarious(context):
         context.getSite(), 'portal_url'
     ).getPortalObject()
     install_pamultilingual(portal)
+    create_content(portal, BASE_CONTENTS_TO_INIT)
     publish_all(portal)
     install_groups(portal)
     full_reindex(portal)
-    #create_content(portal, EN_BASE_CONTENTS_TO_INIT)
+    setup_catalog(portal)
 
 def setupQi(context):
     """Miscellanous steps import handle.
@@ -114,6 +187,7 @@ def setupQi(context):
     logger = logging.getLogger('libertic.event / setuphandler')
 
     # Ordinarily, GenericSetup handlers check for the existence of XML files.
+
     # Here, we are not parsing an XML file, but we use this text file as a
     # flag to check that we actually meant for this import step to be run.
     # The file is found in profiles/default.

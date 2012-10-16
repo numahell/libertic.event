@@ -72,5 +72,6 @@
   <plone:static directory="static" type="theme" name="libertic.event" />
 
   <includeOverrides package=".members"/>
+  <includeOverrides package=".content"/>
 </configure>
 <!-- vim:set ft=xml: -->

@@ -12,5 +12,77 @@
       <role name="Owner"/>
       <role name="Site Administrator"/>
     </permission>
+    <!-- default private permissions of database -->
+    <permission name="View libertic eventsdatabase" acquire="False">
+      <role name="Manager"/>
+      <role name="Site Administrator"/>
+    </permission>
+    <permission name="Add libertic eventsdatabase" acquire="False">
+      <role name="Manager"/>
+      <role name="Site Administrator"/>
+    </permission>
+    <permission name="Edit libertic eventsdatabase" acquire="False">
+      <role name="Manager"/>
+      <role name="Site Administrator"/>
+    </permission>
+    <permission name="Delete libertic eventsdatabase" acquire="False">
+      <role name="Manager"/>
+      <role name="Site Administrator"/>
+    </permission> 
+    <!--
+    the following are controlled via workflows 
+    -->
+    <!--
+    <permission name="View libertic event" acquire="False">
+      <role name="LiberticSupplier"/>
+      <role name="LiberticOperator" />
+      <role name="Manager"/>
+      <role name="Owner"/>
+      <role name="Contributor"/>
+      <role name="Editor"/>
+      <role name="Site Administrator"/>
+    </permission>
+    <permission name="Add libertic event" acquire="False">
+      <role name="LiberticSupplier"/>
+      <role name="Manager"/>
+      <role name="Site Administrator"/>
+    </permission>
+    <permission name="Edit libertic event" acquire="False">
+      <role name="Owner"/>
+      <role name="Contributor"/>
+      <role name="Editor"/>
+      <role name="Manager"/>
+      <role name="Site Administrator"/>
+    </permission>
+    <permission name="Delete libertic event" acquire="False">
+      <role name="Owner"/>
+      <role name="Manager"/>
+      <role name="Site Administrator"/>
+    </permission>
+    <permission name="Add libertic source" acquire="False">
+      <role name="LiberticSupplier"/>
+      <role name="Manager"/>
+      <role name="Site Administrator"/>
+    </permission>
+    <permission name="View libertic source" acquire="False">
+      <role name="Owner"/>
+      <role name="Editor"/>
+      <role name="Contributor"/>
+      <role name="Manager"/>
+      <role name="Site Administrator"/>
+    </permission>
+    <permission name="Delete libertic source" acquire="False">
+      <role name="Owner"/>
+      <role name="Manager"/>
+      <role name="Site Administrator"/>
+    </permission>
+    <permission name="Edit libertic source" acquire="False">
+      <role name="Owner"/>
+      <role name="Contributor"/>
+      <role name="Editor"/>
+      <role name="Manager"/>
+      <role name="Site Administrator"/>
+    </permission>
+    -->
   </permissions>
 </rolemap>

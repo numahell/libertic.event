@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 __docformat__ = 'restructuredtext en'
+import csv
 from five import grok
 from zope import schema
+from StringIO import StringIO
 
 from zope.interface import implements, alsoProvides
 
@@ -17,6 +19,12 @@ from libertic.event import MessageFactory as _
 from z3c.relationfield.schema import RelationList, Relation, RelationChoice
 from plone.formwidget.contenttree import ObjPathSourceBinder
 from Products.CMFDefault.utils import checkEmailAddress
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
+
+try:
+    import json
+except:
+    import simplejson as json
 
 def is_email(value):
     checkEmailAddress(value)
@@ -26,6 +34,7 @@ class NoLicenseError(Invalid):
     __doc__ = _(u"No license provided")
 
 
+datefmt = '%Y%m%dT%H%M'
 
 def is_latlon(value):
     try:
@@ -37,6 +46,106 @@ def is_latlon(value):
         raise Invalid(
             _('This is not a lat long value, eg : -47.5;48.5')
         )
+
+class csv_dialect(csv.Dialect):
+    delimiter = ','
+    quotechar = '"'
+    doublequote = True
+    skipinitialspace = False
+    lineterminator = '\n'
+    quoting = csv.QUOTE_ALL
+
+def export_csv(request, titles, rows, filename='file.csv'):
+        output = StringIO()
+        csvwriter = csv.DictWriter(
+            output,
+            fieldnames=titles,
+            extrasaction='ignore',
+            dialect = csv_dialect)
+        titles_row = dict([(title, title) for title in titles])
+        rows = [titles_row] + rows
+        for i, row in enumerate(rows):
+            for cell in row:
+                if isinstance(row[cell], unicode):
+                    row[cell] = row[cell].encode('utf-8')
+        csvwriter.writerows(rows)
+        resp = output.getvalue()
+        lresp = len(resp)
+        request.RESPONSE.setHeader('Content-Type','text/csv')
+        request.RESPONSE.addHeader(
+            "Content-Disposition","filename=%s"%filename)
+        request.RESPONSE.setHeader('Content-Length', len(resp))
+        request.RESPONSE.write(resp)
+
+def data(ctx):
+    sdata =  {
+        'source': ctx.source,
+        'sid': ctx.sid,
+        'eid': ctx.eid,
+        'title': ctx.title,
+        'description': ctx.description,
+        'subject':  ctx.subject,
+        'target': ctx.target,
+        'address': ctx.address,
+        'address_details': ctx.address_details,
+        'street': ctx.street,
+        'town': ctx.town,
+        'country': ctx.country,
+        'latlong': ctx.latlong,
+        'lastname': ctx.lastname,
+        'firstname': ctx.firstname,
+        'telephone': ctx.telephone,
+        'email': ctx.email,
+        'organiser': ctx.organiser,
+        'author_lastname': ctx.author_lastname,
+        'author_firstname': ctx.author_firstname,
+        'author_telephone': ctx.author_telephone,
+        'author_email': ctx.author_email,
+        'gallery_url': ctx.gallery_url,
+        'gallery_license': ctx.gallery_license,
+        'photos1_url': ctx.photos1_url,
+        'photos1_license': ctx.photos1_license,
+        'photos2_url': ctx.photos2_url,
+        'photos2_license': ctx.photos2_license,
+        'photos3_url': ctx.photos3_url,
+        'photos3_license': ctx.photos3_license,
+        'video_url': ctx.video_url,
+        'video_license': ctx.video_license,
+        'audio_url': ctx.audio_url,
+        'audio_license': ctx.audio_license,
+        'press_url': ctx.press_url,
+    }
+    effective, effectivev = '', ctx.effective()
+    if effectivev:
+        effective = effectivev.asdatetime().strftime(datefmt)
+    sdata['effective'] = effective
+
+    expires, expiresv = '', ctx.expires()
+    if expiresv:
+        expires = expiresv.asdatetime().strftime(datefmt)
+    sdata['expires'] = expires
+
+    event_start, event_startv = '', ctx.event_start
+    if event_startv:
+        event_start = event_startv.strftime(datefmt)
+    sdata['event_start'] = event_start
+
+    event_end, event_endv = '', ctx.event_end
+    if event_endv:
+        event_end = event_endv.strftime(datefmt)
+    sdata['event_end'] = event_end
+
+    for relate in ['contained', 'related']:
+        l = []
+        for item in getattr(ctx, relate, []):
+            obj = item.to_object
+            it = {"sid": obj.sid,
+                  "eid": obj.eid}
+            if not it in l:
+                l.append(it)
+        sdata[relate] = l
+    return sdata
+
 
 class SourceMapping(form.Schema):
     sid = schema.TextLine(title=_('label_source_id', default='Source id'), required=True)
@@ -109,23 +218,23 @@ class ILiberticEvent(form.Schema):
             ),
     )
 
-    @invariant
-    def validateDataLicense(data):
-        for url, license in (
-            ('gallery_url', 'gallery_license'),
-            ('photos1_url', 'photos1_license'),
-            ('photos2_url', 'photos2_license'),
-            ('photos3_url', 'photos3_license'),
-            ('video_url',   'video_license'),
-            ('audio_url',   'audio_license'),
-            ('press_url',   'press_license'),
-            ):
-            vurl = getattr(data, url, None)
-            vlicense = getattr(data, license, None)
-            if vurl and not vlicense:
-                raise  Invalid(
-                _('Missing relative license for ${url}.',
-                mapping = {'url':url,}))
+@invariant
+def validateDataLicense(data):
+    for url, license in (
+        ('gallery_url', 'gallery_license'),
+        ('photos1_url', 'photos1_license'),
+        ('photos2_url', 'photos2_license'),
+        ('photos3_url', 'photos3_license'),
+        ('video_url',   'video_license'),
+        ('audio_url',   'audio_license'),
+        ('press_url',   'press_license'),
+        ):
+        vurl = getattr(data, url, None)
+        vlicense = getattr(data, license, None)
+        if vurl and not vlicense:
+            raise  Invalid(
+            _('Missing relative license for ${url}.',
+            mapping = {'url':url,}))
 
 alsoProvides(ILiberticEvent, form.IFormFieldProvider)
 
@@ -144,23 +253,70 @@ class View(dexterity.DisplayForm):
     grok.context(ILiberticEvent)
     grok.require('libertic.event.View')
 
-class ILiberticImportedEvent(ILiberticEvent):
+
+class ILiberticExportImportedEvent(ILiberticEvent):
     """A libertic event"""
     contained = schema.Tuple(title=_('Events contained'), required=False,
                              value_type=schema.Object(SourceMapping))
-    related =   schema.Tuple(title=_('Tvents related'),   required=False,
+    related = schema.Tuple(title=_('Tvents related'), required=False,
                              value_type=schema.Object(SourceMapping))
 
 
+class Json(grok.View):
+    grok.context(ILiberticEvent)
+    grok.require('libertic.event.View')
+
+    def render(self):
+        sdata = data(self.context)
+        resp = json.dumps(sdata)
+        lresp = len(resp)
+        self.request.RESPONSE.setHeader('Content-Type','application/json')
+        self.request.RESPONSE.addHeader(
+            "Content-Disposition","filename=%s.json" % (
+                self.context.getId()))
+        self.request.RESPONSE.setHeader('Content-Length', len(resp))
+        self.request.RESPONSE.write(resp)
 
 
+class Xml(grok.View):
+    grok.context(ILiberticEvent)
+    grok.require('libertic.event.View')
+    xml = ViewPageTemplateFile('liberticevent_templates/xml.pt')
+
+    def __call__(self):
+        sdata = data(self.context)
+        resp = self.xml(**sdata).encode(
+            'utf-8')
+        lresp = len(resp)
+        self.request.RESPONSE.setHeader('Content-Type','text/xml')
+        self.request.RESPONSE.addHeader(
+            "Content-Disposition","filename=%s.xml" % (
+                self.context.getId()))
+        self.request.RESPONSE.setHeader('Content-Length', len(resp))
+        self.request.RESPONSE.write(resp)
 
 
+class Csv(grok.View):
+    grok.context(ILiberticEvent)
+    grok.require('libertic.event.View')
 
-
-
-
-
-
+    def render(self):
+        sdata = data(self.context)
+        for it in 'target', 'subject':
+            sdata[it] = '|'.join(sdata[it])
+        for it in 'related', 'contained':
+            values = []
+            for item in sdata[it]:
+                values.append(
+                    '%s_|_%s' % (
+                    item['sid'],
+                    item['eid'],
+                ))
+            sdata[it] = '|'.join(values)
+        titles = sdata.keys()
+        export_csv(
+            self.request,
+            titles,
+            [sdata])
 
 # vim:set et sts=4 ts=4 tw=80:

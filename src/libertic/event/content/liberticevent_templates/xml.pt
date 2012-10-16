@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<event
+xmlns:tal="http://xml.zope.org/namespaces/tal"
+xmlns:metal="http://xml.zope.org/namespaces/metal"
+xml:lang="en" lang="en"
+tal:define="ctx options">
+<source tal:content="ctx/source"/>
+<sid tal:content="ctx/sid"/>
+<eid tal:content="ctx/eid"/>
+<title tal:content="ctx/title"/>
+<description tal:content="ctx/description"/>
+<tal:block tal:repeat="s ctx/subject"><subjet tal:content="s"/> </tal:block>
+<tal:block tal:repeat="s ctx/target"><target tal:content="s"/> </tal:block>
+<address tal:content="ctx/address"/>
+<address_details tal:content="ctx/address_details"/>
+<street tal:content="ctx/street"/>
+<town tal:content="ctx/town"/>
+<country tal:content="ctx/country"/>
+<latlong tal:content="ctx/latlong"/>
+<lastname tal:content="ctx/lastname"/>
+<firstname tal:content="ctx/firstname"/>
+<telephone tal:content="ctx/telephone"/>
+<email tal:content="ctx/email"/>
+<organiser tal:content="ctx/organiser"/>
+<author_lastname tal:content="ctx/author_lastname"/>
+<author_firstname tal:content="ctx/author_firstname"/>
+<author_telephone tal:content="ctx/author_telephone"/>
+<author_email tal:content="ctx/author_email"/>
+<gallery_url tal:content="ctx/gallery_url"/>
+<gallery_license tal:content="ctx/gallery_license"/>
+<photos1_url tal:content="ctx/photos1_url"/>
+<photos1_license tal:content="ctx/photos1_license"/>
+<photos2_url tal:content="ctx/photos2_url"/>
+<photos2_license tal:content="ctx/photos2_license"/>
+<photos3_url tal:content="ctx/photos3_url"/>
+<photos3_license tal:content="ctx/photos3_license"/>
+<video_url tal:content="ctx/video_url"/>
+<video_license tal:content="ctx/video_license"/>
+<audio_url tal:content="ctx/audio_url"/>
+<audio_license tal:content="ctx/audio_license"/>
+<expires tal:content="ctx/expires"/>
+<effective tal:content="ctx/effective"/>
+<event_start tal:content="ctx/event_start"/>
+<event_end tal:content="ctx/event_end"/>
+<tal:block tal:repeat="item ctx/related">
+<related>
+  <sid tal:content="item/sid"/>
+  <eid tal:content="item/eid"/>
+</related>
+</tal:block>              
+<tal:block tal:repeat="item ctx/contained">
+<contained>
+  <sid tal:content="item/sid"/>
+  <eid tal:content="item/eid"/>
+</contained>
+</tal:block>
+</event>

@@ -12,6 +12,13 @@
     <h1 class="documentFirstHeading" tal:content="context/Title" /> 
 
     <p class="documentDescription" tal:content="context/Description" />
+    <p>View as</p>
+    <ul> 
+      <li><a href="json">json</a></li>
+      <li><a href="csv">csv</a></li>
+      <li><a href="ical">ical</a></li>
+      <li><a href="xml">xml</a></li>
+    </ul>
 
     <tal:block repeat="widget view/widgets/values">
         <div class="field" tal:condition="python:widget.__name__ not in ('IBasic.title', 'IBasic.description', 'title', 'description',)">

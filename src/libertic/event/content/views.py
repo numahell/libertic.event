@@ -34,9 +34,14 @@ class EventsViewMixin(grok.View):
     def items(self):
         sdata = []
         if IATTopic.providedBy(self.context):
-            sdata = self.context.queryCatalog()
+            sdata = [a
+                     for a in self.context.queryCatalog()
+                     if a.portal_type in ['libertic_event']]
         if ICollection.providedBy(self.context):
-            sdata = self.context.results(batch=False, brains=True)
+            sdata = [a
+                     for a in self.context.results(batch=False,
+                                                   brains=True)
+                     if a.portal_type in ['libertic_event']]
         if IDatabase.providedBy(self.context):
             catalog = getToolByName(self.context, 'portal_catalog')
             query = {

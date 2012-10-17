@@ -1,4 +1,3 @@
-import pdb;pdb.set_trace()  ## Breakpoint ##
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 __docformat__ = 'restructuredtext en'

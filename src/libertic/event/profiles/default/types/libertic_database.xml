@@ -18,6 +18,10 @@
  <property name="allow_discussion">False</property>
  <property name="default_view">view</property>
  <property name="view_methods">
+  <element value="eventsasical"/>
+  <element value="eventsasxml"/>
+  <element value="eventsascsv"/>
+  <element value="eventsasjson"/>
   <element value="view"/>
   <element value="json"/>
   <element value="ical"/>
@@ -26,12 +30,13 @@
  </property>
  <property name="default_view_fallback">False</property>
  <property name="add_permission">libertic.eventsdatabase.Add</property>
- <property name="klass">plone.dexterity.content.Container</property>
+ <property name="klass">libertic.event.content.database.Database</property>
  <property name="behaviors">
    <element value="plone.app.dexterity.behaviors.metadata.IDublinCore"/>
    <element value="plone.app.content.interfaces.INameFromTitle"/>
    <element value="plone.app.dexterity.behaviors.exclfromnav.IExcludeFromNavigation"/>
    <element value="plone.multilingualbehavior.interfaces.IDexterityTranslatable"/>
+   <element value="plone.app.referenceablebehavior.referenceable.IReferenceable"/>
    <element value="collective.dexteritytextindexer.behavior.IDexterityTextIndexer"/>
  </property>
  <property name="schema">libertic.event.content.database.IDatabase</property>

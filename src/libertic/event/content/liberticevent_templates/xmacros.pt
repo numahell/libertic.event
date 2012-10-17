@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tal:block xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:metal="http://xml.zope.org/namespaces/metal">
+  <metal:block metal:define-macro="item">
+    <event xml:lang="en" lang="en">
+    <source tal:content="ctx/source"></source>
+    <sid tal:content="ctx/sid"></sid>
+    <eid tal:content="ctx/eid"></eid>
+    <title tal:content="ctx/title"></title>
+    <description tal:content="ctx/description"></description>
+    <tal:block tal:repeat="s ctx/subject">
+      <subjet tal:content="s"></subjet>
+    </tal:block>
+    <tal:block tal:repeat="s ctx/target">
+      <target tal:content="s"></target>
+    </tal:block>
+    <address tal:content="ctx/address"/>
+    <address_details tal:content="ctx/address_details"/>
+    <street tal:content="ctx/street"/>
+    <town tal:content="ctx/town"></town>
+    <country tal:content="ctx/country"></country>
+    <latlong tal:content="ctx/latlong"></latlong>
+    <lastname tal:content="ctx/lastname"></lastname>
+    <firstname tal:content="ctx/firstname"></firstname>
+    <telephone tal:content="ctx/telephone"></telephone>
+    <email tal:content="ctx/email"></email>
+    <organiser tal:content="ctx/organiser"></organiser>
+    <author_lastname tal:content="ctx/author_lastname"></author_lastname>
+    <author_firstname tal:content="ctx/author_firstname"></author_firstname>
+    <author_telephone tal:content="ctx/author_telephone"></author_telephone>
+    <author_email tal:content="ctx/author_email"></author_email>
+    <gallery_url tal:content="ctx/gallery_url"></gallery_url>
+    <gallery_license tal:content="ctx/gallery_license"></gallery_license>
+    <photos1_url tal:content="ctx/photos1_url"></photos1_url>
+    <photos1_license tal:content="ctx/photos1_license"/>
+    <photos2_url tal:content="ctx/photos2_url"/>
+    <photos2_license tal:content="ctx/photos2_license"/>
+    <photos3_url tal:content="ctx/photos3_url"/>
+    <photos3_license tal:content="ctx/photos3_license"/>
+    <video_url tal:content="ctx/video_url"></video_url>
+    <video_license tal:content="ctx/video_license"></video_license>
+    <audio_url tal:content="ctx/audio_url"></audio_url>
+    <audio_license tal:content="ctx/audio_license"/>
+    <expires tal:content="ctx/expires"></expires>
+    <effective tal:content="ctx/effective"></effective>
+    <event_start tal:content="ctx/event_start"></event_start>
+    <event_end tal:content="ctx/event_end"></event_end>
+    <tal:block tal:repeat="item ctx/related">
+      <related>
+      <sid tal:content="item/sid"></sid>
+      <eid tal:content="item/eid"></eid>
+      </related>
+    </tal:block>
+    <tal:block tal:repeat="item ctx/contained">
+      <contained>
+      <sid tal:content="item/sid"></sid>
+      <eid tal:content="item/eid"></eid>
+      </contained>
+    </tal:block>
+    </event>
+  </metal:block>
+</tal:block>

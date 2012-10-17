@@ -23,12 +23,13 @@
  </property>
  <property name="default_view_fallback">False</property>
  <property name="add_permission">libertic.event.Add</property>
- <property name="klass">plone.dexterity.content.Container</property>
+ <property name="klass">libertic.event.content.liberticevent.LiberticEvent</property>
  <property name="behaviors">
    <element value="plone.app.dexterity.behaviors.metadata.IDublinCore"/>
    <element value="plone.app.content.interfaces.INameFromTitle"/>
    <element value="plone.app.dexterity.behaviors.metadata.IPublication"/>
    <element value="plone.app.dexterity.behaviors.exclfromnav.IExcludeFromNavigation"/>
+   <element value="plone.app.referenceablebehavior.referenceable.IReferenceable"/>
    <element value="plone.multilingualbehavior.interfaces.IDexterityTranslatable"/>
    <element value="collective.dexteritytextindexer.behavior.IDexterityTextIndexer"/>
  </property>

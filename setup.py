@@ -103,6 +103,7 @@ setup(
         'collective.z3cform.keywordwidget',
         'plone.directives.dexterity',
         'collective.dexteritytextindexer',
+        'plone.app.referenceablebehavior',
         'plone.directives.form',
         # -*- Extra requirements: -*-
     ],

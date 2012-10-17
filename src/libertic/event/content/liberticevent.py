@@ -1,3 +1,4 @@
+import pdb;pdb.set_trace()  ## Breakpoint ##
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 __docformat__ = 'restructuredtext en'
@@ -11,6 +12,7 @@ from zope.interface import implements, alsoProvides
 from zope.interface import invariant, Invalid
 from plone.app.textfield import RichText
 from plone.namedfile.field import NamedImage
+from plone.dexterity.content import Container
 from plone.directives import form, dexterity
 
 from libertic.event import MessageFactory as _
@@ -47,6 +49,7 @@ def is_latlon(value):
             _('This is not a lat long value, eg : -47.5;48.5')
         )
 
+
 class csv_dialect(csv.Dialect):
     delimiter = ','
     quotechar = '"'
@@ -54,6 +57,7 @@ class csv_dialect(csv.Dialect):
     skipinitialspace = False
     lineterminator = '\n'
     quoting = csv.QUOTE_ALL
+
 
 def export_csv(request, titles, rows, filename='file.csv'):
         output = StringIO()
@@ -217,6 +221,12 @@ class ILiberticEvent(form.Schema):
                     **{'portal_type':'libertic_event'})
             ),
     )
+alsoProvides(ILiberticEvent, form.IFormFieldProvider)
+
+
+class LiberticEvent(Container):
+    implements(ILiberticEvent)
+
 
 @invariant
 def validateDataLicense(data):
@@ -235,8 +245,6 @@ def validateDataLicense(data):
             raise  Invalid(
             _('Missing relative license for ${url}.',
             mapping = {'url':url,}))
-
-alsoProvides(ILiberticEvent, form.IFormFieldProvider)
 
 
 class AddForm(dexterity.AddForm):
@@ -282,11 +290,14 @@ class Xml(grok.View):
     grok.context(ILiberticEvent)
     grok.require('libertic.event.View')
     xml = ViewPageTemplateFile('liberticevent_templates/xml.pt')
+    _macros = ViewPageTemplateFile('liberticevent_templates/xmacros.pt')
+    @property
+    def xmacros(self):
+        return self._macros.macros
 
     def __call__(self):
         sdata = data(self.context)
-        resp = self.xml(**sdata).encode(
-            'utf-8')
+        resp = self.xml(ctx=sdata).encode('utf-8')
         lresp = len(resp)
         self.request.RESPONSE.setHeader('Content-Type','text/xml')
         self.request.RESPONSE.addHeader(

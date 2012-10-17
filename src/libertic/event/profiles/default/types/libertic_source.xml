@@ -19,11 +19,12 @@
  </property>
  <property name="default_view_fallback">False</property>
  <property name="add_permission">libertic.source.Add</property>
- <property name="klass">plone.dexterity.content.Container</property>
+ <property name="klass">libertic.event.content.source.Source</property>
  <property name="behaviors">
    <element value="plone.app.dexterity.behaviors.metadata.IDublinCore"/>
    <element value="plone.app.content.interfaces.INameFromTitle"/>
    <element value="plone.app.dexterity.behaviors.exclfromnav.IExcludeFromNavigation"/>
+   <element value="plone.app.referenceablebehavior.referenceable.IReferenceable"/>
  </property>
  <property name="schema">libertic.event.content.source.ISource</property>
  <property

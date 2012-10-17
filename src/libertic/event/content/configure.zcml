@@ -26,6 +26,15 @@
   <permission id="libertic.eventsdatabase.Edit"    title="Edit libertic eventsdatabase"/>
   <permission id="libertic.eventsdatabase.Add"     title="Add libertic eventsdatabase"/>
   <permission id="libertic.eventsdatabase.Delete"  title="Delete libertic eventsdatabase"/>
+  <class class="Products.ATContentTypes.content.topic.ATTopic">
+    <implements interface=".views.IEventsCollection"/>
+  </class>
+  <class class="plone.app.collection.collection.Collection">
+    <implements interface=".views.IEventsCollection"/>
+  </class>
+  <class class=".database.Database">
+    <implements interface=".views.IEventsCollection"/>
+  </class>
   <grok:grok package="."/>
 </configure>
 <!-- vim:set ft=xml: -->

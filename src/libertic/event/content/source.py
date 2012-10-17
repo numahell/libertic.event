@@ -9,6 +9,7 @@ from plone.directives import form, dexterity
 
 from libertic.event import MessageFactory as _
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
+from plone.dexterity.content import Container
 
 sources = SimpleVocabulary(
     [SimpleTerm(value=u'json', title=_(u'Json')),
@@ -22,8 +23,11 @@ class ISource(form.Schema):
     source = schema.URI(title=_('Source url'), required=True)
     activated = schema.Bool(title=_('Activated to be parsed'), required=True, default=True)
     type = schema.Choice(title=_(u"Type"), vocabulary=sources, required=True,)
-
 alsoProvides(ISource, form.IFormFieldProvider)
+
+
+class Source(Container):
+    implements(ISource) 
 
 
 class AddForm(dexterity.AddForm):

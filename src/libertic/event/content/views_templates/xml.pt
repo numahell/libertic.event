@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tal:block xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:metal="http://xml.zope.org/namespaces/metal">
+  <metal:block metal:define-macro="items">
+    <events xml:lang="en" lang="en" >
+    <tal:block tal:repeat="ctx options/data">
+      <metal:block use-macro="view/xmacros/item"/>
+    </tal:block>
+    </events>
+  </metal:block>
+</tal:block>

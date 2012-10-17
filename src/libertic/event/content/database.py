@@ -7,12 +7,17 @@ from zope.interface import implements, alsoProvides
 
 from plone.directives import form, dexterity
 
+from plone.dexterity.content import Container
+
 
 class IDatabase(form.Schema):
     """A Database of opendata events"""
-
 alsoProvides(IDatabase, form.IFormFieldProvider)
 
+
+class Database(Container):
+    implements(IDatabase)
+ 
 
 class AddForm(dexterity.AddForm):
     grok.name('libertic_database')

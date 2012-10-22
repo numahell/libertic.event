@@ -26,7 +26,7 @@
    <element value="plone.app.dexterity.behaviors.exclfromnav.IExcludeFromNavigation"/>
    <element value="plone.app.referenceablebehavior.referenceable.IReferenceable"/>
  </property>
- <property name="schema">libertic.event.content.source.ISource</property>
+ <property name="schema">libertic.event.interfaces.ISource</property>
  <property
     name="model_source">&lt;model xmlns="http://namespaces.plone.org/supermodel/schema"&gt;
     &lt;schema /&gt;

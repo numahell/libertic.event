@@ -4,8 +4,21 @@ import transaction
 from OFS.Folder import Folder
 
 import unittest2 as unittest
+from zope.component.interfaces import IFactory
 
+from plone.testing.zca import UNIT_TESTING
 from zope.configuration import xmlconfig
+from plone.dexterity.interfaces import IDexterityFTI
+import mocker
+import zope.component
+
+from zope.component import (getUtility,
+                           getAdapter,
+                           getAdapters,
+                           queryMultiAdapter,
+                           getMultiAdapter,
+                          )
+import zope.component.testing as zctesting
 
 from plone.app.testing import (
     FunctionalTesting as BFunctionalTesting,
@@ -25,11 +38,16 @@ from plone.app.testing import (
 from plone.app.testing.selenium_layers import (
     SELENIUM_FUNCTIONAL_TESTING as SELENIUM_TESTING
 )
+from zope.interface import implements
+
 from plone.testing import Layer, zodb, zca, z2
 from collective.cron import testing as base
 from plone.app.async import testing as asynctesting
 
 from libertic.event import interfaces as lei
+from libertic.event.content import source as s
+from libertic.event.content import liberticevent as le
+from libertic.event.content import jobs as j
 
 PLONE_MANAGER_NAME = 'Plone_manager'
 PLONE_MANAGER_ID = 'plonemanager'
@@ -41,6 +59,30 @@ OPERATOR_NAME = 'Plone_operator'
 OPERATOR_ID = 'ploneoperator'
 OPERATOR_PASSWORD = 'ploneoperator'
 GENTOO_FF_UA = 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.1.3) Gecko/20090912 Gentoo Shiretoko/3.5.3'
+
+
+class Dummy(object):
+    """Dummy object with arbitrary attributes
+    """
+    def __init__(self, **kw):
+        self.__dict__.update(kw)
+
+class Source(Dummy, s.Source):
+    implements(lei.ISource)
+    source = u''
+    activated = True
+    type = u'json'
+    logs = None
+    def __init__(self, *a, **kw):
+        self.logs = []
+        Dummy.__init__(self, *a, **kw)
+
+
+class EFTI(object):
+    factory = fti = 'libertic_event'
+    def getId(self):
+        return 'libertic_event'
+
 
 class LiberticEventLayer(base.CollectiveCronLayer):
 
@@ -140,6 +182,8 @@ class LayerMixin(base.LayerMixin):
     defaultBases = (LIBERTIC_EVENT_FIXTURE,)
 
     def testTearDown(self):
+        self._getToolByName_mock = None
+        self['mocker'].restore()  
         self.loginAsPortalOwner()
         if 'test-folder' in self['portal'].objectIds():
             self['portal'].manage_delObjects('test-folder')
@@ -149,6 +193,8 @@ class LayerMixin(base.LayerMixin):
         transaction.commit()
 
     def testSetUp(self):
+        self['jsongrab'] = getUtility(lei.IEventsGrabber, name=u'json')
+        self['mocker'] = mocker.Mocker()
         if not self['portal']['acl_users'].getUser(PLONE_MANAGER_NAME):
             self.loginAsPortalOwner()
             self.add_user(
@@ -224,12 +270,118 @@ class FunctionalTesting(LayerMixin, base.FunctionalTesting):
         base.FunctionalTesting.testSetUp(self)
         LayerMixin.testSetUp(self)
 
-
 class SimpleLayer(Layer):
-    defaultBases = tuple()
+    defaultBases = (UNIT_TESTING,)
+    def create_dummy(self, **kw):
+        return Dummy(**kw)
+
+    def testSetUp(self):
+        self.utility(j.JSONGrabber(), lei.IEventsGrabber, name=u'json')
+        self.adapter(j.EventConstructor, lei.IEventConstructor, lei.IDatabaseItem)
+        self.adapter(j.EventEditor, lei.IEventEditor, lei.ILiberticEvent)
+        self.adapter(j.JSONGrabber, lei.IEventsGrabber, lei.ISource)
+        self.adapter(j.EventsImporter, lei.IEventsImporter, lei.ISource)
+        self.utility(EFTI(), IDexterityFTI, name='libertic_event')
+        self.utility(le.LiberticEvent, IFactory, name='libertic_event')
+        self.utility(j.EventDataManager(), lei.IEventDataManager)
+        self['jsongrab'] = getUtility(lei.IEventsGrabber, name=u'json')
+
+    def utility(self, mock, provides, name=u""):
+        """Register the mock as a utility providing the given interface
+        """
+        zope.component.provideUtility(
+            provides=provides, component=mock, name=name)
+
+    def adapter(self, mock, provides, adapts, name=u""):
+        """Register the mock as an adapter providing the given interface
+        and adapting the given interface(s)
+        """
+        if not isinstance(adapts, (list, tuple)):
+            adapts = [adapts]
+        zope.component.provideAdapter(
+            factory=mock,
+            adapts=adapts, provides=provides, name=name)
+
+    def subscription_adapter(self, mock, provides, adapts):
+        """Register the mock as a utility providing the given interface
+        """
+        if not isinstance(adapts, (list, tuple)):
+            adapts = [adapts]
+        zope.component.provideSubscriptionAdapter(
+            factory=mock, provides=provides, adapts=adapts)
+
+    def handler(self, mock, adapts):
+        """Register the mock as a utility providing the given interface
+        """
+        zope.component.provideHandler(
+            factory=mock, adapts=adapts)
+
+LIBERTIC_EVENT_SIMPLE = SimpleLayer(name='LiberticEvent:Simple')
 
 
-LIBERTIC_EVENT_SIMPLE              = SimpleLayer(name='LiberticEvent:Simple')
+class MockLayer(Layer):
+    """
+    Base class for mocker-based mock tests.
+    There are convenience methods
+    to make mock testing easier.
+    adapted from plone.mocktestcase
+    """
+    defaultBases = (LIBERTIC_EVENT_SIMPLE,)
+    def create_dummy(self, *a, **kw):
+        return LIBERTIC_EVENT_SIMPLE.create_dummy(**kw)
+    def utility(self, *a, **kw):
+        return LIBERTIC_EVENT_SIMPLE.utility(*a, **kw)
+    def adapter(self, *a, **kw):
+        return LIBERTIC_EVENT_SIMPLE.adapter(*a, **kw)
+    def subscription_adapter(self, *a, **kw):
+        return LIBERTIC_EVENT_SIMPLE.subscription_adapter(*a, **kw)
+    def handler(self, *a, **kw):
+        return LIBERTIC_EVENT_SIMPLE.handler(*a, **kw)
+
+    def testSetUp(self):
+        self['mocker'] = mocker.Mocker()
+
+    def testTearDown(self):
+        self._getToolByName_mock = None
+        self['mocker'].restore()
+
+    _getToolByName_mock = None
+    def tool(self, mock, name):
+        """Register a mock tool that will be returned when getToolByName()
+        is called.
+        """
+
+        if self._getToolByName_mock is None:
+            self._getToolByName_mock = mocker.replace(
+                'Products.CMFCore.utils.getToolByName')
+        self.expect(self._getToolByName_mock(
+            mocker.ANY, name)).result(mock)
+
+    def match_provides(self, interface):
+        """A function parameter matches that checks whether the given
+        interface is provided by the function argument, e.g.
+
+            some_mock = self.mocker.mock()
+            some_mock.foo(self.match_provides(IFoo))
+
+        This will ensure that foo() is called on some_mock with an object
+        that provides IFoo.
+        """
+        return mocker.MATCH(lambda x: interface.providedBy(x))
+
+    def match_type(self, type):
+        """A function parameter matches that checks whether the function
+        argument is an instance of the given type, e.g.:
+
+            some_mock = self.mocker.mock()
+            some_mock.foo(self.match_isinstance(basestring))
+
+        This will ensure that foo() is called on some_mock with an object
+        that is a string
+        """
+        return mocker.MATCH(lambda x: isinstance(x, type))
+
+LIBERTIC_EVENT_MOCK = MockLayer(name='LiberticEvent:Mock')
 LIBERTIC_EVENT_INTEGRATION_TESTING = IntegrationTesting(name = "LiberticEvent:Integration")
 LIBERTIC_EVENT_FUNCTIONAL_TESTING  = FunctionalTesting(name = "LiberticEvent:Functional")
 LIBERTIC_EVENT_SELENIUM_TESTING    = FunctionalTesting(bases = (SELENIUM_TESTING,

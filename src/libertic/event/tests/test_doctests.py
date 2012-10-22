@@ -12,7 +12,13 @@ Launching all doctests in the tests directory using:
 # and in your doctests, you can do:
 # >>> bar.something
 from libertic.event.tests.globals import *
-from libertic.event.testing import LIBERTIC_EVENT_FUNCTIONAL_TESTING as FUNCTIONAL_TESTING
+from libertic.event.testing import (
+    LIBERTIC_EVENT_FUNCTIONAL_TESTING as FUNCTIONAL_TESTING,
+    LIBERTIC_EVENT_SIMPLE as SIMPLE,
+    LIBERTIC_EVENT_MOCK as MOCK,
+    LIBERTIC_EVENT_INTEGRATION_TESTING as INT,
+)
+
 
 import unittest2 as unittest
 import glob
@@ -39,6 +45,13 @@ def test_suite():
     suite = unittest.TestSuite()
     globs = globals()
     for s in files:
+        layer = FUNCTIONAL_TESTING
+        if s.split(os.path.sep)[-1].startswith('simple_'):
+            layer = SIMPLE
+        if s.split(os.path.sep)[-1].startswith('mock_'):
+            layer = MOCK 
+        if s.split(os.path.sep)[-1].startswith('int_'):
+            layer = INT 
         suite.addTests([
             layered(
                 doctest.DocFileSuite(
@@ -47,7 +60,7 @@ def test_suite():
                     module_relative=False,
                     optionflags=optionflags,         
                 ),
-                layer=FUNCTIONAL_TESTING
+                layer=layer
             ),
         ])
     return suite

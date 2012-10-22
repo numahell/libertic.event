@@ -17,7 +17,7 @@ import transaction
 
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.utils import _createObjectByType
-              
+
 PROFILE =  'libertic.event:default'
 PROFILEID = 'profile-%s' % PROFILE
 
@@ -77,13 +77,12 @@ def upgrade_profile(context, profile_id, steps=None):
             'upgrades': steps,
         })
     portal_setup.manage_doUpgrades(fr)
-  
-def upgrade_1000(context):
+
+def upgrade_1001(context):
     """
     """
     site = getToolByName(context, 'portal_url').getPortalObject()
     portal_setup = site.portal_setup
-    
     # install Products.PloneSurvey and dependencies
     #migration_util.loadMigrationProfile(site,
     #                                    'profile-Products.PloneSurvey:default')
@@ -91,6 +90,11 @@ def upgrade_1000(context):
     #portal_setup.runImportStepFromProfile('profile-libertic.event:default', 'cssregistry', run_dependencies=False)
     #portal_setup.runImportStepFromProfile('profile-libertic.event:default', 'portlets', run_dependencies=False)
     #portal_setup.runImportStepFromProfile('profile-libertic.event:default', 'propertiestool', run_dependencies=False)
-    log('v1000 applied')
+    portal_setup.runImportStepFromProfile('profile-libertic.event:default', 'typeinfo', run_dependencies=False)
+    log('v1001 applied')
+
+
+
+
 
 

@@ -9,18 +9,45 @@
 
 <metal:main fill-slot="main">
 
-    <h1 class="documentFirstHeading" tal:content="context/Title" /> 
+    <h1 class="documentFirstHeading" tal:content="context/Title" />
 
     <p class="documentDescription" tal:content="context/Description" />
 
+    <p>Actions:</p>
+    <ul>
+      <li><a i18n:translate="" href="get_events">Get events</a></li>
+    </ul>
+
     <tal:block repeat="widget view/widgets/values">
-        <div class="field" tal:condition="python:widget.__name__ not in ('IBasic.title', 'IBasic.description', 'title', 'description',)">
+        <div class="field" tal:condition="python:widget.__name__ not in ('IBasic.title', 'IBasic.description', 'title', 'description', 'logs')">
             <label tal:content="widget/label" />
             <br />
             <div tal:content="structure widget/render" />
         </div>
     </tal:block>
-            
+
+    <table tal:condition="context/logs" class="listing" width="100%">
+      <tr>
+        <th width="10%">Date</th>
+        <th width="5%">Status</th>
+        <th width="85%">Messages</th>
+      </tr>
+      <tal:block tal:repeat="log context/logs">
+        <tr>
+          <td tal:content="python:view.format_date(log.date)"></td>
+          <td i18:translate="" tal:content="python:view.get_status(log.status)"></td>
+          <td>
+            <ul>
+              <tal:block tal:repeat="err log/messages">
+                <li tal:content="err"/>
+              </tal:block>
+            </ul>
+          </td>
+        </tr>
+      </tal:block>
+    </table>
+
+
     <fieldset tal:repeat="group view/groups"
               tal:attributes="id python:''.join((group.prefix, 'groups.', group.__name__)).replace('.', '-')">
         <legend tal:content="group/label" />
@@ -35,4 +62,4 @@
 
 </body>
 </html>
- 
+

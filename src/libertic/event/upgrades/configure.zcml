@@ -14,7 +14,7 @@
     <genericsetup:upgradeStep
           title="libertic.event import CSS"
           description=""
-          handler=".import_css" />  
+          handler=".import_css" />
     <genericsetup:upgradeStep
         title="libertic.event import JS"
         description=""
@@ -23,20 +23,13 @@
         title="libertic.event Recook resources"
         description=""
         handler=".recook_resources" />
-  </genericsetup:upgradeSteps>  
-
-  <genericsetup:upgradeSteps
-      profile="libertic.event:default"
-      source="*"
-      destination="1000">
-    <genericsetup:upgradeStep
-        title="libertic.event * - 1000"
-        description=""
-        handler=".upgrade_1000"
-      />
-  </genericsetup:upgradeSteps> 
+  </genericsetup:upgradeSteps>
 
   -->
+  <genericsetup:upgradeSteps profile="libertic.event:default" source="*" destination="1001">
+    <genericsetup:upgradeStep title="libertic.event * - 1000" description="" handler=".upgrade_1001" />
+  </genericsetup:upgradeSteps>
+
 
   <!-- vim:set ft=xml: -->
 </configure>

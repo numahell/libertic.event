@@ -17,13 +17,39 @@ from Products.CMFCore.utils import getToolByName
 
 
 alsoProvides(IDatabase, form.IFormFieldProvider)
+_marker = object()
 class Database(Container):
     implements(IDatabase)
     def database(self):
         return self
 
+    def get_sources(self, review_state=_marker, multiple=True, asobj=True, **kw):
+        catalog = getToolByName(self, 'portal_catalog')
+        query = {
+            'path': {'query': '/'.join(self.getPhysicalPath())},
+        }
+        if review_state is not None:
+            if review_state is _marker:
+                query['review_state'] = 'published'
+        query.update(kw)
+        brains = catalog.searchResults(**query)
+        if asobj:
+            brains = [a.getObject() for a in brains]
+        else:
+            brains = [a for a in brains]
+        if not multiple:
+            if len(brains) >= 1:
+                brains = brains[0]
+            else:
+                brains = None
+        return brains
+
+    def get_source(self, review_state=_marker, asobj=True,  **kw):
+        return self.get_sources(review_state=review_state,
+                               multiple=False, **kw)
+
     def get_events(self, sid=None, eid=None, review_state=None,
-                   multiple=True, **kw):
+                   multiple=True, asobj=True, **kw):
         catalog = getToolByName(self, 'portal_catalog')
         query = {
             'path': {'query': '/'.join(self.getPhysicalPath())},
@@ -33,16 +59,18 @@ class Database(Container):
         if review_state: query['review_state'] = review_state
         query.update(kw)
         brains = catalog.searchResults(**query)
+        if asobj:
+            brains = [a.getObject() for a in brains]
+        else:
+            brains = [a for a in brains]
         if not multiple:
             if len(brains) >= 1:
                 brains = brains[0]
             else:
                 brains = None
-        else:
-            brains = [a for a in brains]
         return brains
 
-    def get_event(self, sid=None, eid=None, review_state=None, **kw):
+    def get_event(self, sid=None, eid=None, review_state=None, asobj=True,  **kw):
         return self.get_events(sid=sid, eid=eid, review_state=review_state,
                                multiple=False, **kw)
 

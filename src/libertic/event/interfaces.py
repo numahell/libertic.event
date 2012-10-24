@@ -1,7 +1,7 @@
 from zope.interface import invariant, Invalid, Interface
 from Products.PluggableAuthService.interfaces.authservice import IPropertiedUser
 from z3c.relationfield.schema import RelationList, Relation, RelationChoice
-from plone.formwidget.contenttree import ObjPathSourceBinder
+from plone.formwidget.contenttree import ObjPathSourceBinder, MultiContentTreeFieldWidget
 from Products.CMFDefault.utils import checkEmailAddress
 from zope import interface, schema
 from plone.theme.interfaces import IDefaultPloneLayer
@@ -111,13 +111,16 @@ class ISource(IDatabaseItem):
                        value_type=schema.Object(ILog))
     form.omitted('logs')
 
+    def get_last_source_parsingstatus(self):
+        """."""
+
 
 class ISourceMapping(form.Schema):
     sid = schema.TextLine(title=_('label_source_id', default='Source id'), required=True)
     eid = schema.TextLine(title=_('label_event_id', default='Event id'), required=True)
 
 
-class ILiberticEvent(IDatabaseItem):
+class ILiberticEvent(form.Schema, IDatabaseItem):
     """A libertic event"""
     source = schema.URI(title=_('label_source', default='Source'), required=True)
     sid = schema.TextLine(title=_('label_source_id', default='Source id'), required=True)
@@ -183,6 +186,18 @@ class ILiberticEvent(IDatabaseItem):
             ),
     )
 
+    #import pdb;pdb.set_trace()  ## Breakpoint ##
+    form.widget(drelated=MultiContentTreeFieldWidget)
+    drelated = schema.List(
+        title=u"Related events",
+        defaultFactory=list, #req zope.schema >= 3.8.0
+        value_type = schema.Choice(
+            source = ObjPathSourceBinder(
+                **{'portal_type':'libertic_event'})
+        ),
+    )
+
+
 
 class ILiberticEventMapping(ILiberticEvent, IDublinCore, INameFromTitle, IPublication, ):
     """A libertic event"""
@@ -194,8 +209,24 @@ class ILiberticEventMapping(ILiberticEvent, IDublinCore, INameFromTitle, IPublic
         value_type=schema.Object(ISourceMapping))
 
 
+_marker = object()
 class IDatabase(IDatabaseItem):
     """A Database of opendata events"""
+    def database(self):
+        """Return the current database (self // compat)"""
+
+    def get_sources(review_state=_marker, multiple=True, asobj=True, **kw):
+        """Get Sources matching criteria inside database"""
+
+    def get_source(review_state=_marker, asobj=True,  **kw):
+        """Get Source matching criteria inside database"""
+
+    def get_events(sid=None, eid=None, review_state=None,
+                   multiple=True, asobj=True, **kw):
+        """Get Events matching criteria inside database"""
+
+    def get_event(sid=None, eid=None, review_state=None, asobj=True,  **kw):
+        """Get Event matching criteria inside database"""
 
 
 class IDatabaseGetter(form.Schema):
@@ -246,6 +277,7 @@ class IEventsGrabber(Interface):
 class IEventDataManager(Interface):
     def validate(data):
         """Validates data conforming to the events format
+        See https://docs.google.com/spreadsheet/ccc?key=0AlOGPSGPZ66idHJGTTN0YTY3SERuZGxHbG1laFFwWmc#gid=1
         Return:
 
         - a mapping with sanitized values
@@ -261,6 +293,8 @@ class IEventDataManager(Interface):
 class IDBPusher(Interface):
     def push_event(data):
         """Push an event (construct/edit) from an external source to the db"""
+    def filter_data(data):
+        """Filter data from event format spec to something eatable by dexterity"""
 
 class IEventConstructor(Interface):
     def construct(data):
@@ -272,20 +306,9 @@ class IEventEditor(Interface):
         """Edit a event with prior data validatation"""
 
 
-class IEventSearcher(Interface):
-    def edit(data):
-        """Edit a event with prior data validatation"""
-
-
-class IEventAdder(Interface):
-    def edit(data):
-        """Edit a event with prior data validatation"""
-
-
 class IEventSetter(ILiberticEvent):
     def set(data):
-        """Edit a event with prior data validatation
-        https://docs.google.com/spreadsheet/ccc?key=0AlOGPSGPZ66idHJGTTN0YTY3SERuZGxHbG1laFFwWmc#gid=1
+        """Set data on an event
         """
 
 

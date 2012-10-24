@@ -54,6 +54,11 @@ class Source(Container):
     def database(self):
         return i.IDatabaseGetter(self).database()
 
+    def get_last_source_parsingstatus(self):
+        """."""
+        if len(self.logs):
+            return self.logs[0].status
+
 
 class AddForm(dexterity.AddForm):
     grok.name('libertic_source')

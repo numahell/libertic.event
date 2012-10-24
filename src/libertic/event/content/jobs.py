@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 __docformat__ = 'restructuredtext en'
 from five import grok
+from copy import deepcopy
 import datetime
 import socket
 import time
@@ -10,6 +11,7 @@ try:
 except ImportError:
     from simplejson import json
 
+import traceback
 from zope.schema.fieldproperty import FieldProperty
 from zope import schema
 from zope.interface import implements, alsoProvides, Interface, implementedBy
@@ -40,6 +42,9 @@ from libertic.event.content.liberticevent import (
     editable_SID_EID_check,
 )
 from libertic.event.utils import Browser
+from z3c.relationfield.interfaces import IRelationList, IRelationValue
+from z3c.relationfield.relation import RelationValue
+from zope.app.intid.interfaces import IIntIds
 
 _marker = object()
 class NotUnique(Exception):pass
@@ -59,8 +64,6 @@ class Dummy(object):
     def __init__(self, **kw):
         self.__dict__.update(kw)
 
-
-
     @property
     def title(self):
         return '%s_%s' % (
@@ -72,6 +75,45 @@ class Dummy(object):
 class DBPusher(grok.Adapter):
     grok.context(i.IDatabase)
     grok.provides(i.IDBPusher)
+    def filter_data(self, db, data):
+        """Second pass filtering
+            we have filtered the data to conform events specs
+            here we do another filtering pass to make data adapted
+            to be in the plone application context
+        """
+        for k in ['related', 'contained']:
+            if k in data:
+                values = data[k]
+                items = []
+                for v in values:
+                    if isinstance(v, dict):
+                        try:
+                            evt = db.get_event(sid=v['sid'], eid=v['eid'])
+                            if evt:
+                                items.append(evt)
+                        except Exception, e:
+                            continue
+                    elif i.ISourceMapping.providedBy(v):
+                        try:
+                            evt = db.get_event(sid=v.sid, eid=v.eid)
+                            if evt:
+                                items.append(evt)
+                        except Exception, e:
+                            continue
+                    elif i.ILiberticEvent.providedBy(v):
+                        items.append(v)
+                    else:
+                        raise Exception('Not handled case:\n'
+                                        '%s\n'
+                                        '%s\n'
+                                        '%s\n'
+                                        '%s\n'
+                                        ''% (
+                                            db, data, k, v
+                                        ))
+                data[k] = tuple(items)
+
+
     def push_event(self, data):
         db = self.context
         status = 'failed'
@@ -83,20 +125,17 @@ class DBPusher(grok.Adapter):
                 msg += "%s\n"% pformat(data["initial"])
             except Exception, e:
                 msg += "\n"
+            msg += "\nERRORS:\n"
             for it in data["errors"]:
                 msg += "%s\n" % it
             messages.append(msg)
         else:
-            # relations are done later to avoid circular dependencies errors
-            cdata = data.copy()
-            for k in ['contained', 'related']:
-                if k in cdata:
-                    del cdata[k]
-            # to create an event,
-            # verify that there are no ther event with same (eid, sid)
             try:
                 try:
+                    # to create an event,
+                    # verify that there are no other event with same (eid, sid)
                     constructor = i.IEventConstructor(db)
+                    self.filter_data(db, data['transformed'])
                     event = constructor.construct(data['transformed'])
                     status = 'created'
                 except NotUnique, e:
@@ -106,12 +145,17 @@ class DBPusher(grok.Adapter):
                     status = 'edited'
             except Exception, e:
                 status = 'failed'
+                trace = traceback.format_exc()
                 try:
                     messages.append(
-                        "Failed to push event: \n%s\n%s" % (e, pformat(data)))
+                        "Failed to push event: \n"
+                        "%s\n"
+                        "%s\n" % (
+                            trace,
+                            pformat(data)))
                 except Exception, e:
                     # handle case where repr(data) can failed
-                    messages.append("%s" % e)
+                    messages.append(trace)
         return messages, status, event
 
 
@@ -132,9 +176,14 @@ class EventsImporter(grok.Adapter):
             db = i.IDatabaseGetter(self.context).database()
             if db is None:
                 raise Exception('Can\'t get parent database for %s' % self.context)
+            secondpass_datas = []
             for data in datas:
                 try:
-                    infos, ret, event = i.IDBPusher(db).push_event(data)
+                    cdata = deepcopy(data)
+                    for k in ['contained', 'related']:
+                        if k in cdata:
+                            del cdata[k]
+                    infos, ret, event = i.IDBPusher(db).push_event(cdata)
                     if event is not None: event.reindexObject()
                     messages.extend(infos)
                 except Exception, e:
@@ -143,17 +192,32 @@ class EventsImporter(grok.Adapter):
                     created += 1
                 elif ret == 'failed':
                     failed += 1
+                    status = 2
                 elif ret == 'edited':
                     edited += 1
+                if ret in ['created', 'edited']:
+                    secondpass_datas.append(data)
             # wehn we finally have added / edited, set the references
-            for data in datas:
-                pass
+            for data in secondpass_datas:
+                try:
+                    cdata = deepcopy(data)
+                    infos, ret, event = i.IDBPusher(db).push_event(cdata)
+                    if event is not None: event.reindexObject()
+                    messages.extend(infos)
+                except Exception, e:
+                    trace = traceback.format_exc()
+                    messages.extend(trace)
+                    failed += 1
+                    status = 2
         except Exception, e:
             status = 0
-            messages.append('%s' % e)
+            trace = traceback.format_exc()
+            messages.append(trace)
         messages.append('%s created, %s edited, %s failed' % (
             created, edited, failed))
         self.context.log(status=status, messages=messages)
+        self.context.reindexObject()
+
 
 class EventConstructor(grok.Adapter):
     grok.context(i.IDatabase)
@@ -179,7 +243,7 @@ class EventEditor(grok.Adapter):
 
     def edit(self, data):
         db = i.IDatabaseGetter(self.context).database()
-        evt = db.get_event(sid=data["sid"], eid=data["eid"]).getObject()
+        evt = db.get_event(sid=data["sid"], eid=data["eid"])
         try:
             editable_SID_EID_check(evt, data["sid"], data["eid"])
         except ActionExecutionError, e:
@@ -192,18 +256,30 @@ class EventEditor(grok.Adapter):
         i.IEventSetter(evt).set(data)
 
 
-class EventAdder(grok.Adapter):
-    grok.context(i.IDatabaseItem)
-    grok.provides(i.IEventAdder)
-
-
 class EventSetter(grok.Adapter):
     grok.context(i.ILiberticEvent)
     grok.provides(i.IEventSetter)
+    def set(self, data, only_keys=None):
+        if not only_keys:
+            only_keys = data.keys()
+        # relations are done later to avoid circular dependencies errors
+        db = i.IDatabaseGetter(self.context).database()
+        intids = getUtility(IIntIds)
+        for it in [k for k in data if k in only_keys]:
+            value = data[it]
+            field = i.ILiberticEvent.get(it)
+            if IRelationList.providedBy(field) and bool(value):
+                # empty the existing relations, then reset them
+                # for null in getattr(self.context, it)[:]:
+                #     getattr(self.context, it).pop()
+                newval = []
+                for v in value:
+                    if not IRelationValue.providedBy(v):
+                        v = RelationValue(intids.getId(v))
+                    newval.append(v)
+                value = newval
+            setattr(self.context, it, value)
 
-    def set(self, data):
-        for i in data:
-            setattr(self.context, i, data[i])
 
 class EventsGrabber(grok.GlobalUtility):
     grok.provides(i.IEventsGrabber)
@@ -351,6 +427,24 @@ class JSONGrabber(EventsGrabber):
     grok.name('json')
     def mappings(self, contents):
         results = []
+        try:
+            jdata = json.loads(contents)
+        except Exception, e:
+            raise Exception('Data is not in json format')
+        try:
+            results = jdata['events']
+            if not isinstance(results, list):
+                raise Exception()
+        except Exception, e:
+            raise Exception('Invalid json format, '
+                            'not in the {"event": []} form')
+        return results
+
+class XMLGrabber(EventsGrabber):
+    grok.name('xml')
+    def mappings(self, contents):
+        results = []
+        import pdb;pdb.set_trace()  ## Breakpoint ##
         try:
             jdata = json.loads(contents)
         except Exception, e:

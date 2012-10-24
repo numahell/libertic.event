@@ -5,7 +5,6 @@ Setup
 -----------------
 ::
 
-    >>> import uuid
     >>> id = uuid.uuid4().hex
     >>> from libertic.event import interfaces as lei
     >>> from libertic.event.content import jobs
@@ -16,6 +15,7 @@ Setup
     >>> layer.login(SUPPLIER_NAME)
     >>> n = db.invokeFactory('libertic_source', id, type='json', source='http://foo', activated=True)
     >>> jsource = db[id]
+    >>> catalog = layer['portal'].portal_catalog
 
 The EventsGrabber
 ----------------------
@@ -27,6 +27,7 @@ The JSONGrabber
 Responsible for fetching data from json sources::
 
     >>> jg = getUtility(lei.IEventsGrabber, name=u'json')
+    >>> xg = getUtility(lei.IEventsGrabber, name=u'xml')
 
 Invalid json input data
 ++++++++++++++++++++++++
@@ -214,24 +215,66 @@ After validation, the EventGrabber can give us a meaningful list of importable e
     >>> ret[0]['initial']['related'], ret[0]['errors'], ret[0]['transformed']['related']
     ([{u'eid': u'aaamyeid2', u'sid': u'aaamysid2'}, {u'eid': u'aaamyeid', u'sid': u'aaamysid'}], [], (<libertic.event.content.jobs.SourceMapping object at ...>, <libertic.event.content.jobs.SourceMapping object at ...>))
 
-
-The import finnally
+The import finally
 ====================
-::
+Some events got created and edited::
 
     >>> jsource.source = 'file://%s/%s' % (testdir, 'ievents.json')
     >>> lei.IEventsImporter(jsource).do_import()
     >>> jsource.logs[0].messages[-1]
-    u'10 created, 1 edited, 1 failed'
+    u'14 created, 1 edited, 1 failed'
     >>> db.objectIds()
-    ['...', 'event1', 'event1-1', 'event1-2', 'event1-3', 'event1-4', 'event1-5', 'event1-6', 'event1-7', 'event1-8', 'event1-9']
+    ['...', 'event1', 'event1-1', 'event1-2', 'event1-3', 'event1-4', 'event1-5', 'event1-6', 'event1-7', 'event1-8', 'event1-9', 'event1-10', 'event1-11', 'event1-12', 'event1-13']
+
     >>> [getattr(db['event1'], k) for k in ['event_start', 'sid', 'eid', 'press_url']]
     [datetime.datetime(2012, 10, 4, 0, 0), u'qsdfqsdf', u'sqdf', 'http://qsdf']
+    >>> db['event1'].address_details
+    u'edited address details'
+
+Related fields are set in a second pass::
+
+    >>> [(a.sid, a.eid, a) for a in db['event1-9'].related]
+    [(u'aaamysid2', u'aaamyeid2', <LiberticEvent at /plone/fr/database/event1-12>), (u'aaamysid', u'aaamyeid', <LiberticEvent at /plone/fr/database/event1-13>)]
+    >>> [(a.sid, a.eid, a) for a in db['event1-9'].contained]
+    [(u'mysid2', u'myeid2', <LiberticEvent at /plone/fr/database/event1-10>), (u'mysid', u'myeid', <LiberticEvent at /plone/fr/database/event1-11>)]
+
+An event failed validation::
+
     >>> print jsource.logs[0].messages[0]
     A record failed validation:
     {u'__comment': u'IN ERROR ITEM...
     [('gallery_url', InvalidURI('not an url'))]
     <BLANKLINE>
 
+With events failed, we get a warning status::
 
+    >>> 2 in catalog.uniqueValuesFor('get_last_source_parsingstatus')
+    True
+
+The xml grabber
+=================
+
+Get data from xml files
+++++++++++++++++++++++++++++
+The parser waits for ``event`` subnodes inside a global ``events`` node conforming to the event spec.
+
+::
+
+    >>> out = StringIO()
+    >>> layer.logout()
+    >>> layer.loginAsPortalOwner()
+    >>> from libertic.event.setuphandlers import publish_all
+    >>> publish_all(db)
+    >>> layer.logout()
+    >>> layer.login(SUPPLIER_NAME)
+    >>> req = makerequest(layer['portal']['fr']['database'], stdout=out).REQUEST
+    >>> view  = getMultiAdapter((db,req), name='eventsasxml')
+    >>> print view.render()
+    >>> import pdb;pdb.set_trace()  ## Breakpoint ##
+    >>> data = xg.fetch('file://'+testdir+'/1events.xml')
+    >>> json = xg.mappings(data)
+    >>> pprint(json)
+    [{u'address': u'sdfgsfdsfdgsfdgsfdgsfdg',
+      u'address_details': ...
+    >>> data = json[0]
 

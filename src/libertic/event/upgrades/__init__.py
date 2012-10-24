@@ -18,6 +18,8 @@ import transaction
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.utils import _createObjectByType
 
+from libertic.event import setuphandlers
+
 PROFILE =  'libertic.event:default'
 PROFILEID = 'profile-%s' % PROFILE
 
@@ -91,10 +93,7 @@ def upgrade_1001(context):
     #portal_setup.runImportStepFromProfile('profile-libertic.event:default', 'portlets', run_dependencies=False)
     #portal_setup.runImportStepFromProfile('profile-libertic.event:default', 'propertiestool', run_dependencies=False)
     portal_setup.runImportStepFromProfile('profile-libertic.event:default', 'typeinfo', run_dependencies=False)
+    setuphandlers.setup_catalog(site)
     log('v1001 applied')
-
-
-
-
 
 

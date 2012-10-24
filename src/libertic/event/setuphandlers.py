@@ -34,7 +34,7 @@ INDEXES = {
         'author_lastname', 'author_firstname',
         'author_telephone', 'author_email',
         'lastname', 'firstname', 'telephone', 'email',
-        'organiser',
+        'organiser', 'get_last_source_parsingstatus',
     ],
     'KeywordIndex' : [
         'latlong',
@@ -82,8 +82,8 @@ def create_content(context, structure):
         title = item_page['title']
         lang = item_page['language']
         if id not in existing:
-            if typ in ['libertic_database', 
-                       'libertic_event', 
+            if typ in ['libertic_database',
+                       'libertic_event',
                        'libertic_source']:
                 page = createContentInContainer(parent, typ, id=id)
             else:

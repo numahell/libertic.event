@@ -4,7 +4,10 @@ __docformat__ = 'restructuredtext en'
 
 from five import grok
 from plone.indexer import indexer
-from libertic.event.content.liberticevent import ILiberticEvent
+from libertic.event.interfaces import (
+    ILiberticEvent,
+    ISource,
+)
 from collective.dexteritytextindexer.utils import searchable
 
 @indexer(ILiberticEvent)
@@ -16,6 +19,13 @@ grok.global_adapter(sourceIndexer, name="source")
 def eidIndexer(obj):
     return obj.eid
 grok.global_adapter(eidIndexer, name="eid")
+
+
+@indexer(ISource)
+def get_last_source_parsingstatusIndexer(obj):
+    return obj.get_last_source_parsingstatus()
+grok.global_adapter(get_last_source_parsingstatusIndexer,
+                    name="get_last_source_parsingstatus")
 
 @indexer(ILiberticEvent)
 def sidIndexer(obj):

@@ -3,6 +3,8 @@
 __docformat__ = 'restructuredtext en'
 import csv
 from five import grok
+import datetime
+import DateTime
 from zope import schema
 from zope.schema.fieldproperty import FieldProperty
 from StringIO import StringIO
@@ -149,29 +151,22 @@ def data_from_ctx(ctx):
         'press_url': ctx.press_url,
         'language': ctx.language,
     }
-    effective, effectivev = '', ctx.effective()
-    if effectivev:
-        effective = effectivev.asdatetime().strftime(datefmt)
-    sdata['effective'] = effective
-
-    expires, expiresv = '', ctx.expires()
-    if expiresv:
-        expires = expiresv.asdatetime().strftime(datefmt)
-    sdata['expires'] = expires
-
-    event_start, event_startv = '', ctx.event_start
-    if event_startv:
-        event_start = event_startv.strftime(datefmt)
-    sdata['event_start'] = event_start
-
-    event_end, event_endv = '', ctx.event_end
-    if event_endv:
-        event_end = event_endv.strftime(datefmt)
-    sdata['event_end'] = event_end
-
+    for item in ['effective', 'expires',
+                 'event_start' ,'event_end',]:
+        value = ''
+        try:
+            value = getattr(ctx, item)()
+        except TypeError, ex:
+            value = getattr(ctx, item)
+        if isinstance(value, DateTime.DateTime):
+            value.asdatetime()
+        if isinstance(value, datetime.datetime):
+            value = value.strftime(datefmt)
+        sdata[item] = value
     for relate in ['contained', 'related']:
         l = []
         for item in getattr(ctx, relate, []):
+            import pdb;pdb.set_trace()  ## Breakpoint ##
             obj = item.to_object
             it = {"sid": obj.sid,
                   "eid": obj.eid}
@@ -240,7 +235,7 @@ def unique_SID_EID_check(context, sid, eid, request=None, form=None, *args, **kw
 
 def editable_SID_EID_check(context, sid, eid, request=None, form=None, *args, **kw):
     db = IDatabaseGetter(context).database()
-    events = [a.getObject() for a in db.get_events(sid=sid, eid=eid)]
+    events = [a for a in db.get_events(sid=sid, eid=eid)]
     uuids = [IUUID(a) for a in events]
     cuuid = IUUID(context)
     if cuuid not in uuids:

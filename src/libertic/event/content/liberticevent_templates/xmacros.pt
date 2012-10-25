@@ -8,11 +8,11 @@
     <eid tal:content="ctx/eid"></eid>
     <title tal:content="ctx/title"></title>
     <description tal:content="ctx/description"></description>
-    <tal:block tal:repeat="s ctx/subject">
-      <subjet tal:content="s"></subjet>
+    <tal:block tal:repeat="s ctx/subjects">
+      <subjects tal:condition="s" tal:content="s"></subjects>
     </tal:block>
-    <tal:block tal:repeat="s ctx/target">
-      <target tal:content="s"></target>
+    <tal:block tal:repeat="s ctx/targets">
+      <targets tal:condition="s" tal:content="s"></targets>
     </tal:block>
     <address tal:content="ctx/address"/>
     <address_details tal:content="ctx/address_details"/>

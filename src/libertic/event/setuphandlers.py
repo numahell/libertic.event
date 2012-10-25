@@ -35,6 +35,8 @@ INDEXES = {
         'author_telephone', 'author_email',
         'lastname', 'firstname', 'telephone', 'email',
         'organiser', 'get_last_source_parsingstatus',
+        'source_created_events', 'source_failed_events', 
+        'source_edited_events',
     ],
     'KeywordIndex' : [
         'latlong',

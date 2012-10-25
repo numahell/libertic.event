@@ -102,6 +102,7 @@ setup(
         'five.grok',
         'collective.z3cform.keywordwidget',
         'plone.directives.dexterity',
+        'chardet',
         'collective.dexteritytextindexer',
         'plone.app.referenceablebehavior',
         'plone.directives.form',

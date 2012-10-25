@@ -17,6 +17,9 @@ from Products.CMFCore.utils import getToolByName
 from plone.app.collection.interfaces import ICollection
 from Products.ATContentTypes.interfaces.topic import IATTopic
 from libertic.event.content.liberticevent import export_csv
+
+from libertic.event import interfaces as lei
+
 try:
     import json
 except ImportError:
@@ -67,12 +70,12 @@ class EventsAsXml(EventsViewMixin):
         for i in self.items:
             sdata['data'].append(data_from_ctx(i.getObject()))
         resp = self.events(**sdata).encode('utf-8')
-        self.request.RESPONSE.setHeader('Content-Type','text/xml')
-        self.request.RESPONSE.addHeader(
+        self.request.response.setHeader('Content-Type','text/xml')
+        self.request.response.addHeader(
             "Content-Disposition","filename=%s.xml" % (
                 self.context.getId()))
-        self.request.RESPONSE.setHeader('Content-Length', len(resp))
-        self.request.RESPONSE.write(resp)
+        self.request.response.setHeader('Content-Length', len(resp))
+        self.request.response.write(resp)
 
 
 
@@ -88,12 +91,12 @@ class EventsAsJson(EventsViewMixin):
         for i in self.items:
             sdata['events'].append(data_from_ctx(i.getObject()))
         resp = json.dumps(sdata)
-        self.request.RESPONSE.setHeader('Content-Type','application/json')
-        self.request.RESPONSE.addHeader(
+        self.request.response.setHeader('Content-Type','application/json')
+        self.request.response.addHeader(
             "Content-Disposition","filename=%s.json" % (
                 self.context.getId()))
-        self.request.RESPONSE.setHeader('Content-Length', len(resp))
-        self.request.RESPONSE.write(resp)
+        self.request.response.setHeader('Content-Length', len(resp))
+        self.request.response.write(resp)
 
 
 class EventsAsCsv(EventsViewMixin):
@@ -101,20 +104,25 @@ class EventsAsCsv(EventsViewMixin):
         rows = []
         for ix in self.items:
             sdata = data_from_ctx(ix.getObject())
-            for it in 'target', 'subject':
-                sdata[it] = '|'.join(sdata[it])
-            for it in 'related', 'contained':
+            for it in ['targets', 'subjects',
+                       'related', 'contained']:
                 values = []
                 for item in sdata[it]:
-                    values.append(
-                        '%s_|_%s' % (
-                        item['sid'],
-                        item['eid'],
-                    ))
+                    val = item
+                    if it in ['targets', 'subjects']:
+                        if not val.strip():
+                            # skip empty keywords
+                            continue
+                    if it in ['related', 'contained']:
+                        val = '%s%s%s' % (
+                            val['sid'], lei.SID_EID_SPLIT,
+                            val['eid'])
+                    values.append(val)
                 sdata[it] = '|'.join(values)
             rows.append(sdata)
         if rows:
             titles = rows[0].keys()
-            export_csv( self.request, titles, rows)
+            titles.sort()
+            export_csv(self.request, titles, rows)
 
 # vim:set et sts=4 ts=4 tw=80:

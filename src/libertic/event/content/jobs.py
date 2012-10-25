@@ -4,37 +4,50 @@ __docformat__ = 'restructuredtext en'
 from five import grok
 from copy import deepcopy
 import datetime
+from StringIO import StringIO
 import socket
 import time
+import chardet
 try:
     import json
 except ImportError:
     from simplejson import json
 
 import traceback
-from zope.schema.fieldproperty import FieldProperty
-from zope import schema
+from pprint import pformat
+
+from lxml import etree
+
 from zope.interface import implements, alsoProvides, Interface, implementedBy
-from z3c.form.interfaces import ActionExecutionError
+from zope.app.intid.interfaces import IIntIds
+from zope.schema.fieldproperty import FieldProperty
+from zope.schema import interfaces as si
+from zope import schema
 from zope.component import getUtility
+
+from z3c.form.interfaces import ActionExecutionError
+from z3c.relationfield.interfaces import IRelationList, IRelationValue
+from z3c.relationfield.relation import RelationValue
 
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.utils import getToolByName
 from Products.ATContentTypes.interfaces.topic import IATTopic
-from pprint import pformat
 
-from plone.directives import form, dexterity
+from plone.autoform.interfaces import IFormFieldProvider
 from plone.app.collection.interfaces import ICollection
-from plone.dexterity.utils import createContent
-
+from plone.dexterity.interfaces import IDexterityFTI
+from plone.dexterity.utils import (createContentInContainer,
+                                   resolveDottedName,
+                                   getAdditionalSchemata,)
+from plone.directives import form, dexterity
 
 from libertic.event.content.liberticevent import export_csv
-from plone.dexterity.utils import createContentInContainer
 from libertic.event.content import source
 from libertic.event import interfaces as i
 from libertic.event.content.source import Source, Log
 from libertic.event.content.liberticevent import (
+    read_csv,
     data_from_ctx,
     empty_data,
     LiberticEvent,
@@ -42,9 +55,7 @@ from libertic.event.content.liberticevent import (
     editable_SID_EID_check,
 )
 from libertic.event.utils import Browser
-from z3c.relationfield.interfaces import IRelationList, IRelationValue
-from z3c.relationfield.relation import RelationValue
-from zope.app.intid.interfaces import IIntIds
+
 
 _marker = object()
 class NotUnique(Exception):pass
@@ -58,18 +69,172 @@ class SourceMapping(object):
         self.sid = sid
         self.eid = eid
 
+
+def magicstring(string):
+    try:
+        detectedenc = chardet.detect(string).get('encoding')
+    except Exception,e:
+        detectedenc = None
+    if detectedenc.lower().startswith('iso-8859'):
+        detectedenc = 'ISO-8859-15'
+    found_encodings = [
+        'ISO-8859-15', 'TIS-620', 'EUC-KR',
+        'EUC-JP', 'SHIFT_JIS', 'GB2312', 'utf-8', 'ascii',
+    ]
+    if detectedenc.lower() not in ('utf-8', 'ascii'):
+        try:
+            string = string.decode(detectedenc).encode(
+                detectedenc)
+        except:
+            for idx, i in enumerate(found_encodings):
+                try:
+                    string = string.decode(i).encode(i)
+                    break
+                except:
+                    if idx == (len(found_encodings)-1):
+                        raise
+    if isinstance(string, unicode):
+        string = string.encode('utf-8')
+    string = string.decode('utf-8').encode('utf-8')
+    return string
+
+
+def to_unicode(value):
+    if not isinstance(value, unicode):
+        try:
+            value = unicode(value)
+        except:
+            value = magicstring(value).decode('utf-8')
+    return value
+
+def to_string(value):
+    if isinstance(value, unicode):
+        try:
+            value = str(value)
+        except:
+            value = magicstring(value)
+    return value
+
+
+def smart_type(field, value):
+    if isinstance(value, basestring):
+        # char / unicodes
+        if si.IBytes.providedBy(field):
+            value = to_string(value)
+        if si.IText.providedBy(field):
+            value = to_unicode(value)
+        # date fields
+        if si.IDatetime.providedBy(field):
+            try:
+                value = datetime.datetime.strptime(
+                    value, i.datefmt)
+            except Exception, e:
+                pass
+    # transform dicts to SourceMappings for related objects
+    if (field.__name__ in ['contained', 'related']):
+        itms = []
+        if bool(value): 
+            for itm in list(value):
+                if isinstance(itm, dict):
+                    try:
+                        sid = to_unicode(itm['sid'])
+                        eid = to_unicode(itm['eid'])
+                        it = SourceMapping(sid, eid)
+                        itms.append(it)
+                    except Exception, e:
+                        continue
+                else:
+                    itms.append(itm)
+        value = tuple(itms)
+    # ensure tuples
+    if field.__name__ in ['targets', 'subjects']:
+        if value and isinstance(value, (list, tuple)):
+            value = [to_unicode(v) for v in value]
+    if si.ITuple.providedBy(field):
+        if isinstance(value, list):
+            value = tuple(value)
+        elif not value:
+            value = tuple()
+    return value
+
+
+def getDexterityFields(idextif, portal_type=None):
+    fields = []
+    ret = {}
+    fields.extend(schema.getFieldsInOrder(idextif))
+    if portal_type:
+        # stolen from plone.dexterity.utils
+        fti = getUtility(IDexterityFTI, name=portal_type)
+        for behavior_name in fti.behaviors:
+            try:
+                behavior_interface = resolveDottedName(behavior_name)
+            except (ValueError, ImportError):
+                continue
+            if behavior_interface is not None:
+                behavior_schema = IFormFieldProvider(behavior_interface, None)
+                if behavior_schema is not None:
+                    fields.extend(schema.getFieldsInOrder(behavior_schema))
+    for k, value in fields:
+        ret[k] = value
+    return ret
+
+
+def csv_value(value, field):
+    fieldname = field.__name__
+    multiple = isinstance(field, schema.Iterable)
+    related = fieldname in ['contained', 'related']
+    if isinstance(value, basestring):
+        if value == '':
+            value = None
+    if multiple and isinstance(value, basestring):
+        value = [a
+                 for a in value.split('|')
+                 if a.strip()]
+        if related:
+            items = []
+            for v in value[:]:
+                if i.SID_EID_SPLIT in v:
+                    parts = v.split(i.SID_EID_SPLIT)
+                    v = {'sid': parts[0], 'eid': parts[1]}
+                items.append(v)
+            value = items
+    return value
+
+
+def unwrap_str(value):
+    """Mainly used to unwrap lxml strings objects
+    to python base ones.
+    EG; lxml.etree._ElementStringResult"""
+    if isinstance(value, basestring):
+        if isinstance(value, unicode):
+            value = unicode(value)
+        else:
+            value = str(value)
+    return value
+
+
+def node_value(node, field):
+    value = _marker
+    fieldname = field.__name__
+    multiple = isinstance(field, schema.Iterable)
+    related = fieldname in ['contained', 'related']
+    if not multiple:
+        value = unwrap_str(node.xpath(fieldname+'/text()')[0])
+    if multiple:
+        if not related:
+            value = unwrap_str(node.xpath(fieldname+'/text()'))
+        else:
+            value = [{'eid': unwrap_str(a.xpath('eid/text()')[0]),
+                      'sid': unwrap_str(a.xpath('sid/text()')[0])}
+                     for a in node.xpath(fieldname)]
+    return value
+
 class Dummy(object):
     """Dummy object with arbitrary attributes
     """
     def __init__(self, **kw):
+        self.__dict__.update(empty_data())
         self.__dict__.update(kw)
-
-    @property
-    def title(self):
-        return '%s_%s' % (
-            self.sid, self.eid
-        )
-
 
 
 class DBPusher(grok.Adapter):
@@ -84,6 +249,7 @@ class DBPusher(grok.Adapter):
         for k in ['related', 'contained']:
             if k in data:
                 values = data[k]
+                if not values: continue
                 items = []
                 for v in values:
                     if isinstance(v, dict):
@@ -164,6 +330,7 @@ class EventsImporter(grok.Adapter):
     grok.provides(i.IEventsImporter)
     def do_import(self, *args, **kwargs):
         """Here datas is mainly used for tests"""
+        pdb = kwargs.get('pdb', None)
         messages = []
         catalog = getToolByName(self.context, 'portal_catalog')
         status = 1
@@ -172,7 +339,7 @@ class EventsImporter(grok.Adapter):
             if not self.context.activated:
                 raise Exception('This source is not activated')
             grabber = getUtility(i.IEventsGrabber, name=self.context.type)
-            datas = grabber.data(self.context.source)
+            datas = grabber.data(self.context.source, pdb=pdb)
             db = i.IDatabaseGetter(self.context).database()
             if db is None:
                 raise Exception('Can\'t get parent database for %s' % self.context)
@@ -209,12 +376,16 @@ class EventsImporter(grok.Adapter):
                     messages.extend(trace)
                     failed += 1
                     status = 2
+
         except Exception, e:
             status = 0
             trace = traceback.format_exc()
             messages.append(trace)
-        messages.append('%s created, %s edited, %s failed' % (
-            created, edited, failed))
+        self.context.created_events += created
+        self.context.edited_events += edited
+        self.context.failed_events += failed
+        messages.append(
+            '%s created, %s edited, %s failed' % ( created, edited, failed))
         self.context.log(status=status, messages=messages)
         self.context.reindexObject()
 
@@ -269,9 +440,6 @@ class EventSetter(grok.Adapter):
             value = data[it]
             field = i.ILiberticEvent.get(it)
             if IRelationList.providedBy(field) and bool(value):
-                # empty the existing relations, then reset them
-                # for null in getattr(self.context, it)[:]:
-                #     getattr(self.context, it).pop()
                 newval = []
                 for v in value:
                     if not IRelationValue.providedBy(v):
@@ -298,7 +466,8 @@ class EventsGrabber(grok.GlobalUtility):
     def mappings(self, content):
         raise NotImplementedError()
 
-    def validate(self, mappings):
+    def validate(self, mappings, **kw):
+        pdb = kw.get('pdb', None)
         results = []
         for cdata in mappings:
             dm = getUtility(i.IEventDataManager)
@@ -307,7 +476,7 @@ class EventsGrabber(grok.GlobalUtility):
             # we accept to have one event
             # malformed, just skip it
             try:
-                tdata = dm.validate(cdata)
+                tdata = dm.validate(cdata, pdb=pdb)
                 valid = True
             except schema.ValidationError, e:
                 errors.append(e)
@@ -320,100 +489,47 @@ class EventsGrabber(grok.GlobalUtility):
                 })
         return results
 
-    def data(self, url):
+    def data(self, url, **kw):
+        pdb = kw.get('pdb', None)
         contents = self.fetch(url)
         raw_mappings = self.mappings(contents)
-        return self.validate(raw_mappings)
-
-
-def as_unicode(mystr):
-    ret = mystr
-    if not isinstance(ret, unicode):
-        try:
-            ret = unicode(ret)
-        except Exception, e:
-            ret = ret.decode('utf-8')
-    return ret
+        return self.validate(raw_mappings, pdb=pdb)
 
 
 not_settable = ['contributors', 'creators', 'rights']
 class EventDataManager(grok.GlobalUtility):
     grok.provides(i.IEventDataManager)
-
-    def to_event_values(self, data):
-        cdata = empty_data()
-        for k in cdata.keys():
+    def to_event_values(self, data, **kw):
+        pdb = kw.get('pdb', None)
+        cdata = {}
+        fields = getDexterityFields(i.ILiberticEvent, 'libertic_event')
+        fieldnames = fields.keys()
+        for k in fieldnames:
             cdata[k] = _marker
         # do not allow creators/contributors to be set
-        for k in cdata.keys():
+        for k in fieldnames:
             if k in not_settable:
                 del cdata[k]
         # keep only desired values settable on a liberticevent
         for k in data:
             if k in cdata:
                 cdata[k] = data[k]
-        # keep only setted data
+        # keep only setted data but also filter values to something
+        # more eatable.
         for k in cdata.keys():
             if cdata[k] is _marker:
                 del cdata[k]
-        # ensure tuples
-        for k in ['target', 'subject', 'contained', 'related']:
-            if isinstance(cdata.get(k, None), list):
-                cdata[k] = tuple(cdata[k])
-            if k in cdata:
-                if not cdata[k]:
-                    cdata[k] = tuple()
-        # those fields are synonyms target/targets subject/subjects
-        for k in ['subject', 'target']:
-            if k in cdata:
-                cdata[k+'s'] = cdata[k]
-        for k in ['contained', 'related']:
-            itms = []
-            for itm in cdata[k]:
-                if isinstance(itm, dict):
-                    try:
-                        sid = as_unicode(
-                            itm['sid'])
-                        eid = as_unicode(
-                            itm['eid'])
-                        it = SourceMapping(
-                            sid, eid)
-                        itms.append(it)
-                    except Exception, e:
-                        continue
-            if itms:
-                cdata[k] = tuple(itms)
-        # defaults to fr
-        if not cdata.get('language', None):
-            cdata['language'] = 'fr'
-        # bytesstrings, be sure not to be unicode
-        for k in [
-            u'source',
-            u'video_url', u'gallery_url',
-            u'photos2_url', u'audio_url',
-            u'photos1_url', u'photos3_url',
-            u'press_url']:
-            if isinstance(cdata.get(k, None), unicode):
-                try:
-                    cdata[k] = cdata[k].encode('ascii')
-                except:
-                    cdata[k] = cdata[k].encode('utf-8')
-        # date fields
-        for k in [
-            'event_start', 'event_end',
-            'expires', 'effective',
-        ]:
-            val = cdata.get(k, None)
-            if isinstance(val, basestring):
-                try:
-                    cdata[k] = datetime.datetime.strptime(
-                        val, i.datefmt)
-                except Exception, e:
-                    pass
+            else:
+                cdata[k] = smart_type(fields[k], cdata[k])
+        # SPECIALCASE: default lang to fr
+        lang = data.get('language', None)
+        if not lang: lang = 'fr'
+        cdata['language'] = lang
         return cdata
 
-    def validate(self, data):
-        cdata = self.to_event_values(data)
+    def validate(self, data, **kw):
+        pdb = kw.get('pdb', None)
+        cdata = self.to_event_values(data, pdb=pdb)
         obj = Dummy(**cdata)
         alsoProvides(obj , i.ILiberticEventMapping)
         errors = [a for a in
@@ -426,36 +542,97 @@ class EventDataManager(grok.GlobalUtility):
 class JSONGrabber(EventsGrabber):
     grok.name('json')
     def mappings(self, contents):
+        fields = getDexterityFields(i.ILiberticEventMapping, 'libertic_event')
+        fieldnames = fields.keys()
         results = []
         try:
             jdata = json.loads(contents)
         except Exception, e:
             raise Exception('Data is not in json format')
         try:
-            results = jdata['events']
+            jresults = jdata['events']
             if not isinstance(results, list):
                 raise Exception()
         except Exception, e:
             raise Exception('Invalid json format, '
                             'not in the {"event": []} form')
+        for item in jresults:
+            result = {}
+            for fieldname in fieldnames:
+                field = fields[fieldname]
+                try:
+                    result[fieldname] = item[fieldname]
+                except Exception, e:
+                    # in case of exception, just skip this node value
+                    # we do not validate here, we must do importation
+                    # of incomplete events if they have enought data
+                    # to be considered valid
+                    # The validation will skip the event if there are
+                    # not enought datas in any case.
+                    continue
+            results.append(result)
         return results
+
 
 class XMLGrabber(EventsGrabber):
     grok.name('xml')
     def mappings(self, contents):
+        fields = getDexterityFields(i.ILiberticEventMapping, 'libertic_event')
+        fieldnames = fields.keys()
         results = []
-        import pdb;pdb.set_trace()  ## Breakpoint ##
         try:
-            jdata = json.loads(contents)
+            jdata = etree.fromstring(contents)
         except Exception, e:
-            raise Exception('Data is not in json format')
+            raise Exception('Data is not in XML format')
+        for item in jdata.xpath('/events/event'):
+            result = {}
+            for fieldname in fieldnames:
+                field =  fields[fieldname]
+                try:
+                    value = node_value(item, field)
+                except Exception, e:
+                    # in case of exception, just skip this node value
+                    # we do not validate here, we must do importation
+                    # of incomplete events if they have enought data
+                    # to be considered valid
+                    # The validation will skip the event if there are
+                    # not enought datas in any case.
+                    continue
+                if not value is _marker:
+                    result[fieldname] = value
+            results.append(result)
+        return results
+
+
+class CSVGrabber(EventsGrabber):
+    grok.name('csv')
+    def mappings(self, contents):
+        fields = getDexterityFields(i.ILiberticEventMapping, 'libertic_event')
+        fieldnames = fields.keys()
+        results = []
         try:
-            results = jdata['events']
-            if not isinstance(results, list):
-                raise Exception()
+            scontents = StringIO(contents)
+            jdata = read_csv(scontents)
         except Exception, e:
-            raise Exception('Invalid json format, '
-                            'not in the {"event": []} form')
+            raise Exception('Data is not in CSV format')
+        for item in jdata:
+            result = {}
+            for fieldname in fieldnames:
+                field = fields[fieldname]
+                try:
+                    value = csv_value(item.get(fieldname, _marker), field)
+                except Exception, e:
+                    # in case of exception, just skip this node value
+                    # we do not validate here, we must do importation
+                    # of incomplete events if they have enought data
+                    # to be considered valid
+                    # The validation will skip the event if there are
+                    import pdb;pdb.set_trace()  ## Breakpoint ##
+                    # not enought datas in any case.
+                    continue
+                if not value is _marker:
+                    result[fieldname] = value
+            results.append(result)
         return results
 
 # vim:set et sts=4 ts=4 tw=80:

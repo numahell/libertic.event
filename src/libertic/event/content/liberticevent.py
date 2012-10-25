@@ -14,6 +14,8 @@ from z3c.form.interfaces import ActionExecutionError
 
 from zope.interface import invariant, Invalid
 from plone.dexterity.content import Container
+from plone.app.dexterity.behaviors.metadata import IDublinCore
+from plone.app.dexterity.behaviors.metadata import IPublication
 from plone.directives import form, dexterity
 
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
@@ -30,6 +32,7 @@ from libertic.event.interfaces import (
     IDatabaseGetter,
     datefmt,
     ISourceMapping,
+    SID_EID_SPLIT,
 )
 
 
@@ -43,27 +46,35 @@ class csv_dialect(csv.Dialect):
 
 
 def export_csv(request, titles, rows, filename='file.csv'):
-        output = StringIO()
-        csvwriter = csv.DictWriter(
-            output,
-            fieldnames=titles,
-            extrasaction='ignore',
-            dialect = csv_dialect)
-        titles_row = dict([(title, title) for title in titles])
-        rows = [titles_row] + rows
-        for i, row in enumerate(rows):
-            for cell in row:
-                if isinstance(row[cell], unicode):
-                    row[cell] = row[cell].encode('utf-8')
-        csvwriter.writerows(rows)
-        resp = output.getvalue()
-        lresp = len(resp)
-        request.RESPONSE.setHeader('Content-Type','text/csv')
-        request.RESPONSE.addHeader(
-            "Content-Disposition","filename=%s"%filename)
-        request.RESPONSE.setHeader('Content-Length', len(resp))
-        request.RESPONSE.write(resp)
+    output = StringIO()
+    csvwriter = csv.DictWriter(
+        output,
+        fieldnames=titles,
+        extrasaction='ignore',
+        dialect = csv_dialect)
+    titles_row = dict([(title, title) for title in titles])
+    rows = [titles_row] + rows
+    for i, row in enumerate(rows):
+        for cell in row:
+            if isinstance(row[cell], unicode):
+                row[cell] = row[cell].encode('utf-8')
+    csvwriter.writerows(rows)
+    resp = output.getvalue()
+    lresp = len(resp)
+    request.response.setHeader('Content-Type','text/csv')
+    request.response.addHeader(
+        "Content-Disposition","filename=%s"%filename)
+    request.response.setHeader('Content-Length', len(resp))
+    request.response.write(resp)
 
+
+def read_csv(fileobj):
+    csvreader = csv.DictReader(fileobj, dialect = csv_dialect)
+    rows = []
+    for row in csvreader:
+        rows.append(row)
+    return rows
+    
 
 def empty_data():
     sdata =  {
@@ -75,7 +86,7 @@ def empty_data():
         'author_firstname': None,
         'author_lastname': None,
         'author_telephone': None,
-        'contained': None,
+        'contained': [],
         'country': None,
         'description': None,
         'effective': None,
@@ -98,12 +109,12 @@ def empty_data():
         'photos3_license': None,
         'photos3_url': None,
         'press_url': None,
-        'related': None,
+        'related': [],
         'sid': None,
         'source': None,
         'street': None,
-        'subject': None,
-        'target': None,
+        'subjects': tuple(),
+        'targets': tuple(),
         'telephone': None,
         'title': None,
         'town': None,
@@ -112,48 +123,56 @@ def empty_data():
     }
     return sdata
 
-def data_from_ctx(ctx):
+def data_from_ctx(ctx, **kw):
+    pdb = kw.get('pdb', None)
+    dc = IDublinCore(ctx)
+    pub = IPublication(ctx)
     sdata =  {
-        'source': ctx.source,
-        'sid': ctx.sid,
-        'eid': ctx.eid,
-        'title': ctx.title,
-        'description': ctx.description,
-        'subject':  ctx.subject,
-        'target': ctx.target,
         'address': ctx.address,
         'address_details': ctx.address_details,
-        'street': ctx.street,
-        'town': ctx.town,
-        'country': ctx.country,
-        'latlong': ctx.latlong,
-        'lastname': ctx.lastname,
-        'firstname': ctx.firstname,
-        'telephone': ctx.telephone,
-        'email': ctx.email,
-        'organiser': ctx.organiser,
-        'author_lastname': ctx.author_lastname,
-        'author_firstname': ctx.author_firstname,
-        'author_telephone': ctx.author_telephone,
-        'author_email': ctx.author_email,
-        'gallery_url': ctx.gallery_url,
-        'gallery_license': ctx.gallery_license,
-        'photos1_url': ctx.photos1_url,
-        'photos1_license': ctx.photos1_license,
-        'photos2_url': ctx.photos2_url,
-        'photos2_license': ctx.photos2_license,
-        'photos3_url': ctx.photos3_url,
-        'photos3_license': ctx.photos3_license,
-        'video_url': ctx.video_url,
-        'video_license': ctx.video_license,
-        'audio_url': ctx.audio_url,
         'audio_license': ctx.audio_license,
+        'audio_url': ctx.audio_url,
+        'author_email': ctx.author_email,
+        'author_firstname': ctx.author_firstname,
+        'author_lastname': ctx.author_lastname,
+        'author_telephone': ctx.author_telephone,
+        'country': ctx.country,
+        'description': dc.description,
+        'eid': ctx.eid,
+        'email': ctx.email,
+        'firstname': ctx.firstname,
+        'gallery_license': ctx.gallery_license,
+        'gallery_url': ctx.gallery_url,
+        'language': dc.language,
+        'lastname': ctx.lastname,
+        'latlong': ctx.latlong,
+        'organiser': ctx.organiser,
+        'photos1_license': ctx.photos1_license,
+        'photos1_url': ctx.photos1_url,
+        'photos2_license': ctx.photos2_license,
+        'photos2_url': ctx.photos2_url,
+        'photos3_license': ctx.photos3_license,
+        'photos3_url': ctx.photos3_url,
         'press_url': ctx.press_url,
-        'language': ctx.language,
+        'sid': ctx.sid,
+        'source': ctx.source,
+        'street': ctx.street,
+        'subjects':  dc.subjects,
+        'targets': ctx.targets,
+        'telephone': ctx.telephone,
+        'title': dc.title,
+        'town': ctx.town,
+        'video_license': ctx.video_license,
+        'video_url': ctx.video_url,
     }
-    for item in ['effective', 'expires',
-                 'event_start' ,'event_end',]:
-        value = ''
+    # if we have not the values in dublincore, try to get them on context
+    for k in 'language', 'title', 'description', 'subjects':
+        if not sdata[k]:
+            try:
+                sdata[k] = getattr(ctx, k)
+            except:
+                continue
+    def get_datetime_value(ctx, item):
         try:
             value = getattr(ctx, item)()
         except TypeError, ex:
@@ -161,15 +180,20 @@ def data_from_ctx(ctx):
         if isinstance(value, DateTime.DateTime):
             value.asdatetime()
         if isinstance(value, datetime.datetime):
-            value = value.strftime(datefmt)
-        sdata[item] = value
+            value = value.strftime(datefmt) 
+        return value
+    for item in ['effective', 'expires',
+                 'event_start' ,'event_end',]:
+        cctx = ctx
+        if item in ['effective', 'expires']:
+            cctx = pub
+        sdata[item] = get_datetime_value(cctx, item)
     for relate in ['contained', 'related']:
         l = []
         for item in getattr(ctx, relate, []):
-            import pdb;pdb.set_trace()  ## Breakpoint ##
-            obj = item.to_object
-            it = {"sid": obj.sid,
-                  "eid": obj.eid}
+            #obj = item.to_object
+            obj = item
+            it = {"sid": obj.sid, "eid": obj.eid}
             if not it in l:
                 l.append(it)
         sdata[relate] = l
@@ -238,7 +262,7 @@ def editable_SID_EID_check(context, sid, eid, request=None, form=None, *args, **
     events = [a for a in db.get_events(sid=sid, eid=eid)]
     uuids = [IUUID(a) for a in events]
     cuuid = IUUID(context)
-    if cuuid not in uuids:
+    if (cuuid not in uuids) and bool(uuids):
         raise ActionExecutionError(
             Invalid(_(u"The SID/EID combination is already in use, "
                       "please adapt them.")))
@@ -257,12 +281,12 @@ class Json(grok.View):
         sdata = data_from_ctx(self.context)
         resp = json.dumps(sdata)
         lresp = len(resp)
-        self.request.RESPONSE.setHeader('Content-Type','application/json')
-        self.request.RESPONSE.addHeader(
+        self.request.response.setHeader('Content-Type','application/json')
+        self.request.response.addHeader(
             "Content-Disposition","filename=%s.json" % (
                 self.context.getId()))
-        self.request.RESPONSE.setHeader('Content-Length', len(resp))
-        self.request.RESPONSE.write(resp)
+        self.request.response.setHeader('Content-Length', len(resp))
+        self.request.response.write(resp)
 
 
 class Xml(grok.View):
@@ -278,12 +302,12 @@ class Xml(grok.View):
         sdata = data_from_ctx(self.context)
         resp = self.xml(ctx=sdata).encode('utf-8')
         lresp = len(resp)
-        self.request.RESPONSE.setHeader('Content-Type','text/xml')
-        self.request.RESPONSE.addHeader(
+        self.request.response.setHeader('Content-Type','text/xml')
+        self.request.response.addHeader(
             "Content-Disposition","filename=%s.xml" % (
                 self.context.getId()))
-        self.request.RESPONSE.setHeader('Content-Length', len(resp))
-        self.request.RESPONSE.write(resp)
+        self.request.response.setHeader('Content-Length', len(resp))
+        self.request.response.write(resp)
 
 
 class Csv(grok.View):
@@ -292,16 +316,17 @@ class Csv(grok.View):
 
     def render(self):
         sdata = data_from_ctx(self.context)
-        for it in 'target', 'subject':
+        for it in 'targets', 'subjects':
             sdata[it] = '|'.join(sdata[it])
         for it in 'related', 'contained':
             values = []
             for item in sdata[it]:
                 values.append(
-                    '%s_|_%s' % (
-                    item['sid'],
-                    item['eid'],
-                ))
+                    '%s%s%s' % (
+                        item['sid'],
+                        SID_EID_SPLIT,
+                        item['eid'],
+                    ))
             sdata[it] = '|'.join(values)
         titles = sdata.keys()
         export_csv(

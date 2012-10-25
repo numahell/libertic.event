@@ -67,7 +67,7 @@ import mocker as mmocker
 testdir = pkg_resources.resource_filename('libertic.event', 'tests')
 
 from libertic.event.testing import Dummy
+from libertic.event.setuphandlers import publish_all 
 from StringIO import StringIO               
-from Testing.makerequest import makerequest 
 import uuid
 # vim:set et sts=4 ts=4 tw=80:

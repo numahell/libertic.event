@@ -20,6 +20,7 @@ from plone.app.dexterity.behaviors.exclfromnav import IExcludeFromNavigation
 
 
 datefmt = '%Y%m%dT%H%M'
+SID_EID_SPLIT = '_/_'
 
 source_status = SimpleVocabulary([
     SimpleVocabulary.createTerm(0, '0', _(u'FAILURE')),
@@ -109,23 +110,49 @@ class ISource(IDatabaseItem):
     type = schema.Choice(title=_(u"Type"), vocabulary=sources, required=True,)
     logs = schema.List(title=_('logs'), required=False,
                        value_type=schema.Object(ILog))
-    form.omitted('logs')
+    created_events = schema.Int(title=_('events created by this siyrce'), required=False, default=0) 
+    edited_events = schema.Int(title=_('events edited by this siyrce'), required=False, default=0) 
+    failed_events = schema.Int(title=_('events failed by this siyrce'), required=False, default=0) 
+    form.omitted('related')
+    form.widget(related=MultiContentTreeFieldWidget)
+    related = schema.List(
+            title=u"related events",
+            default=[],
+            value_type = schema.Choice(
+                title = _(u"related events"),
+                source = ObjPathSourceBinder(
+                    **{'portal_type':'libertic_event'})
+            ),
+    )
+ 
 
     def get_last_source_parsingstatus(self):
         """."""
 
 
+def sideidchars_check(value):
+    for c in ['|', '_', '/']:
+        if c in value:
+            raise Invalid(_('${name} is not allowed', mapping={"name": c}))
+    return True                                                       
+
+
 class ISourceMapping(form.Schema):
-    sid = schema.TextLine(title=_('label_source_id', default='Source id'), required=True)
-    eid = schema.TextLine(title=_('label_event_id', default='Event id'), required=True)
+    sid = schema.TextLine(title=_('label_source_id',default='Source id'), 
+                          constraint=sideidchars_check,  required=True)
+    eid = schema.TextLine(title=_('label_event_id', default='Event id'),  
+                          constraint=sideidchars_check, required=True)
 
 
-class ILiberticEvent(form.Schema, IDatabaseItem):
+
+class ILiberticEvent(IDatabaseItem):
     """A libertic event"""
     source = schema.URI(title=_('label_source', default='Source'), required=True)
-    sid = schema.TextLine(title=_('label_source_id', default='Source id'), required=True)
-    eid = schema.TextLine(title=_('label_event_id', default='Event id'), required=True)
-    target = schema.Tuple(
+    sid = schema.TextLine(title=_('label_source_id', default='Source id'),
+                          constraint=sideidchars_check,  required=True)
+    eid = schema.TextLine(title=_('label_event_id',  default='Event id'), 
+                          constraint=sideidchars_check, required=True)
+    targets = schema.Tuple(
         title=_('label_audience', default='Audience'),
         description=_('help_audience', default='children adullts -18'),
         value_type= schema.TextLine(),
@@ -167,34 +194,43 @@ class ILiberticEvent(form.Schema, IDatabaseItem):
     audio_url = schema.URI(title=_('Audio url'), required=False)
     audio_license = schema.TextLine(title=_('Audio license', ), required=False)
     press_url = schema.URI(title=_('Press url'), required=False)
-    contained = RelationList(
+    #contained = RelationList(
+    #        title=u"contained Items",
+    #        default=[],
+    #        value_type = RelationChoice(
+    #            title = _(u"contained Items"),
+    #            source = ObjPathSourceBinder(
+    #                **{'portal_type':'libertic_event'})
+    #        ),
+    #)
+    #related = RelationList(
+    #        title=u"related events",
+    #        default=[],
+    #        value_type = RelationChoice(
+    #            title = _(u"related events"),
+    #            source = ObjPathSourceBinder(
+    #                **{'portal_type':'libertic_event'})
+    #        ),
+    #)
+    form.widget(contained=MultiContentTreeFieldWidget)
+    contained = schema.List(
             title=u"contained Items",
             default=[],
-            value_type = RelationChoice(
+            value_type = schema.Choice(
                 title = _(u"contained Items"),
                 source = ObjPathSourceBinder(
                     **{'portal_type':'libertic_event'})
             ),
     )
-    related = RelationList(
+    form.widget(related=MultiContentTreeFieldWidget)
+    related = schema.List(
             title=u"related events",
             default=[],
-            value_type = RelationChoice(
+            value_type = schema.Choice(
                 title = _(u"related events"),
                 source = ObjPathSourceBinder(
                     **{'portal_type':'libertic_event'})
             ),
-    )
-
-    #import pdb;pdb.set_trace()  ## Breakpoint ##
-    form.widget(drelated=MultiContentTreeFieldWidget)
-    drelated = schema.List(
-        title=u"Related events",
-        defaultFactory=list, #req zope.schema >= 3.8.0
-        value_type = schema.Choice(
-            source = ObjPathSourceBinder(
-                **{'portal_type':'libertic_event'})
-        ),
     )
 
 
@@ -202,10 +238,10 @@ class ILiberticEvent(form.Schema, IDatabaseItem):
 class ILiberticEventMapping(ILiberticEvent, IDublinCore, INameFromTitle, IPublication, ):
     """A libertic event"""
     contained = schema.Tuple(
-        title=_('Events contained'), required=False,
+        title=_('Contained events'), required=False,
         value_type=schema.Object(ISourceMapping))
     related = schema.Tuple(
-        title=_('Tvents related'), required=False,
+        title=_('Related events'), required=False,
         value_type=schema.Object(ISourceMapping))
 
 

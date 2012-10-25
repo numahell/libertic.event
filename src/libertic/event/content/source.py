@@ -113,7 +113,7 @@ class Get_Events(grok.View):
             msg = _('Events are already planned to be fetched, '
                     'please refresh in a while')
         IStatusMessage(self.request).addStatusMessage(msg)
-        self.request.RESPONSE.redirect(
+        self.request.response.redirect(
             self.context.absolute_url()
         )
 

@@ -1,5 +1,11 @@
-Events import
-===================
+Events import, the Source kingdom
+===================================
+
+Mainly the import is a pull system when our events are fetched by the server on distance ``sources``.
+We need forthis a special content type: **Source** which know where and how to grab events.
+This object has also battery included to log and get some statistics counters on fetched data and failures.
+
+-  **TODO** : Add a browser view to expose the same service but in a ``push`` where the client pushes its data to the server.
 
 Setup
 -----------------
@@ -28,6 +34,7 @@ Responsible for fetching data from json sources::
 
     >>> jg = getUtility(lei.IEventsGrabber, name=u'json')
     >>> xg = getUtility(lei.IEventsGrabber, name=u'xml')
+    >>> csvg = getUtility(lei.IEventsGrabber, name=u'csv')
 
 Invalid json input data
 ++++++++++++++++++++++++
@@ -74,8 +81,8 @@ When we have enought data from a json mapping, we got a list of mappings::
     >>> data = jg.fetch('file://'+testdir+'/event.json')
     >>> json = jg.mappings(data)
     >>> pprint(json)
-    [{u'address': u'sdfgsfdsfdgsfdgsfdgsfdg',
-      u'address_details': ...
+    [{'address': u'sdfgsfdsfdgsfdgsfdgsfdg',
+      'address_details': ...
     >>> data = json[0]
 
 The most important settings of the data are the **eid** and the **sid**. Indeed, they represent the unique identifier of every each event.
@@ -88,7 +95,7 @@ IDataManager: The policy officer
 The datamanager will be use as datavalidator and mangler for all source types.
 It is responsible to sanitize, validate and transform input data mapping to suitable keywords arguments to the LiberticEvent dexterity factory constructor.
 
-First step:  sanitize the input data for prior validation
+First step: sanitize the input data for prior validation
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ::
 
@@ -114,16 +121,16 @@ Tuples::
 
 Subjects && targets::
 
-    >>> k='subject';edata[k]= ['aaa'];dm.to_event_values(edata)[k];dm.to_event_values(edata)[k+'s']
-    ('aaa',)
-    ('aaa',)
-    >>> k='target';edata[k]= ['aaa'];dm.to_event_values(edata)[k];dm.to_event_values(edata)[k+'s']
-    ('aaa',)
-    ('aaa',)
+    >>> k='subjects';edata[k]= ['aaa'];dm.to_event_values(edata)[k]
+    (u'aaa',)
+    >>> k='targets';edata[k]= ['aaa'];dm.to_event_values(edata)[k]
+    (u'aaa',)
 
 ByteStrings::
 
-    >>> k='press_url';edata[k]= u'éaaa';dm.to_event_values(edata)[k]
+    >>> k='press_url'
+    >>> edata[k]= u'éaaa'
+    >>> dm.to_event_values(edata)[k]
     '\xc3\x83\xc2\xa9aaa'
 
 Language is fr by default::
@@ -188,10 +195,14 @@ Contained / Related::
     (<libertic.event.content.jobs.SourceMapping object at ...>,)
     >>> [[a.__dict__ for a in cdata[k]] for k in ('related', 'contained')]
     [[{'eid': u'aaamyeid2', 'sid': u'aaamysid2'}, {'eid': u'aaamyeid', 'sid': u'aaamysid'}], [{'eid': u'myeid2', 'sid': u'mysid2'}, {'eid': u'myeid', 'sid': u'mysid'}]]
+
+Special case, related and contained skip malformed dict elements::
+
     >>> edata = cdata.copy();edata['related']=({'eid':u'fooé', },);dm.validate(edata)['related']
-    Traceback (most recent call last):
-    ...
-    ValidationError: [('related', WrongContainedType([SchemaNotProvided()], 'related'))]
+    ()
+
+::
+
     >>> edata = cdata.copy();edata['related']=('foo',);dm.validate(edata)['related']
     Traceback (most recent call last):
     ...
@@ -199,7 +210,7 @@ Contained / Related::
     >>> edata = cdata.copy();edata['related']='foo';dm.validate(edata)['related']
     Traceback (most recent call last):
     ...
-    ValidationError: [('related', WrongType('foo', <type 'tuple'>, 'related'))]
+    ValidationError: ...
     >>> edata = cdata.copy();edata['related']=['haha'];dm.validate(edata)['related']
     Traceback (most recent call last):
     ...
@@ -242,7 +253,7 @@ An event failed validation::
 
     >>> print jsource.logs[0].messages[0]
     A record failed validation:
-    {u'__comment': u'IN ERROR ITEM...
+    {...
     [('gallery_url', InvalidURI('not an url'))]
     <BLANKLINE>
 
@@ -257,24 +268,148 @@ The xml grabber
 Get data from xml files
 ++++++++++++++++++++++++++++
 The parser waits for ``event`` subnodes inside a global ``events`` node conforming to the event spec.
-
 ::
 
-    >>> out = StringIO()
+    >>> xmlout = StringIO()
+    >>> req = layer['request']
+    >>> req.response.stdout = xmlout
     >>> layer.logout()
     >>> layer.loginAsPortalOwner()
-    >>> from libertic.event.setuphandlers import publish_all
     >>> publish_all(db)
     >>> layer.logout()
     >>> layer.login(SUPPLIER_NAME)
-    >>> req = makerequest(layer['portal']['fr']['database'], stdout=out).REQUEST
     >>> view  = getMultiAdapter((db,req), name='eventsasxml')
-    >>> print view.render()
-    >>> import pdb;pdb.set_trace()  ## Breakpoint ##
-    >>> data = xg.fetch('file://'+testdir+'/1events.xml')
+    >>> view.render()
+    >>> content = '\n'.join(
+    ...   [a for a in xmlout.getvalue().strip().splitlines()
+    ...   if a.strip()])
+    >>> print content
+    Status: 200 OK
+    X-Powered-By: ...
+    Content-Length: ...
+    Content-Type: text/xml
+    Set-Cookie: ...
+    Content-Disposition: filename=database.xml
+    <?xml version="1.0" encoding="UTF-8"?>
+        <events xml:lang="en" lang="en">
+        <event xml:lang="en" lang="en">
+        <source>http://qsdf</source>
+        <sid>qsdfqsdf</sid>...
+    >>> xmlurl = 'file://'+testdir+'/ievents.xml'
+    >>> data = xg.fetch(xmlurl)
     >>> json = xg.mappings(data)
-    >>> pprint(json)
-    [{u'address': u'sdfgsfdsfdgsfdgsfdgsfdg',
-      u'address_details': ...
-    >>> data = json[0]
+
+Validating, and verifing the filtered data::
+
+    >>> vjson = xg.validate(json)
+    >>> len(vjson)
+    14
+    >>> vjson[1]['transformed']['related']
+    (<libertic.event.content.jobs.SourceMapping object at ...>, <libertic.event.content.jobs.SourceMapping object at ...>)
+    >>> vjson[1]['transformed']['event_start']
+    datetime.datetime(2012, 10, 4, 0, 0)
+    >>> vjson[1]['initial']['event_start']
+    '20121004T0000'
+    >>> vjson[1]['initial']['subjects']
+    ['fdhd', 'd  fg', 'h', 'fd ', 'h', 'gh', 'ddd']
+    >>> vjson[1]['initial']['subjects']
+    ['fdhd', 'd  fg', 'h', 'fd ', 'h', 'gh', 'ddd']
+    >>> vjson[1]['initial']['title']
+    'xmlevent1'
+    >>> vjson[1]['transformed']['title']
+    u'xmlevent1'
+
+Now repeating the import cycle::
+
+    >>> jsource.source = xmlurl
+    >>> jsource.type = 'json'
+    >>> lei.IEventsImporter(jsource).do_import()
+    >>> print '\n'.join(jsource.logs[0].messages).strip()
+    Traceback (most recent call last):
+    ...
+    Exception: Data is not in json format...
+    0 created, 0 edited, 0 failed
+
+Oups, we forgot to say that's XML::
+
+    >>> jsource.type = 'xml'
+    >>> lei.IEventsImporter(jsource).do_import()
+    >>> print '\n'.join(jsource.logs[0].messages).strip()
+    14 created, 0 edited, 0 failed
+    >>> jsource.logs[0].status
+    1
+
+Notice that we have counters on event creation, edition and failure::
+
+    >>> [getattr(jsource, a) for a in 'created_events', 'edited_events', 'failed_events']
+    [28, 1, 1]
+
+
+The csv grabber
+=================
+
+Get data from csv files
+++++++++++++++++++++++++++++
+The parser waits for a csv with an header of ``event keys``.
+And after that, lines of values conforming to the event spec forming one event per line.
+::
+
+    >>> csvurl = 'file://'+testdir+'/ievents.csv'
+    >>> csvout = StringIO()
+    >>> req = layer['request']
+    >>> req.response.stdout = csvout
+    >>> layer.logout()
+    >>> layer.loginAsPortalOwner()
+    >>> publish_all(db)
+    >>> layer.logout()
+    >>> layer.login(SUPPLIER_NAME)
+    >>> csvview = getMultiAdapter((db,req), name='eventsascsv')
+    >>> csvview.render()
+    >>> data = csvg.fetch(csvurl)
+    >>> json = csvg.mappings(data)
+
+Validating, and verifing the filtered data::
+
+    >>> vjson = csvg.validate(json)
+    >>> len(vjson)
+    14
+    >>> vjson[1]['transformed']['related']
+    (<libertic.event.content.jobs.SourceMapping object at ...>, <libertic.event.content.jobs.SourceMapping object at ...>)
+    >>> vjson[1]['transformed']['event_start']
+    datetime.datetime(2012, 10, 4, 0, 0)
+    >>> vjson[1]['initial']['event_start']
+    '20121004T0000'
+    >>> vjson[1]['initial']['subjects']
+    ['fdhd', 'd  fg', 'h', 'fd ', 'h', 'gh', 'ddd']
+    >>> vjson[1]['initial']['subjects']
+    ['fdhd', 'd  fg', 'h', 'fd ', 'h', 'gh', 'ddd']
+    >>> vjson[1]['initial']['title']
+    'csvevent1'
+    >>> vjson[1]['transformed']['title']
+    u'csvevent1'
+
+Now repeating the import cycle::
+
+    >>> jsource.source = csvurl
+    >>> jsource.type = 'json'
+    >>> lei.IEventsImporter(jsource).do_import()
+    >>> print '\n'.join(jsource.logs[0].messages).strip()
+    Traceback (most recent call last):
+    ...
+    Exception: Data is not in json format...
+    0 created, 0 edited, 0 failed
+
+Oups, we forgot to say that's CSV::
+
+    >>> jsource.type = 'csv'
+    >>> lei.IEventsImporter(jsource).do_import()
+    >>> print '\n'.join(jsource.logs[0].messages).strip()
+    14 created, 0 edited, 0 failed
+    >>> jsource.logs[0].status
+    1
+
+Notice that we have counters on event creation, edition and failure::
+
+    >>> [getattr(jsource, a) for a in 'created_events', 'edited_events', 'failed_events']
+    [42, 1, 1]
 

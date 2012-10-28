@@ -47,7 +47,7 @@ Suppliers can:
     >>> browser.getControl(name='form.libertic_event_supplier').value = True
     >>> browser.getControl(name='form.actions.register').click()
     >>> [a.getId() for a in suppliers.getAllGroupMembers()]
-    ['foosupplier']
+    ['foosupplier', 'plonesupplier']
     >>> supplreq = [b for b in pwt._requests if pwt._requests[b][0] == 'foosupplier'][0]
     >>> verif = Browser.new('http://foo/plone/portal_registration/passwordreset/%s?userid=%s' % (supplreq, 'foosupplier'))
     >>> verif.getControl(name='password').value = 'foofoo'
@@ -89,7 +89,7 @@ We can register as operator
     >>> browser.getControl(name='form.libertic_event_operator').value = True
     >>> browser.getControl(name='form.actions.register').click()
     >>> [a.getId() for a in operators.getAllGroupMembers()]
-    ['foooperator']
+    ['foooperator', 'ploneoperator']
     >>> opreq = [b for b in pwt._requests if pwt._requests[b][0] == 'foooperator'][0]
     >>> verif2 = Browser.new('http://foo/plone/portal_registration/passwordreset/%s?userid=%s' % (opreq, 'foooperator'))
     >>> verif2.getControl(name='password').value = 'foofoo'

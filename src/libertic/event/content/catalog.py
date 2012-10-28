@@ -130,19 +130,19 @@ searchable(ILiberticEvent, 'address')
 
 @indexer(ISource)
 def sourcecreatedeventIndexer(obj):
-    return obj.created_events
+    return int(obj.created_events)
 grok.global_adapter(sourcecreatedeventIndexer, name="source_created_events")
 
 
 @indexer(ISource)
 def sourceeditedeventIndexer(obj):
-    return obj.edited_events
+    return int(obj.edited_events)
 grok.global_adapter(sourceeditedeventIndexer, name="source_edited_events")
 
 
 @indexer(ISource)
 def sourcefailedeventIndexer(obj):
-    return obj.failed_events
+    return int(obj.failed_events)
 grok.global_adapter(sourcefailedeventIndexer, name="source_failed_events")
 
 # vim:set et sts=4 ts=4 tw=80:

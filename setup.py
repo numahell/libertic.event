@@ -67,8 +67,6 @@ setup(
         'Pillow',
         # with_ploneproduct_seo
         'collective.seo',
-        # with_ploneproduct_eeatags
-        'eea.tags',
         # with_ploneproduct_patheming
         'plone.app.theming',
         'plone.app.themingplugins',

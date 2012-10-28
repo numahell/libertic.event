@@ -139,10 +139,7 @@ class LiberticEventLayer(base.CollectiveCronLayer):
         #with_ploneproduct_seo
         import collective.seo
         self.loadZCML('configure.zcml', package=collective.seo)
-        #with_ploneproduct_eeatags
-        import eea.tags
-        self.loadZCML('configure.zcml', package=eea.tags)
-        #with_ploneproduct_masonry
+        ##with_ploneproduct_masonry
         import collective.masonry
         self.loadZCML('configure.zcml', package=collective.masonry)
         #with_ploneproduct_patheming

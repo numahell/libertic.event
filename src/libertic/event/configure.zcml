@@ -48,8 +48,6 @@
   <include package="collective.portlet.oembed" file="configure.zcml"/>
   <!--with_ploneproduct_seo -->
   <include package="collective.seo" file="configure.zcml"/>
-  <!--with_ploneproduct_eeatags -->
-  <include package="eea.tags" file="configure.zcml"/>
   <!--with_ploneproduct_configviews -->
   <include package="collective.configviews" file="configure.zcml"/>
   <!--with_ploneproduct_ccron -->

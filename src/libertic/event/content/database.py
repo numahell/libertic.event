@@ -14,6 +14,7 @@ from libertic.event.interfaces import (
 from Acquisition import aq_inner, aq_parent
 
 from Products.CMFCore.utils import getToolByName
+from libertic.event.content import source
 
 
 alsoProvides(IDatabase, form.IFormFieldProvider)
@@ -26,6 +27,7 @@ class Database(Container):
     def get_sources(self, review_state=_marker, multiple=True, asobj=True, **kw):
         catalog = getToolByName(self, 'portal_catalog')
         query = {
+            'portal_type': ['libertic_source'],
             'path': {'query': '/'.join(self.getPhysicalPath())},
         }
         if review_state is not None:
@@ -52,6 +54,7 @@ class Database(Container):
                    multiple=True, asobj=True, **kw):
         catalog = getToolByName(self, 'portal_catalog')
         query = {
+            'portal_type': ['libertic_event'],
             'path': {'query': '/'.join(self.getPhysicalPath())},
         }
         if sid: query['sid'] = sid
@@ -105,6 +108,36 @@ class DatabaseGetter(grok.Adapter):
             ctx = None
             oldctx = None
         return ctx
+
+
+from collective.cron import interfaces as croni
+from Products.CMFPlone.interfaces.siteroot import IPloneSiteRoot
+class EventsGrabber(grok.MultiAdapter):
+    implements(croni.IJobRunner)
+    grok.adapts(IPloneSiteRoot, croni.ICron)
+    grok.name('libertic_grab')
+
+    def __init__(self, context, cron):
+        self.context = context
+        self.cron = cron
+
+    def databases(self, asobj=True):
+        ct = getToolByName(self.context, 'portal_catalog')
+        query = {
+            'portal_type': 'libertic_database',
+            'review_state': 'published',
+        }
+        brains = ct.searchResults(**query) 
+        brains = [a for a in brains]
+        if asobj:
+            brains = [a.getObject() for a in brains]
+        return brains                         
+
+    def run(self):
+        databases = self.databases()
+        for db in databases:
+            for src in db.get_sources():
+                source.register_collect_job(src)
 
 
 # vim:set et sts=4 ts=4 tw=80:

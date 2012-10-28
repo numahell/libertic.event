@@ -64,7 +64,7 @@ class AddForm(dexterity.AddForm):
     grok.name('libertic_source')
     grok.require('libertic.source.Add')
     def updateFields(self):
-        dexterity.EditForm.updateFields(self)
+        dexterity.AddForm.updateFields(self)
         self.fields = self.fields.omit('logs')
 
 
@@ -80,12 +80,16 @@ class View(dexterity.DisplayForm):
     grok.context(i.ISource)
     grok.require('libertic.source.View')
     def get_status(self, status):
+        try:
+            status = i.source_status.getTermByToken(str(status)).title
+        except:
+            pass
         return status
 
     def format_date(self, date):
         sstr = ''
         if date:
-            sstr = date.strftime(i.datefmt)
+            sstr = date.strftime(i.rdatefmt)
         return sstr
 
     def updateFields(self):
@@ -97,17 +101,8 @@ class Get_Events(grok.View):
     grok.require('libertic.source.Add')
 
     def render(self):
-        portal = getToolByName(
-            self.context, 'portal_url').getPortalObject()
-        db = self.context.database()
-        queue = getAdapter(portal, IQueue)
-        job_infos = queue.get_job_infos(
-            begin_after=None,
-            context=self.context,
-            job=do_import,)
-        if (not queue.is_job_running(job_infos)
-            and not queue.is_job_pending(job_infos)):
-            queue.register_job(job_infos)
+        ret = register_collect_job(self.context)
+        if ret :
             msg = _('Events will be grabbed, please refresh in a while')
         else:
             msg = _('Events are already planned to be fetched, '
@@ -118,9 +113,23 @@ class Get_Events(grok.View):
         )
 
 
-def do_import(ctx, *args, **kwargs):
-    importer = i.IEventImporter(ctx)
-    importer.do_import()
+def register_collect_job(source):
+    ret = False
+    db = i.IDatabaseGetter(source).database()
+    portal = getToolByName(
+        source, 'portal_url').getPortalObject()
+    queue = getAdapter(portal, IQueue)
+    job_infos = queue.get_job_infos(
+        begin_after=None, context=source, job=do_import,)
+    if (not queue.is_job_running(job_infos)
+        and not queue.is_job_pending(job_infos)):
+        queue.register_job(job_infos)
+        ret = True
+    return ret
 
+
+def do_import(ctx, *args, **kwargs):
+    importer = i.IEventsImporter(ctx)
+    importer.do_import()
 
 # vim:set et sts=4 ts=4 tw=80:

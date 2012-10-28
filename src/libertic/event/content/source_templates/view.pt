@@ -18,14 +18,31 @@
       <li><a i18n:translate="" href="get_events">Get events</a></li>
     </ul>
 
+    <h2 i18n:translate="">Source details</h2>
     <tal:block repeat="widget view/widgets/values">
-        <div class="field" tal:condition="python:widget.__name__ not in ('IBasic.title', 'IBasic.description', 'title', 'description', 'logs')">
+      <div class="field" tal:condition="python:widget.__name__ not in (
+        'IBasic.title', 'IBasic.description', 
+        'title', 'description', 'logs',
+        'created_events', 'edited_events', 'failed_events')">
             <label tal:content="widget/label" />
             <br />
             <div tal:content="structure widget/render" />
         </div>
     </tal:block>
-
+    <h2 i18n:translate="">Global statistics for events parsed</h2>
+    <table class="listing" style="width:auto">
+      <tr>
+        <th i18n:translate="" width="10%">Created</th>
+        <th i18n:translate="" width="5%">Edited</th>
+        <th i18n:translate="" width="85%">Failed to import</th>
+      </tr>
+      <tr>
+        <td tal:content="here/created_events"></td>
+        <td tal:content="here/edited_events"></td>
+        <td tal:content="here/failed_events"></td>
+      </tr>
+    </table>
+    <h2 i18n:translate="">Logs</h2>
     <table tal:condition="context/logs" class="listing" width="100%">
       <tr>
         <th width="10%">Date</th>
@@ -46,8 +63,6 @@
         </tr>
       </tal:block>
     </table>
-
-
     <fieldset tal:repeat="group view/groups"
               tal:attributes="id python:''.join((group.prefix, 'groups.', group.__name__)).replace('.', '-')">
         <legend tal:content="group/label" />
@@ -57,7 +72,6 @@
             <div tal:content="structure widget/render" />
         </div>
     </fieldset>
-
 </metal:main>
 
 </body>

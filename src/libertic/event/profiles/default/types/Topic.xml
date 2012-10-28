@@ -2,7 +2,7 @@
 <object name="Topic" i18n:domain="plone"
     meta_type="Factory-based Type Information with dynamic views"
     xmlns:i18n="http://xml.zope.org/namespaces/i18n">
-  <property name="global_allow">True</property>
+  <property name="global_allow">False</property>
   <property name="view_methods">
     <element value="eventsasical"/>
     <element value="eventsasxml"/>

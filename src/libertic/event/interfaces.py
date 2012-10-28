@@ -20,6 +20,7 @@ from plone.app.dexterity.behaviors.exclfromnav import IExcludeFromNavigation
 
 
 datefmt = '%Y%m%dT%H%M'
+rdatefmt = "%Y-%m-%d %H:%M:%S"
 SID_EID_SPLIT = '_/_'
 
 source_status = SimpleVocabulary([
@@ -110,10 +111,10 @@ class ISource(IDatabaseItem):
     type = schema.Choice(title=_(u"Type"), vocabulary=sources, required=True,)
     logs = schema.List(title=_('logs'), required=False,
                        value_type=schema.Object(ILog))
-    created_events = schema.Int(title=_('events created by this siyrce'), required=False, default=0) 
-    edited_events = schema.Int(title=_('events edited by this siyrce'), required=False, default=0) 
-    failed_events = schema.Int(title=_('events failed by this siyrce'), required=False, default=0) 
-    form.omitted('related')
+    created_events = schema.Int(title=_('events created by this source'), required=False, default=0) 
+    edited_events = schema.Int(title=_('events edited by this source'), required=False, default=0) 
+    failed_events = schema.Int(title=_('events failed by this source'), required=False, default=0) 
+    form.omitted('related', 'created_events', 'edited_events', 'failed_events')
     form.widget(related=MultiContentTreeFieldWidget)
     related = schema.List(
             title=u"related events",
@@ -157,7 +158,7 @@ class ILiberticEvent(IDatabaseItem):
         description=_('help_audience', default='children adullts -18'),
         value_type= schema.TextLine(),
         required = False,
-        missing_value = (),
+        defaultFactory = tuple,
     )
     #
     address = schema.Text(title=_('Address'), required=True)

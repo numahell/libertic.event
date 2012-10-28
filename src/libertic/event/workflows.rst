@@ -11,7 +11,6 @@ We will have groups mapped to roles::
 ::
 
     >>> groups = layer['portal'].portal_groups
-    >>> abrowser = Browser.new('http://foo/plone/fr/database', login=True)
 
 
 The user role (Member (simple) & anonymous)
@@ -25,7 +24,6 @@ We can add a source
 ~~~~~~~~~~~~~~~~~~~~~
 ::
 
-    >>> import pdb;pdb.set_trace()  ## Breakpoint ##
     >>> browser = Browser.new('http://foo/plone/fr/database', SUPPLIER_NAME, SUPPLIER_PASSWORD)
     >>> '++add++libertic_source' in browser.contents
     True
@@ -70,6 +68,7 @@ We can add and submit for moderation an event
 
 Only admin or other reviewers can publish events::
 
+    >>> abrowser = Browser.new('http://foo/plone/fr/database', login=True)
     >>> abrowser.getLink('myevent').click()
     >>> browser.getLink('myevent').click()
     >>> 'content_status_modify?workflow_action=publish' in browser.contents

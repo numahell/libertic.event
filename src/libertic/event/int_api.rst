@@ -184,7 +184,6 @@ Ooops, we must login::
     >>> req.response.stdout = StringIO()
     >>> db.restrictedTraverse('@@xml_api').render()
     >>> resp = req.response.stdout.getvalue()
-    >>> import pdb;pdb.set_trace()  ## Breakpoint ##
     >>> print resp
     <?xml version="1.0" encoding="UTF-8"?>...
     Exception: Data is not in XML format
@@ -196,7 +195,7 @@ Now, do a valid xml import session::
     >>> req.method = 'POST'
     >>> req.stdin = StringIO(jsonc)
     >>> req.response.stdout = StringIO()
-    >>> db.restrictedTraverse('@@xml_api').render(pdb=True)
+    >>> db.restrictedTraverse('@@xml_api').render()
     >>> resp = '\n'.join([a.strip()
     ...  for a in req.response.stdout.getvalue().splitlines()
     ...  if a .strip()])

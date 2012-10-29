@@ -4,10 +4,12 @@ __docformat__ = 'restructuredtext en'
 from five import grok
 from copy import deepcopy
 import datetime
+import DateTime
 from StringIO import StringIO
 import socket
 import time
 import chardet
+from plone.app.dexterity.behaviors.exclfromnav import IExcludeFromNavigation
 try:
     import json
 except ImportError:
@@ -34,6 +36,7 @@ from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.utils import getToolByName
 from Products.ATContentTypes.interfaces.topic import IATTopic
 
+from AccessControl.unauthorized import Unauthorized
 from plone.autoform.interfaces import IFormFieldProvider
 from plone.app.collection.interfaces import ICollection
 from plone.dexterity.interfaces import IDexterityFTI
@@ -133,7 +136,7 @@ def smart_type(field, value):
     # transform dicts to SourceMappings for related objects
     if (field.__name__ in ['contained', 'related']):
         itms = []
-        if bool(value): 
+        if bool(value):
             for itm in list(value):
                 if isinstance(itm, dict):
                     try:
@@ -280,7 +283,9 @@ class DBPusher(grok.Adapter):
                 data[k] = tuple(items)
 
 
-    def push_event(self, data):
+    def push_event(self, data, editors):
+        if not editors:
+            raise Exception('must supply editors')
         db = self.context
         status = 'failed'
         messages = []
@@ -302,12 +307,12 @@ class DBPusher(grok.Adapter):
                     # verify that there are no other event with same (eid, sid)
                     constructor = i.IEventConstructor(db)
                     self.filter_data(db, data['transformed'])
-                    event = constructor.construct(data['transformed'])
+                    event = constructor.construct(data['transformed'], editors)
                     status = 'created'
                 except NotUnique, e:
                     # in case of not unique, it means an edit session
                     editor = i.IEventEditor(db)
-                    event = editor.edit(data['transformed'])
+                    event = editor.edit(data['transformed'], editors)
                     status = 'edited'
             except Exception, e:
                 status = 'failed'
@@ -322,6 +327,11 @@ class DBPusher(grok.Adapter):
                 except Exception, e:
                     # handle case where repr(data) can failed
                     messages.append(trace)
+        for itm in [db, event]:
+            if itm is not None:
+                nav = IExcludeFromNavigation(itm)
+                nav.exclude_from_nav = False
+                itm.reindexObject()
         return messages, status, event
 
 
@@ -330,6 +340,7 @@ class EventsImporter(grok.Adapter):
     grok.provides(i.IEventsImporter)
     def do_import(self, *args, **kwargs):
         """Here datas is mainly used for tests"""
+        editors = list(self.context.listCreators())
         pdb = kwargs.get('pdb', None)
         messages = []
         catalog = getToolByName(self.context, 'portal_catalog')
@@ -350,7 +361,7 @@ class EventsImporter(grok.Adapter):
                     for k in ['contained', 'related']:
                         if k in cdata:
                             del cdata[k]
-                    infos, ret, event = i.IDBPusher(db).push_event(cdata)
+                    infos, ret, event = i.IDBPusher(db).push_event(cdata, editors)
                     if event is not None: event.reindexObject()
                     messages.extend(infos)
                 except Exception, e:
@@ -368,7 +379,7 @@ class EventsImporter(grok.Adapter):
             for data in secondpass_datas:
                 try:
                     cdata = deepcopy(data)
-                    infos, ret, event = i.IDBPusher(db).push_event(cdata)
+                    infos, ret, event = i.IDBPusher(db).push_event(cdata, editors)
                     if event is not None: event.reindexObject()
                     messages.extend(infos)
                 except Exception, e:
@@ -376,11 +387,17 @@ class EventsImporter(grok.Adapter):
                     messages.extend(trace)
                     failed += 1
                     status = 2
-
         except Exception, e:
             status = 0
             trace = traceback.format_exc()
             messages.append(trace)
+        if status == 0:
+            self.context.fails += 1
+
+        if status == 1:
+            self.context.runs += 1
+        if status == 2:
+            self.context.warns += 1
         self.context.created_events += created
         self.context.edited_events += edited
         self.context.failed_events += failed
@@ -394,17 +411,47 @@ class EventConstructor(grok.Adapter):
     grok.context(i.IDatabase)
     grok.provides(i.IEventConstructor)
 
-    def construct(self, data):
+    def construct(self, data, editors):
         try:
             unique_SID_EID_check(self.context, data["sid"], data["eid"])
         except ActionExecutionError, e:
             raise NotUnique("%s_%s combination is not unique" % (
                 data["sid"], data["eid"]))
+        pm = getToolByName(self.context, 'portal_membership')
+        for editor in editors:
+            try:
+                user = pm.getMemberById(editor)
+                if not user:
+                    raise Exception()
+            except:
+                raise Unauthorized(editor)
+            roles = pm.getMemberById(
+                editor).getRolesInContext(self.context)
+            if 'Manager' in roles:
+                roles.append('LiberticSupplier')
+            if not 'LiberticSupplier' in roles:
+                raise Unauthorized(editor)
         # get first a dummy event
         evt = createContentInContainer(self.context, 'libertic_event',
                                        title=data["title"])
         # then try to set all values
         i.IEventSetter(evt).set(data)
+        # set creator
+        if evt is not None:
+            changed = False
+            creators = list(evt.listCreators())
+            for it in editors:
+                if not it in creators:
+                    creators.append(it)
+                    changed = True
+            if changed:
+                evt.setCreators(creators)
+                for it in evt.listCreators():
+                    roles = list(evt.get_local_roles_for_userid(it))
+                    if not 'Owner' in roles:
+                        roles.append('Owner')
+                    evt.manage_setLocalRoles(it, roles)
+                evt.reindexObject()
         return evt
 
 
@@ -412,7 +459,7 @@ class EventEditor(grok.Adapter):
     grok.context(i.IDatabaseItem)
     grok.provides(i.IEventEditor)
 
-    def edit(self, data):
+    def edit(self, data, editors):
         db = i.IDatabaseGetter(self.context).database()
         evt = db.get_event(sid=data["sid"], eid=data["eid"])
         try:
@@ -420,13 +467,28 @@ class EventEditor(grok.Adapter):
         except ActionExecutionError, e:
             raise NotUnique("%s_%s combination is not unique" % (
                 data["sid"], data["eid"]))
+        pm = getToolByName(self.context, 'portal_membership')
+        for editor in editors:
+            try:
+                user = pm.getMemberById(editor)
+                if not user:
+                    raise Exception()
+            except:
+                raise Unauthorized(editor)
+            roles = pm.getMemberById(
+                editor).getRolesInContext(evt)
+            if 'Manager' in roles:
+                roles.append('Owner')
+            if not (('Editor' in roles)
+                    or ('Owner' in roles)):
+                raise Unauthorized(editor)
         # we can edit an event only if it is not published
         wf = getToolByName(evt, 'portal_workflow')
         if wf.getInfoFor(evt, 'review_state') not in ['private', 'pending']:
             raise CantEdit("%s is not in pending state, cant edit" % evt)
         i.IEventSetter(evt).set(data)
 
-
+from plone.app.dexterity.behaviors.metadata import IPublication
 class EventSetter(grok.Adapter):
     grok.context(i.ILiberticEvent)
     grok.provides(i.IEventSetter)
@@ -446,7 +508,11 @@ class EventSetter(grok.Adapter):
                         v = RelationValue(intids.getId(v))
                     newval.append(v)
                 value = newval
-            setattr(self.context, it, value)
+            ctx = self.context
+            if it in ['expires', 'effective']:
+                ctx = IPublication(self.context)
+            setattr(ctx, it, value)
+        db.reindexObject()
 
 
 class EventsGrabber(grok.GlobalUtility):
@@ -574,6 +640,12 @@ class JSONGrabber(EventsGrabber):
         return results
 
 
+class APIJSONGrabber(JSONGrabber):
+    grok.name('jsonapi')
+    def fetch(self, data):
+        return data
+
+
 class XMLGrabber(EventsGrabber):
     grok.name('xml')
     def mappings(self, contents):
@@ -604,6 +676,12 @@ class XMLGrabber(EventsGrabber):
         return results
 
 
+class APIJSONGrabber(XMLGrabber):
+    grok.name('xmlapi')
+    def fetch(self, data):
+        return data
+
+
 class CSVGrabber(EventsGrabber):
     grok.name('csv')
     def mappings(self, contents):
@@ -627,7 +705,6 @@ class CSVGrabber(EventsGrabber):
                     # of incomplete events if they have enought data
                     # to be considered valid
                     # The validation will skip the event if there are
-                    import pdb;pdb.set_trace()  ## Breakpoint ##
                     # not enought datas in any case.
                     continue
                 if not value is _marker:

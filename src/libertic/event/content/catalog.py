@@ -145,4 +145,23 @@ def sourcefailedeventIndexer(obj):
     return int(obj.failed_events)
 grok.global_adapter(sourcefailedeventIndexer, name="source_failed_events")
 
+
+@indexer(ISource)
+def sourcerunseventIndexer(obj):
+    return int(obj.runs)
+grok.global_adapter(sourcerunseventIndexer, name="source_runs_events")
+
+
+@indexer(ISource)
+def sourcefailseventIndexer(obj):
+    return int(obj.fails)
+grok.global_adapter(sourcefailseventIndexer, name="source_fails_events")
+ 
+@indexer(ISource)
+def sourcewarnseventIndexer(obj):
+    return int(obj.warns)
+grok.global_adapter(sourcewarnseventIndexer, name="source_warns_events")
+ 
+
+
 # vim:set et sts=4 ts=4 tw=80:

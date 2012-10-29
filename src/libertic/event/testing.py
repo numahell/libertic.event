@@ -55,6 +55,9 @@ PLONE_MANAGER_PASSWORD = 'plonemanager'
 SUPPLIER_NAME = 'Plone_supplier'
 SUPPLIER_ID = 'plonesupplier'
 SUPPLIER_PASSWORD = 'plonesupplier'
+SUPPLIER2_NAME = 'Plone_supplier2'
+SUPPLIER2_ID = 'plonesupplier2'
+SUPPLIER2_PASSWORD = 'plonesupplier2'
 OPERATOR_NAME = 'Plone_operator'
 OPERATOR_ID = 'ploneoperator'
 OPERATOR_PASSWORD = 'ploneoperator'
@@ -180,7 +183,7 @@ class LayerMixin(base.LayerMixin):
 
     def testTearDown(self):
         self._getToolByName_mock = None
-        self['mocker'].restore()  
+        self['mocker'].restore()
         self.loginAsPortalOwner()
         if 'test-folder' in self['portal'].objectIds():
             self['portal'].manage_delObjects('test-folder')
@@ -214,10 +217,18 @@ class LayerMixin(base.LayerMixin):
                 SUPPLIER_NAME,
                 SUPPLIER_PASSWORD,
                 TEST_USER_ROLES)
-            self.logout()
+        if not self['portal']['acl_users'].getUser(SUPPLIER2_NAME):
+            self.add_user(
+                self['portal'],
+                SUPPLIER2_ID,
+                SUPPLIER2_NAME,
+                SUPPLIER2_PASSWORD,
+                TEST_USER_ROLES)
+        self.logout()
         portal_groups = self['portal'].portal_groups
         portal_groups.addPrincipalToGroup(OPERATOR_ID, lei.groups['operator']['id'])
         portal_groups.addPrincipalToGroup(SUPPLIER_ID, lei.groups['supplier']['id'])
+        portal_groups.addPrincipalToGroup(SUPPLIER2_ID, lei.groups['supplier']['id'])
         self.login(TEST_USER_NAME)
         self.setRoles(['Manager'])
         if not 'test-folder' in self['portal'].objectIds():

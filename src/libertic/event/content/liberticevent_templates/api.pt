@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response xmlns:tal="http://xml.zope.org/namespaces/tal">
+  <status><tal:block tal:content="options/data/status|nothing"/></status>
+  <messages>
+  <tal:block tal:repeat="m options/data/messages|python:[]">
+    <message tal:content="m"/>
+  </tal:block>
+  </messages>
+  <results>
+  <tal:block tal:repeat="result options/data/results|python:[]">
+    <result>
+      <sid><tal:block tal:content="result/sid|nothing"/></sid>
+      <eid><tal:block tal:content="result/eid|nothing"/></eid>
+      <status><tal:block tal:content="result/status|nothing"/></status>
+      <messages>
+        <tal:block tal:repeat="m result/messages">
+          <message tal:content="m"/>
+        </tal:block>
+      </messages>
+    </result>
+  </tal:block>
+  </results>
+</response>

@@ -55,6 +55,9 @@ from libertic.event.testing import (
     SUPPLIER_NAME,
     SUPPLIER_ID,
     SUPPLIER_PASSWORD,
+    SUPPLIER2_NAME,
+    SUPPLIER2_ID,
+    SUPPLIER2_PASSWORD,
     OPERATOR_NAME,
     OPERATOR_ID,
     OPERATOR_PASSWORD,
@@ -67,7 +70,7 @@ import mocker as mmocker
 testdir = pkg_resources.resource_filename('libertic.event', 'tests')
 
 from libertic.event.testing import Dummy
-from libertic.event.setuphandlers import publish_all 
-from StringIO import StringIO               
+from libertic.event.setuphandlers import publish_all
+from StringIO import StringIO
 import uuid
 # vim:set et sts=4 ts=4 tw=80:

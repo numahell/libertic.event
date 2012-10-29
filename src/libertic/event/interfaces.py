@@ -111,10 +111,14 @@ class ISource(IDatabaseItem):
     type = schema.Choice(title=_(u"Type"), vocabulary=sources, required=True,)
     logs = schema.List(title=_('logs'), required=False,
                        value_type=schema.Object(ILog))
-    created_events = schema.Int(title=_('events created by this source'), required=False, default=0) 
-    edited_events = schema.Int(title=_('events edited by this source'), required=False, default=0) 
-    failed_events = schema.Int(title=_('events failed by this source'), required=False, default=0) 
-    form.omitted('related', 'created_events', 'edited_events', 'failed_events')
+    created_events = schema.Int(title=_('events created by this source'), required=False, default=0)
+    edited_events = schema.Int(title=_('events edited by this source'), required=False, default=0)
+    failed_events = schema.Int(title=_('events failed by this source'), required=False, default=0)
+    warns = schema.Int(title=_('Warn tries'), required=False, default=0)
+    runs = schema.Int(title=_('Runned without errors tries'), required=False, default=0)
+    fails = schema.Int(title=_('Failed runs'), required=False, default=0)
+    form.omitted('related', 'created_events', 'edited_events', 'failed_events',
+                'warns', 'runs', 'fails')
     form.widget(related=MultiContentTreeFieldWidget)
     related = schema.List(
             title=u"related events",
@@ -125,7 +129,7 @@ class ISource(IDatabaseItem):
                     **{'portal_type':'libertic_event'})
             ),
     )
- 
+
 
     def get_last_source_parsingstatus(self):
         """."""
@@ -135,13 +139,13 @@ def sideidchars_check(value):
     for c in ['|', '_', '/']:
         if c in value:
             raise Invalid(_('${name} is not allowed', mapping={"name": c}))
-    return True                                                       
+    return True
 
 
 class ISourceMapping(form.Schema):
-    sid = schema.TextLine(title=_('label_source_id',default='Source id'), 
+    sid = schema.TextLine(title=_('label_source_id',default='Source id'),
                           constraint=sideidchars_check,  required=True)
-    eid = schema.TextLine(title=_('label_event_id', default='Event id'),  
+    eid = schema.TextLine(title=_('label_event_id', default='Event id'),
                           constraint=sideidchars_check, required=True)
 
 
@@ -151,7 +155,7 @@ class ILiberticEvent(IDatabaseItem):
     source = schema.URI(title=_('label_source', default='Source'), required=True)
     sid = schema.TextLine(title=_('label_source_id', default='Source id'),
                           constraint=sideidchars_check,  required=True)
-    eid = schema.TextLine(title=_('label_event_id',  default='Event id'), 
+    eid = schema.TextLine(title=_('label_event_id',  default='Event id'),
                           constraint=sideidchars_check, required=True)
     targets = schema.Tuple(
         title=_('label_audience', default='Audience'),

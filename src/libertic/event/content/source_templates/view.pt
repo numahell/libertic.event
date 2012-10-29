@@ -22,13 +22,26 @@
     <tal:block repeat="widget view/widgets/values">
       <div class="field" tal:condition="python:widget.__name__ not in (
         'IBasic.title', 'IBasic.description', 
-        'title', 'description', 'logs',
+        'title', 'description', 'logs', 'warns', 'fails', 'runs',
         'created_events', 'edited_events', 'failed_events')">
             <label tal:content="widget/label" />
             <br />
             <div tal:content="structure widget/render" />
         </div>
     </tal:block>
+    <h2 i18n:translate="">Global statistics for source runs</h2>
+    <table class="listing" style="width:auto">
+      <tr>
+        <th i18n:translate="" width="10%">OK</th>
+        <th i18n:translate="" width="5%">WARN</th>
+        <th i18n:translate="" width="85%">FAILURE</th>
+      </tr>
+      <tr>
+        <td tal:content="here/runs"></td>
+        <td tal:content="here/warns"></td>
+        <td tal:content="here/fails"></td>
+      </tr>
+    </table>
     <h2 i18n:translate="">Global statistics for events parsed</h2>
     <table class="listing" style="width:auto">
       <tr>

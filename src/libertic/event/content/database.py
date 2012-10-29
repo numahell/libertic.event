@@ -15,6 +15,8 @@ from Acquisition import aq_inner, aq_parent
 
 from Products.CMFCore.utils import getToolByName
 from libertic.event.content import source
+from collective.cron import interfaces as croni
+from Products.CMFPlone.interfaces.siteroot import IPloneSiteRoot
 
 
 alsoProvides(IDatabase, form.IFormFieldProvider)
@@ -109,9 +111,6 @@ class DatabaseGetter(grok.Adapter):
             oldctx = None
         return ctx
 
-
-from collective.cron import interfaces as croni
-from Products.CMFPlone.interfaces.siteroot import IPloneSiteRoot
 class EventsGrabber(grok.MultiAdapter):
     implements(croni.IJobRunner)
     grok.adapts(IPloneSiteRoot, croni.ICron)
@@ -127,11 +126,11 @@ class EventsGrabber(grok.MultiAdapter):
             'portal_type': 'libertic_database',
             'review_state': 'published',
         }
-        brains = ct.searchResults(**query) 
+        brains = ct.searchResults(**query)
         brains = [a for a in brains]
         if asobj:
             brains = [a.getObject() for a in brains]
-        return brains                         
+        return brains
 
     def run(self):
         databases = self.databases()

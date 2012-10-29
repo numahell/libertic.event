@@ -2,12 +2,15 @@
 # -*- coding: utf-8 -*-
 __docformat__ = 'restructuredtext en'
 import csv
+from copy import deepcopy
 from five import grok
 import datetime
+import traceback
 import DateTime
 from zope import schema
 from zope.schema.fieldproperty import FieldProperty
 from StringIO import StringIO
+from AccessControl.unauthorized import Unauthorized
 
 from zope.interface import implements, alsoProvides
 from z3c.form.interfaces import ActionExecutionError
@@ -17,6 +20,9 @@ from plone.dexterity.content import Container
 from plone.app.dexterity.behaviors.metadata import IDublinCore
 from plone.app.dexterity.behaviors.metadata import IPublication
 from plone.directives import form, dexterity
+from Products.CMFCore.utils import getToolByName
+from zope.component import getUtility
+
 
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
@@ -27,14 +33,7 @@ try:
 except:
     import simplejson as json
 
-from libertic.event.interfaces import (
-    ILiberticEvent,
-    IDatabaseGetter,
-    datefmt,
-    ISourceMapping,
-    SID_EID_SPLIT,
-)
-
+from libertic.event import interfaces as lei
 
 class csv_dialect(csv.Dialect):
     delimiter = ','
@@ -74,7 +73,7 @@ def read_csv(fileobj):
     for row in csvreader:
         rows.append(row)
     return rows
-    
+
 
 def empty_data():
     sdata =  {
@@ -180,7 +179,7 @@ def data_from_ctx(ctx, **kw):
         if isinstance(value, DateTime.DateTime):
             value.asdatetime()
         if isinstance(value, datetime.datetime):
-            value = value.strftime(datefmt) 
+            value = value.strftime(lei.datefmt)
         return value
     for item in ['effective', 'expires',
                  'event_start' ,'event_end',]:
@@ -200,14 +199,14 @@ def data_from_ctx(ctx, **kw):
     return sdata
 
 
-alsoProvides(ILiberticEvent, form.IFormFieldProvider)
+alsoProvides(lei.ILiberticEvent, form.IFormFieldProvider)
 
 
 class LiberticEvent(Container):
-    implements(ILiberticEvent)
+    implements(lei.ILiberticEvent)
 
     def database(self):
-        return IDatabaseGetter(self).database()
+        return lei.IDatabaseGetter(self).database()
 
     @invariant
     def validateDataLicense(self, data):
@@ -238,7 +237,7 @@ class AddForm(dexterity.AddForm):
         return data, errors
 
 class EditForm(dexterity.EditForm):
-    grok.context(ILiberticEvent)
+    grok.context(lei.ILiberticEvent)
     grok.require('libertic.event.Edit')
     def extractData(self):
         data, errors = dexterity.EditForm.extractData(self)
@@ -249,7 +248,7 @@ class EditForm(dexterity.EditForm):
 
 
 def unique_SID_EID_check(context, sid, eid, request=None, form=None, *args, **kw):
-    db = IDatabaseGetter(context).database()
+    db = lei.IDatabaseGetter(context).database()
     event = db.get_event(sid=sid, eid=eid)
     if event is not None:
         raise ActionExecutionError(
@@ -258,7 +257,7 @@ def unique_SID_EID_check(context, sid, eid, request=None, form=None, *args, **kw
 
 
 def editable_SID_EID_check(context, sid, eid, request=None, form=None, *args, **kw):
-    db = IDatabaseGetter(context).database()
+    db = lei.IDatabaseGetter(context).database()
     events = [a for a in db.get_events(sid=sid, eid=eid)]
     uuids = [IUUID(a) for a in events]
     cuuid = IUUID(context)
@@ -269,12 +268,12 @@ def editable_SID_EID_check(context, sid, eid, request=None, form=None, *args, **
 
 
 class View(dexterity.DisplayForm):
-    grok.context(ILiberticEvent)
+    grok.context(lei.ILiberticEvent)
     grok.require('libertic.event.View')
 
 
 class Json(grok.View):
-    grok.context(ILiberticEvent)
+    grok.context(lei.ILiberticEvent)
     grok.require('libertic.event.View')
 
     def render(self):
@@ -290,7 +289,7 @@ class Json(grok.View):
 
 
 class Xml(grok.View):
-    grok.context(ILiberticEvent)
+    grok.context(lei.ILiberticEvent)
     grok.require('libertic.event.View')
     xml = ViewPageTemplateFile('liberticevent_templates/xml.pt')
     _macros = ViewPageTemplateFile('liberticevent_templates/xmacros.pt')
@@ -311,7 +310,7 @@ class Xml(grok.View):
 
 
 class Csv(grok.View):
-    grok.context(ILiberticEvent)
+    grok.context(lei.ILiberticEvent)
     grok.require('libertic.event.View')
 
     def render(self):
@@ -324,7 +323,7 @@ class Csv(grok.View):
                 values.append(
                     '%s%s%s' % (
                         item['sid'],
-                        SID_EID_SPLIT,
+                        lei.SID_EID_SPLIT,
                         item['eid'],
                     ))
             sdata[it] = '|'.join(values)
@@ -333,5 +332,145 @@ class Csv(grok.View):
             self.request,
             titles,
             [sdata])
+
+
+class _api(grok.View):
+    grok.baseclass()
+    grok.context(lei.IDatabase)
+    grok.require('libertic.eventsdatabase.View')
+    grabber = None
+    mimetype = None
+    type = None
+
+    def get_contents(self):
+        try:
+            contents = self.request.stdin.getvalue()
+        except:
+            contents = self.request.read()
+            self.request.seek(0)
+        return contents
+
+    def base_create(self, **kwargs):
+        db = self.context
+        pdb = kwargs.get('pdb', None)
+        catalog = getToolByName(self.context, 'portal_catalog')
+        pm = getToolByName(self.context, 'portal_membership')
+        user = pm.getAuthenticatedMember()
+        # must be supplier on context
+        results = {'results': [], 'messages': [], 'status': 1}
+        result = {
+            'eid': None,
+            'sid': None,
+            'status': None,
+            'messages': [],
+        }
+        try:
+            if (not 'LiberticSupplier'
+                in user.getRolesInContext(db)):
+                raise Unauthorized()
+            grabber = getUtility(lei.IEventsGrabber, name=self.grabber)
+            contents = self.get_contents()
+            datas = grabber.data(contents)
+            secondpass_datas = []
+            for data in datas:
+                res = deepcopy(result)
+                try:
+                    res['eid'] = data['transformed']['eid']
+                except Exception, ex:
+                    try:
+                        res['eid'] = data['initial'].get('eid', None)
+                    except Exception, ex:
+                        pass
+                try:
+                    res['sid'] = data['transformed']['sid']
+                except Exception, ex:
+                    try:
+                        res['sid'] = data['initial'].get('sid', None)
+                    except Exception, ex:
+                        pass
+                try:
+                    cdata = deepcopy(data)
+                    for k in ['contained', 'related']:
+                        if k in cdata:
+                            del cdata[k]
+                    infos, ret, event = lei.IDBPusher(db).push_event(cdata, [user.getId()])
+                    if event is not None: event.reindexObject()
+                    if infos:
+                        if isinstance(infos, list):
+                            res['messages'].extend(infos)
+                        else:
+                            res['messages'].append(infos)
+                except Exception, e:
+                    trace = traceback.format_exc()
+                    ret = 'failed'
+                    res['messages'].append(trace)
+                res['status'] = ret
+                if ret in ['created', 'edited']:
+                    secondpass_datas.append(data)
+                results['results'].append(res)
+            # wehn we finally have added / edited, set the references
+            for data in secondpass_datas:
+                try:
+                    cdata = deepcopy(data)
+                    infos, ret, event = lei.IDBPusher(db).push_event(cdata, [user.getId()])
+                    if event is not None: event.reindexObject()
+                except Exception, e:
+                    trace = traceback.format_exc()
+                    res = deepcopy(result)
+                    res['status'] = 2
+                    res['eid'] = data['eid']
+                    res['sid'] = data['sid']
+                    res['messages'].append(trace)
+                    results['results'].append(res)
+        except Exception, e:
+            results['status'] = 0
+            trace = traceback.format_exc()
+            results['messages'].append(trace)
+        return results
+
+    def create(self, *args, **kw):
+        pdb = kw.get('pdb', None)
+        results = self.base_create(pdb=pdb)
+        resp = self.serialize_create(results)
+        lresp = len(resp)
+        self.request.response.setHeader('Content-Type', self.mimetype)
+        self.request.response.addHeader(
+            "Content-Disposition","filename=%s.%s" % (
+                self.context.getId(), self.type))
+        self.request.response.setHeader('Content-Length', len(resp))
+        self.request.response.write(resp)
+
+    def serialize_create(self, datas):
+        return datas
+
+    def render(self, **kw):
+        pdb = kw.get('pdb', None)
+        mtd = self.request.method.upper()
+        mtds = {'GET': 'get',
+                'POST': 'create',
+               }
+        if mtd in mtds:
+            return getattr(self, mtds[mtd])(pdb=pdb)
+
+
+class json_api(_api):
+    grabber = 'jsonapi'
+    mimetype = 'application/json'
+    type = 'json'
+
+    def serialize_create(self, datas):
+        return json.dumps(datas)
+
+class xml_api(_api):
+    grabber = 'xmlapi'
+    mimetype = 'text/xml'
+    type = 'xml'
+    api_template = ViewPageTemplateFile('liberticevent_templates/api.pt')
+
+    def serialize_create(self, datas):
+        sdata = {'data': datas}
+        resp = self.api_template(**sdata).encode('utf-8')
+        import pdb;pdb.set_trace()  ## Breakpoint ##
+        return resp
 
 # vim:set et sts=4 ts=4 tw=80:

@@ -120,11 +120,8 @@ Supplier 2 cant edit::
     >>> db.restrictedTraverse('@@json_api').render()
     >>> resp = json.loads(req.response.stdout.getvalue().splitlines()[-1])
     >>> print resp['results'][1]['messages'][0]
-    Failed to push event:
-    Traceback (most recent call last):
-      ...
-        raise Unauthorized()
-    Unauthorized: Unauthorized()...
+    Failed to push event:...
+    Unauthorized:...
     {'errors': [],...
 
 Supplier 2 can post::
@@ -153,7 +150,7 @@ Operator cant add::
     >>> print resp['messages'][0]
     Traceback (most recent call last):
     ...
-    Unauthorized: Unauthorized()
+    Unauthorized: ...
 
 XML
 ------
@@ -169,13 +166,13 @@ Test the json various load failures & creation::
     >>> req.stdin = StringIO()
     >>> req.response.stdout = StringIO()
     >>> db.restrictedTraverse('@@xml_api').render()
-    >>> resp = req.response.stdout.getvalue().splitlines()
+    >>> resp = req.response.stdout.getvalue()
     >>> print resp.strip()
     <?xml version="1.0" encoding="UTF-8"?>...
         <message>Traceback (most recent call last):
       File "/home/kiorky/minitage/zope/libertic.event/src.mrdeveloper/libertic.event/src/libertic/event/content/liberticevent.py", line 370, in base_create
         raise Unauthorized()
-    Unauthorized: Unauthorized()
+    Unauthorized:...
     </message>...
 
 Ooops, we must login::
@@ -187,6 +184,8 @@ Ooops, we must login::
     >>> req.response.stdout = StringIO()
     >>> db.restrictedTraverse('@@xml_api').render()
     >>> resp = req.response.stdout.getvalue()
+    >>> import pdb;pdb.set_trace()  ## Breakpoint ##
+    >>> print resp
     <?xml version="1.0" encoding="UTF-8"?>...
     Exception: Data is not in XML format
     </message>...
@@ -201,6 +200,7 @@ Now, do a valid xml import session::
     >>> resp = '\n'.join([a.strip()
     ...  for a in req.response.stdout.getvalue().splitlines()
     ...  if a .strip()])
+    >>> print resp
     <?xml version="1.0" encoding="UTF-8"?>
     ...
     <status>1</status>

@@ -676,7 +676,7 @@ class XMLGrabber(EventsGrabber):
         return results
 
 
-class APIJSONGrabber(XMLGrabber):
+class APIXMLGrabber(XMLGrabber):
     grok.name('xmlapi')
     def fetch(self, data):
         return data

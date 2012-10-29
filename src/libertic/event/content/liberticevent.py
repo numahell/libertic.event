@@ -470,7 +470,6 @@ class xml_api(_api):
     def serialize_create(self, datas):
         sdata = {'data': datas}
         resp = self.api_template(**sdata).encode('utf-8')
-        import pdb;pdb.set_trace()  ## Breakpoint ##
         return resp
 
 # vim:set et sts=4 ts=4 tw=80:

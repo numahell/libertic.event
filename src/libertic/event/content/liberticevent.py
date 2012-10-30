@@ -22,6 +22,8 @@ from plone.app.dexterity.behaviors.metadata import IPublication
 from plone.directives import form, dexterity
 from Products.CMFCore.utils import getToolByName
 from zope.component import getUtility
+from plone.app.uuid.utils import uuidToObject
+
 
 
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
@@ -189,7 +191,7 @@ def data_from_ctx(ctx, **kw):
         sdata[item] = get_datetime_value(cctx, item)
     for relate in ['contained', 'related']:
         l = []
-        for item in getattr(ctx, relate, []):
+        for item in getattr(ctx, "%s_objs" % relate, []):
             #obj = item.to_object
             obj = item
             it = {"sid": obj.sid, "eid": obj.eid}
@@ -208,22 +210,24 @@ class LiberticEvent(Container):
     def database(self):
         return lei.IDatabaseGetter(self).database()
 
-    @invariant
-    def validateDataLicense(self, data):
-        for url, license in (
-            ('gallery_url', 'gallery_license'),
-            ('photos1_url', 'photos1_license'),
-            ('photos2_url', 'photos2_license'),
-            ('photos3_url', 'photos3_license'),
-            ('video_url',   'video_license'),
-            ('audio_url',   'audio_license'),
-            ):
-            vurl = getattr(data, url, None)
-            vlicense = getattr(data, license, None)
-            if vurl and not vlicense:
-                raise  Invalid(
-                _('Missing relative license for ${url}.',
-                mapping = {'url':url,}))
+    @property
+    def related_objs(self):
+        val = []
+        for uuid in self.related:
+            obj = uuidToObject(uuid)
+            if obj and not obj in val:
+                val.append(obj)
+        return val
+
+    @property
+    def contained_objs(self):
+        val = []
+        for uuid in self.contained:
+            obj = uuidToObject(uuid)
+            if obj and not obj in val:
+                val.append(obj)
+        return val
+
 
 class AddForm(dexterity.AddForm):
     grok.name('libertic_event')
@@ -451,7 +455,6 @@ class _api(grok.View):
                }
         if mtd in mtds:
             return getattr(self, mtds[mtd])(pdb=pdb)
-
 
 class json_api(_api):
     grabber = 'jsonapi'

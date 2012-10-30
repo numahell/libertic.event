@@ -372,7 +372,7 @@ def ensure_request(func):
                 req.stdin = StringIO()
                 req.response.stdout = StringIO()
                 setattr(app, 'REQUEST', req)
-                result = func(self, *args, **kw)
+            result = func(self, *args, **kw)
         finally:
             if fake and hasattr(app, 'REQUEST'):
                 delattr(app, 'REQUEST')
@@ -568,13 +568,13 @@ class EventSetter(grok.Adapter):
             ctx = self.context
             if it in ['expires', 'effective']:
                 ctx = IPublication(self.context)
-            #if (it in ['contained', 'related'] and value):
-            #    nval = []
-            #    for itm in value:
-            #        if not isinstance(itm, basestring):
-            #            itm = IUUID(itm)
-            #        nval.append(itm)
-            #    value = tuple(nval)
+            if (it in ['contained', 'related'] and value):
+                nval = []
+                for itm in value:
+                    if not isinstance(itm, basestring):
+                        itm = IUUID(itm)
+                    nval.append(itm)
+                value = tuple(nval)
             setattr(ctx, it, value)
         IExcludeFromNavigation(self.context).exclude_from_nav = False
         db.reindexObject()

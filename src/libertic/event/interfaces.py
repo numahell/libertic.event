@@ -1,7 +1,7 @@
 from zope.interface import invariant, Invalid, Interface
 from Products.PluggableAuthService.interfaces.authservice import IPropertiedUser
 from z3c.relationfield.schema import RelationList, Relation, RelationChoice
-from plone.formwidget.contenttree import ObjPathSourceBinder, MultiContentTreeFieldWidget
+from plone.formwidget.contenttree import ObjPathSourceBinder, MultiContentTreeFieldWidget, UUIDSourceBinder
 from Products.CMFDefault.utils import checkEmailAddress
 from zope import interface, schema
 from plone.theme.interfaces import IDefaultPloneLayer
@@ -125,7 +125,7 @@ class ISource(IDatabaseItem):
             default=[],
             value_type = schema.Choice(
                 title = _(u"related events"),
-                source = ObjPathSourceBinder(
+                source = UUIDSourceBinder(
                     **{'portal_type':'libertic_event'})
             ),
     )
@@ -223,7 +223,7 @@ class ILiberticEvent(IDatabaseItem):
             default=[],
             value_type = schema.Choice(
                 title = _(u"contained Items"),
-                source = ObjPathSourceBinder(
+                source = UUIDSourceBinder(
                     **{'portal_type':'libertic_event'})
             ),
     )
@@ -233,10 +233,27 @@ class ILiberticEvent(IDatabaseItem):
             default=[],
             value_type = schema.Choice(
                 title = _(u"related events"),
-                source = ObjPathSourceBinder(
+                source = UUIDSourceBinder(
                     **{'portal_type':'libertic_event'})
             ),
     )
+
+    @invariant
+    def validateDataLicense(self, data):
+        for url, license in (
+            ('gallery_url', 'gallery_license'),
+            ('photos1_url', 'photos1_license'),
+            ('photos2_url', 'photos2_license'),
+            ('photos3_url', 'photos3_license'),
+            ('video_url',   'video_license'),
+            ('audio_url',   'audio_license'),
+            ):
+            vurl = getattr(data, url, None)
+            vlicense = getattr(data, license, None)
+            if vurl and not vlicense:
+                raise  Invalid(
+                _('Missing relative license for ${url}.',
+                mapping = {'url':url,}))
 
 
 

@@ -244,9 +244,9 @@ Some events got created and edited::
 
 Related fields are set in a second pass::
 
-    >>> [(a.sid, a.eid, a) for a in db['event1-9'].related]
+    >>> [(a.sid, a.eid, a) for a in db['event1-9'].related_objs]
     [(u'aaamysid2', u'aaamyeid2', <LiberticEvent at /plone/fr/database/event1-12>), (u'aaamysid', u'aaamyeid', <LiberticEvent at /plone/fr/database/event1-13>)]
-    >>> [(a.sid, a.eid, a) for a in db['event1-9'].contained]
+    >>> [(a.sid, a.eid, a) for a in db['event1-9'].contained_objs]
     [(u'mysid2', u'myeid2', <LiberticEvent at /plone/fr/database/event1-10>), (u'mysid', u'myeid', <LiberticEvent at /plone/fr/database/event1-11>)]
 
 An event failed validation::

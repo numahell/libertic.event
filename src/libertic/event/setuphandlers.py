@@ -7,6 +7,7 @@ from plone.app.multilingual.browser.setup import SetupMultilingualSite
 from plone.app.multilingual.browser.controlpanel import MultiLanguageControlPanelAdapter
 from plone.app.multilingual.browser.controlpanel import MultiLanguageOptionsControlPanelAdapter
 from plone.app.multilingual.browser.controlpanel import MultiLanguageExtraOptionsAdapter
+from plone.app.dexterity.behaviors.exclfromnav import IExcludeFromNavigation
 
 from plone.dexterity.utils import createContentInContainer
 from Products.CMFPlone.utils import _createObjectByType
@@ -88,11 +89,12 @@ def create_content(context, structure):
                        'libertic_event',
                        'libertic_source']:
                 page = createContentInContainer(parent, typ, id=id)
+                IExcludeFromNavigation(page).exclude_from_nav = exclnav
             else:
                 page = _createObjectByType(typ, context, id=id)
                 page.processForm()
+                page.setExcludeFromNav(exclnav)
             page.setTitle(title)
-            page.setExcludeFromNav(exclnav)
             page.setLanguage(lang)
         page = parent[id]
         page.reindexObject()

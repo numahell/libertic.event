@@ -16,7 +16,7 @@ class Browser(baseBrowser):
     """Patch the browser class to be a little more like a webbrowser."""
 
     def __init__(self, url=None, headers=None):
-        baseBrowser.__init__(self, url)
+        baseBrowser.__init__(self, url=None)
         if headers is None: headers = []
         self.mech_browser.set_handle_robots(False)
         for h in headers:

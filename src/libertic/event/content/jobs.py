@@ -17,14 +17,19 @@ except ImportError:
 
 import traceback
 from pprint import pformat
+import transaction
 
+
+from Acquisition import aq_parent
 from lxml import etree
 
 from zope.interface import implements, alsoProvides, Interface, implementedBy
+from plone.app.dexterity.behaviors.metadata import IPublication
 from zope.app.intid.interfaces import IIntIds
 from zope.schema.fieldproperty import FieldProperty
 from zope.schema import interfaces as si
 from zope import schema
+from Testing.makerequest import makerequest
 from zope.component import getUtility
 
 from z3c.form.interfaces import ActionExecutionError
@@ -39,6 +44,7 @@ from Products.ATContentTypes.interfaces.topic import IATTopic
 from AccessControl.unauthorized import Unauthorized
 from plone.autoform.interfaces import IFormFieldProvider
 from plone.app.collection.interfaces import ICollection
+from plone.uuid.interfaces import IUUID
 from plone.dexterity.interfaces import IDexterityFTI
 from plone.dexterity.utils import (createContentInContainer,
                                    resolveDottedName,
@@ -58,7 +64,6 @@ from libertic.event.content.liberticevent import (
     editable_SID_EID_check,
 )
 from libertic.event.utils import Browser
-
 
 _marker = object()
 class NotUnique(Exception):pass
@@ -249,6 +254,7 @@ class DBPusher(grok.Adapter):
             here we do another filtering pass to make data adapted
             to be in the plone application context
         """
+        db = self.context
         for k in ['related', 'contained']:
             if k in data:
                 values = data[k]
@@ -327,17 +333,58 @@ class DBPusher(grok.Adapter):
                 except Exception, e:
                     # handle case where repr(data) can failed
                     messages.append(trace)
-        for itm in [db, event]:
-            if itm is not None:
-                nav = IExcludeFromNavigation(itm)
-                nav.exclude_from_nav = False
-                itm.reindexObject()
+        if event is not None:
+            nav = IExcludeFromNavigation(event)
+            nav.exclude_from_nav = False
+            event.reindexObject()
         return messages, status, event
+
+
+def find_root(parent):
+    found = False
+    while not found:
+        try:
+            current = parent
+            parent = aq_parent(parent)
+            if parent is None:
+                parent = current
+                raise Exception("stop")
+        except:
+            found = True
+    return parent
+
+def ensure_request(func):
+    def wrapper(self, *args, **kw):
+        """Be sure to have a request and if not,
+        set a dummy request and remove it prior to any
+        implicit commit to avoid pickling errors"""
+        portal = getToolByName(
+            self.context, 'portal_url').getPortalObject()
+        app = find_root(portal)
+        oldreq = getattr(app, 'REQUEST', None)
+        result = None
+        fake = False
+        # be sure to have a request
+        try:
+            if isinstance(app.REQUEST, basestring):
+                fake = True
+                req = makerequest(app).REQUEST
+                req.stdin = StringIO()
+                req.response.stdout = StringIO()
+                setattr(app, 'REQUEST', req)
+                result = func(self, *args, **kw)
+        finally:
+            if fake and hasattr(app, 'REQUEST'):
+                delattr(app, 'REQUEST')
+        return result
+    return wrapper
 
 
 class EventsImporter(grok.Adapter):
     grok.context(i.ISource)
     grok.provides(i.IEventsImporter)
+
+    @ensure_request
     def do_import(self, *args, **kwargs):
         """Here datas is mainly used for tests"""
         editors = list(self.context.listCreators())
@@ -347,11 +394,11 @@ class EventsImporter(grok.Adapter):
         status = 1
         created, edited, failed = 0, 0, 0
         try:
+            db = i.IDatabaseGetter(self.context).database()
             if not self.context.activated:
                 raise Exception('This source is not activated')
             grabber = getUtility(i.IEventsGrabber, name=self.context.type)
             datas = grabber.data(self.context.source, pdb=pdb)
-            db = i.IDatabaseGetter(self.context).database()
             if db is None:
                 raise Exception('Can\'t get parent database for %s' % self.context)
             secondpass_datas = []
@@ -375,7 +422,7 @@ class EventsImporter(grok.Adapter):
                     edited += 1
                 if ret in ['created', 'edited']:
                     secondpass_datas.append(data)
-            # wehn we finally have added / edited, set the references
+            # when we finally have added / edited, set the references
             for data in secondpass_datas:
                 try:
                     cdata = deepcopy(data)
@@ -387,13 +434,18 @@ class EventsImporter(grok.Adapter):
                     messages.extend(trace)
                     failed += 1
                     status = 2
+            for itm in [self.context, db]:
+                if itm is not None:
+                    nav = IExcludeFromNavigation(itm)
+                    nav.exclude_from_nav = False
+            for itm in [self.context, db]:
+                itm.reindexObject()
         except Exception, e:
             status = 0
             trace = traceback.format_exc()
             messages.append(trace)
         if status == 0:
             self.context.fails += 1
-
         if status == 1:
             self.context.runs += 1
         if status == 2:
@@ -404,6 +456,10 @@ class EventsImporter(grok.Adapter):
         messages.append(
             '%s created, %s edited, %s failed' % ( created, edited, failed))
         self.context.log(status=status, messages=messages)
+        cat = getToolByName(db, 'portal_catalog')
+        #query = {'path': {
+        #    'query': '/'.join(db.getPhysicalPath())}}
+        #brains = cat.searchResults(query)
         self.context.reindexObject()
 
 
@@ -412,6 +468,7 @@ class EventConstructor(grok.Adapter):
     grok.provides(i.IEventConstructor)
 
     def construct(self, data, editors):
+        evt = None
         try:
             unique_SID_EID_check(self.context, data["sid"], data["eid"])
         except ActionExecutionError, e:
@@ -487,8 +544,8 @@ class EventEditor(grok.Adapter):
         if wf.getInfoFor(evt, 'review_state') not in ['private', 'pending']:
             raise CantEdit("%s is not in pending state, cant edit" % evt)
         i.IEventSetter(evt).set(data)
+        return evt
 
-from plone.app.dexterity.behaviors.metadata import IPublication
 class EventSetter(grok.Adapter):
     grok.context(i.ILiberticEvent)
     grok.provides(i.IEventSetter)
@@ -511,7 +568,15 @@ class EventSetter(grok.Adapter):
             ctx = self.context
             if it in ['expires', 'effective']:
                 ctx = IPublication(self.context)
+            #if (it in ['contained', 'related'] and value):
+            #    nval = []
+            #    for itm in value:
+            #        if not isinstance(itm, basestring):
+            #            itm = IUUID(itm)
+            #        nval.append(itm)
+            #    value = tuple(nval)
             setattr(ctx, it, value)
+        IExcludeFromNavigation(self.context).exclude_from_nav = False
         db.reindexObject()
 
 

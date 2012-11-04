@@ -266,7 +266,7 @@ The xml grabber
 =================
 
 Get data from xml files
-++++++++++++++++++++++++++++
+-----------------------------
 The parser waits for ``event`` subnodes inside a global ``events`` node conforming to the event spec.
 ::
 
@@ -349,7 +349,7 @@ The csv grabber
 =================
 
 Get data from csv files
-++++++++++++++++++++++++++++
+---------------------------
 The parser waits for a csv with an header of ``event keys``.
 And after that, lines of values conforming to the event spec forming one event per line.
 ::

@@ -152,6 +152,7 @@ class ISourceMapping(form.Schema):
 
 class ILiberticEvent(IDatabaseItem):
     """A libertic event"""
+    form.omitted('sid',)
     source = schema.URI(title=_('label_source', default='Source'), required=True)
     sid = schema.TextLine(title=_('label_source_id', default='Source id'),
                           constraint=sideidchars_check,  required=True)
@@ -164,6 +165,10 @@ class ILiberticEvent(IDatabaseItem):
         required = False,
         defaultFactory = tuple,
     )
+    tariff_information = schema.Text(title=_('Tariff information'), required=False)
+
+    jauge = schema.Int(title=_('Jauge'), required=False)
+    left_places = schema.Int(title=_('left_places'), required=False)
     #
     address = schema.Text(title=_('Address'), required=True)
     address_details = schema.Text(title=_('Address details'), required=False)
@@ -239,7 +244,9 @@ class ILiberticEvent(IDatabaseItem):
     )
 
     @invariant
-    def validateDataLicense(self, data):
+    def validateDataLicense(self, data=None):
+        if data is None:
+            data = self
         for url, license in (
             ('gallery_url', 'gallery_license'),
             ('photos1_url', 'photos1_license'),

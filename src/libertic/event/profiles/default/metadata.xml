@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <metadata>
-  <version>1001</version>
+  <version>1002</version>
   <dependencies>
   <!-- QuickInstalled dependencies -->
       <dependency>profile-libertic.event:qi</dependency>
@@ -23,5 +23,6 @@
       <dependency>profile-collective.portlet.oembed:default</dependency>
       <dependency>profile-collective.googleanalytics:default</dependency>
       <dependency>profile-collective.js.jqueryui:default</dependency>
+      <dependency>profile-collective.datatablesviews:default</dependency>
  </dependencies>
 </metadata>

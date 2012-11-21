@@ -20,12 +20,41 @@ from Products.CMFPlone.utils import _createObjectByType
 
 from libertic.event import setuphandlers
 
-PROFILE =  'libertic.event:default'
+PRODUCT =  'libertic.event'
+PROFILE =  '%s:default' % PRODUCT
 PROFILEID = 'profile-%s' % PROFILE
 
-def log(message):
-    logger = logging.getLogger('libertic.event.upgrades')
-    logger.warn(message)
+def log(message, level='info'):
+    logger = logging.getLogger('%s.upgrades' % PRODUCT)
+    getattr(logger, level)(message)
+
+def quickinstall_addons(context, install=None, uninstall=None, upgrades=None):
+    qi = getToolByName(context, 'portal_quickinstaller')
+
+    if install is not None:
+        for addon in install:
+            if qi.isProductInstallable(addon):
+                qi.installProduct(addon)
+            else:
+                log('%s can t be installed' % addon, 'error')
+
+    if uninstall is not None:
+        qi.uninstallProducts(uninstall)
+
+    if upgrades is not None:
+        if upgrades in ("all", True):
+            # find which addons should be upgrades
+            installedProducts = qi.listInstalledProducts(showHidden=True)
+            upgrades = [p['id'] for p in installedProducts]
+        for upgrade in upgrades:
+            # do not try to upgrade myself -> recursion
+            if upgrade == PRODUCT:
+                continue
+            try:
+                qi.upgradeProduct(upgrade)
+                log('Upgraded %s' % upgrade)
+            except KeyError:
+                log('can t upgrade %s' % upgrade, 'error')
 
 def recook_resources(context):
     """
@@ -85,17 +114,26 @@ def upgrade_1001(context):
     """
     site = getToolByName(context, 'portal_url').getPortalObject()
     portal_setup = site.portal_setup
-    # install Products.PloneSurvey and dependencies
-    #migration_util.loadMigrationProfile(site,
-    #                                    'profile-Products.PloneSurvey:default')
-    #portal_setup.runImportStepFromProfile('profile-libertic.event:default', 'jsregistry', run_dependencies=False)
-    #portal_setup.runImportStepFromProfile('profile-libertic.event:default', 'cssregistry', run_dependencies=False)
-    #portal_setup.runImportStepFromProfile('profile-libertic.event:default', 'portlets', run_dependencies=False)
-    #portal_setup.runImportStepFromProfile('profile-libertic.event:default', 'propertiestool', run_dependencies=False)
     portal_setup.runImportStepFromProfile('profile-libertic.event:default', 'typeinfo', run_dependencies=False)
     portal_setup.runImportStepFromProfile('profile-libertic.event:default', 'collective.cron.setupCrons', run_dependencies=False)
     portal_setup.runImportStepFromProfile('profile-libertic.event:default', 'plone.app.registry', run_dependencies=False) 
     setuphandlers.setup_catalog(site)
     log('v1001 applied')
 
+
+def upgrade_1002(context):
+    """
+    """
+    site = getToolByName(context, 'portal_url').getPortalObject()
+    portal_setup = site.portal_setup
+    setuphandlers.configure_extra(site)
+    quickinstall_addons(site, ['collective.datatablesviews'], upgrades=True)
+    portal_setup.runImportStepFromProfile(PROFILEID, 'typeinfo', run_dependencies=False)
+    portal_setup.runImportStepFromProfile(PROFILEID, 'workflow', run_dependencies=False)
+    portal_setup.runImportStepFromProfile('profile-collective.datatablesviews:default', 'typeinfo', run_dependencies=False)
+    import_js(context)
+    recook_resources(context)
+    log('v1002 applied')
+
+ 
 

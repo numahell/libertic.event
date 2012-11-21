@@ -110,19 +110,24 @@ Test the json various load failures & creation::
     ERRORS:
     [('gallery_url', InvalidURI('not an url'))]
 
-Supplier 2 cant edit::
 
-    >>> layer.login(SUPPLIER2_NAME)
-    >>> req = layer['request']
-    >>> req.method = 'POST'
-    >>> req.stdin = StringIO(jsonc)
-    >>> req.response.stdout = StringIO()
-    >>> db.restrictedTraverse('@@json_api').render()
-    >>> resp = json.loads(req.response.stdout.getvalue().splitlines()[-1])
-    >>> print resp['results'][1]['messages'][0]
-    Failed to push event:...
-    Unauthorized:...
-    {'errors': [],...
+.. deactivated as sid is not anymore settable
+.. Supplier 2 cant edit the same event as sid is not settable::
+.. 
+..     >>> layer.login(SUPPLIER2_NAME)
+..     >>> req = layer['request']
+..     >>> req.method = 'POST'
+..     >>> req.stdin = StringIO(jsonc)
+..     >>> req.response.stdout = StringIO()
+..     >>> db.restrictedTraverse('@@json_api').render()
+..     >>> resp = json.loads(req.response.stdout.getvalue().splitlines()[-1])
+..     >>> import pdb;pdb.set_trace()  ## Breakpoint ##
+..     >>> print resp['results'][1]['messages'][0]
+..     Failed to push event:...
+..     Unauthorized:...
+..     {'errors': [],...
+ 
+
 
 Supplier 2 can post::
 
@@ -135,7 +140,10 @@ Supplier 2 can post::
     >>> db.restrictedTraverse('@@json_api').render()
     >>> resp = json.loads(req.response.stdout.getvalue().splitlines()[-1])
     >>> print resp['results'][-1]
-    {u'status': u'created', u'messages': [], u'eid': u'aaamyeid', u'sid': u'aaa2apijsonmysid'}
+    {u'status': u'created', u'messages': [], u'eid': u'aaamyeid', u'sid': u'plonesupplier2'}
+    >>> layer['portal']['fr']['database'][layer['portal']['fr']['database'].objectIds()[-1]].sid
+    'plonesupplier2'
+
 
 Operator cant add::
 
@@ -210,7 +218,7 @@ Now, do a valid xml import session::
     [('gallery_url', InvalidURI('not an url'))]
     </message>...
     <result>
-    <sid>xmlsxmlaaamysid</sid>
+    <sid>plonesupplier</sid>
     <eid>xmlsxmlaaamyeid</eid>
     <status>created</status>
     <messages>

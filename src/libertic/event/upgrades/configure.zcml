@@ -29,7 +29,6 @@
   <genericsetup:upgradeSteps profile="libertic.event:default" source="*" destination="1001">
     <genericsetup:upgradeStep title="libertic.event * - 1000" description="" handler=".upgrade_1001" />
   </genericsetup:upgradeSteps>
-
-
+  <genericsetup:upgradeStep profile="libertic.event:default" source="1001" destination="1002"  handler=".upgrade_1002" title="libertic.event 1002" description="" />
   <!-- vim:set ft=xml: -->
 </configure>

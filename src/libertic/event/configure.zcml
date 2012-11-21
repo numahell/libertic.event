@@ -58,6 +58,7 @@
   <include package="collective.js.jqueryui" file="configure.zcml"/>
   <!--with_ploneproduct_addthis -->
   <include package="collective.addthis" file="configure.zcml"/>
+  <include package="collective.datatablesviews" file="configure.zcml"/>
   <five:registerPackage package="." initialize=".initialize" />
   <!-- activate to customize the dashboard-->
   <!-- <adapter factory=".dashboard.MyPortalDefaultDashboard"/>-->

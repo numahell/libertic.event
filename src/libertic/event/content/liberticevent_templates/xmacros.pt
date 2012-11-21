@@ -24,6 +24,9 @@
     <firstname tal:content="ctx/firstname"></firstname>
     <telephone tal:content="ctx/telephone"></telephone>
     <email tal:content="ctx/email"></email>
+    <jauge tal:content="ctx/jauge"></jauge>
+    <left_places tal:content="ctx/left_places"></left_places>
+    <tariff_information tal:content="ctx/tariff_information"></tariff_information>
     <organiser tal:content="ctx/organiser"></organiser>
     <author_lastname tal:content="ctx/author_lastname"></author_lastname>
     <author_firstname tal:content="ctx/author_firstname"></author_firstname>

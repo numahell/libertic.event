@@ -139,6 +139,8 @@ class LiberticEventLayer(base.CollectiveCronLayer):
         self.loadZCML('configure.zcml', package=collective.oembed)
         import collective.portlet.oembed
         self.loadZCML('configure.zcml', package=collective.portlet.oembed)
+        import collective.datatablesviews
+        self.loadZCML('configure.zcml', package=collective.datatablesviews) 
         #with_ploneproduct_seo
         import collective.seo
         self.loadZCML('configure.zcml', package=collective.seo)

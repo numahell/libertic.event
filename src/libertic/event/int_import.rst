@@ -230,7 +230,7 @@ The import finally
 ====================
 Some events got created and edited::
 
-    >>> jsource.source = 'file://%s/%s' % (testdir, 'ievents.json')
+    >>> jsource.source = 'file://%s/%s' % (testdir, 'ieventsp.json')
     >>> lei.IEventsImporter(jsource).do_import()
     >>> jsource.logs[0].messages[-1]
     u'14 created, 1 edited, 1 failed'
@@ -238,16 +238,16 @@ Some events got created and edited::
     ['...', 'event1', 'event1-1', 'event1-2', 'event1-3', 'event1-4', 'event1-5', 'event1-6', 'event1-7', 'event1-8', 'event1-9', 'event1-10', 'event1-11', 'event1-12', 'event1-13']
 
     >>> [getattr(db['event1'], k) for k in ['event_start', 'sid', 'eid', 'press_url']]
-    [datetime.datetime(2012, 10, 4, 0, 0), u'qsdfqsdf', u'sqdf', 'http://qsdf']
+    [datetime.datetime(2012, 10, 4, 0, 0), 'plonesupplier', u'sqdf', 'http://qsdf']
     >>> db['event1'].address_details
     u'edited address details'
 
 Related fields are set in a second pass::
 
     >>> [(a.sid, a.eid, a) for a in db['event1-9'].related_objs]
-    [(u'aaamysid2', u'aaamyeid2', <LiberticEvent at /plone/fr/database/event1-12>), (u'aaamysid', u'aaamyeid', <LiberticEvent at /plone/fr/database/event1-13>)]
+    [('plonesupplier', u'aaamyeid2', <LiberticEvent at /plone/fr/database/event1-12>), ('plonesupplier', u'aaamyeid', <LiberticEvent at /plone/fr/database/event1-13>)]
     >>> [(a.sid, a.eid, a) for a in db['event1-9'].contained_objs]
-    [(u'mysid2', u'myeid2', <LiberticEvent at /plone/fr/database/event1-10>), (u'mysid', u'myeid', <LiberticEvent at /plone/fr/database/event1-11>)]
+    [('plonesupplier', u'myeid2', <LiberticEvent at /plone/fr/database/event1-10>), ('plonesupplier', u'myeid', <LiberticEvent at /plone/fr/database/event1-11>)]
 
 An event failed validation::
 
@@ -294,7 +294,7 @@ The parser waits for ``event`` subnodes inside a global ``events`` node conformi
         <events xml:lang="en" lang="en">
         <event xml:lang="en" lang="en">
         <source>http://qsdf</source>
-        <sid>qsdfqsdf</sid>...
+        <sid>plonesupplier</sid>...
     >>> xmlurl = 'file://'+testdir+'/ievents.xml'
     >>> data = xg.fetch(xmlurl)
     >>> json = xg.mappings(data)

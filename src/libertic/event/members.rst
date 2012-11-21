@@ -44,15 +44,19 @@ Suppliers can:
     >>> browser.getControl(name='form.username').value = 'foosupplier'
     >>> browser.getControl(name='form.email').value = 'foosupplier@foo.com'
     >>> browser.getControl(name='form.tgu').value  = True
+    >>> browser.getControl(name='form.password').value  = 'foofoo'
+    >>> browser.getControl(name='form.password_ctl').value  = 'foofoo'
     >>> browser.getControl(name='form.libertic_event_supplier').value = True
     >>> browser.getControl(name='form.actions.register').click()
-    >>> [a.getId() for a in suppliers.getAllGroupMembers()]
-    ['foosupplier', 'plonesupplier']
-    >>> supplreq = [b for b in pwt._requests if pwt._requests[b][0] == 'foosupplier'][0]
-    >>> verif = Browser.new('http://foo/plone/portal_registration/passwordreset/%s?userid=%s' % (supplreq, 'foosupplier'))
-    >>> verif.getControl(name='password').value = 'foofoo'
-    >>> verif.getControl(name='password2').value = 'foofoo'
-    >>> verif.getForm(name='pwreset_action').submit()
+    >>> browser.getForm(action='login_form').submit()
+    >>> 'foosupplier' in [a.getId() for a in suppliers.getAllGroupMembers()]
+    True
+
+..    >>> supplreq = [b for b in pwt._requests if pwt._requests[b][0] == 'foosupplier'][0]
+..    >>> verif = Browser.new('http://foo/plone/portal_registration/passwordreset/%s?userid=%s' % (supplreq, 'foosupplier'))
+..    >>> verif.getControl(name='password').value = 'foofoo'
+..    >>> verif.getControl(name='password2').value = 'foofoo'
+..    >>> verif.getForm(name='pwreset_action').submit()
 
 With supplier role, i can promote myself to operator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -84,17 +88,20 @@ We can register as operator
     >>> browser.getControl(name='form.fullname').value = 'foo operator'
     >>> browser.getControl(name='form.username').value = 'foo operator'
     >>> browser.getControl(name='form.username').value = 'foooperator'
+    >>> browser.getControl(name='form.password').value  = 'foofoo'
+    >>> browser.getControl(name='form.password_ctl').value  = 'foofoo'
     >>> browser.getControl(name='form.email').value = 'foooperator@foo.com'
     >>> browser.getControl(name='form.tgu').value  = True
     >>> browser.getControl(name='form.libertic_event_operator').value = True
     >>> browser.getControl(name='form.actions.register').click()
-    >>> [a.getId() for a in operators.getAllGroupMembers()]
-    ['foooperator', 'ploneoperator']
-    >>> opreq = [b for b in pwt._requests if pwt._requests[b][0] == 'foooperator'][0]
-    >>> verif2 = Browser.new('http://foo/plone/portal_registration/passwordreset/%s?userid=%s' % (opreq, 'foooperator'))
-    >>> verif2.getControl(name='password').value = 'foofoo'
-    >>> verif2.getControl(name='password2').value = 'foofoo'
-    >>> verif2.getForm(name='pwreset_action').submit()
+    >>> 'foooperator' in [a.getId() for a in operators.getAllGroupMembers()]
+    True
+
+..     >>> opreq = [b for b in pwt._requests if pwt._requests[b][0] == 'foooperator'][0]
+..     >>> verif2 = Browser.new('http://foo/plone/portal_registration/passwordreset/%s?userid=%s' % (opreq, 'foooperator'))
+..     >>> verif2.getControl(name='password').value = 'foofoo'
+..     >>> verif2.getControl(name='password2').value = 'foofoo'
+..     >>> verif2.getForm(name='pwreset_action').submit()
 
 With operator role, we can promote to supplier
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

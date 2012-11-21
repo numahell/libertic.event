@@ -6,6 +6,7 @@ from Products.CMFCore.utils import getToolByName
 from plone.app.multilingual.browser.setup import SetupMultilingualSite
 from plone.app.multilingual.browser.controlpanel import MultiLanguageControlPanelAdapter
 from plone.app.multilingual.browser.controlpanel import MultiLanguageOptionsControlPanelAdapter
+from plone.app.controlpanel.security import ISecuritySchema
 from plone.app.multilingual.browser.controlpanel import MultiLanguageExtraOptionsAdapter
 from plone.app.dexterity.behaviors.exclfromnav import IExcludeFromNavigation
 
@@ -178,6 +179,7 @@ def setupVarious(context):
     portal = getToolByName(
         context.getSite(), 'portal_url'
     ).getPortalObject()
+    configure_extra(portal)
     install_pamultilingual(portal)
     create_content(portal, BASE_CONTENTS_TO_INIT)
     publish_all(portal)
@@ -203,4 +205,21 @@ def setupQi(context):
     portal_quickinstaller = getToolByName(portal, 'portal_quickinstaller')
     portal_setup = getToolByName(portal, 'portal_setup')
     logger = logging.getLogger('libertic.event.Install')
+
+def configure_extra(context):
+    """To configure extra features not already managed by genericsetup"""
+    portal_url = getToolByName(context, 'portal_url')
+    portal = portal_url.getPortalObject()
+    security = ISecuritySchema(portal)
+
+    if not security.enable_self_reg:
+        security.enable_self_reg = True
+
+    if not security.enable_user_pwd_choice:
+         security.enable_user_pwd_choice = True
+
+    if not security.enable_user_folders:
+        security.enable_user_folders = True
+
+
 

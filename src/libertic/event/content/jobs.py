@@ -31,6 +31,7 @@ from zope.schema import interfaces as si
 from zope import schema
 from Testing.makerequest import makerequest
 from zope.component import getUtility
+from zope.schema.interfaces import SchemaNotFullyImplemented
 
 from z3c.form.interfaces import ActionExecutionError
 from z3c.relationfield.interfaces import IRelationList, IRelationValue
@@ -289,7 +290,7 @@ class DBPusher(grok.Adapter):
                 data[k] = tuple(items)
 
 
-    def push_event(self, data, editors):
+    def push_event(self, data, editors, sid):
         if not editors:
             raise Exception('must supply editors')
         db = self.context
@@ -311,14 +312,14 @@ class DBPusher(grok.Adapter):
                 try:
                     # to create an event,
                     # verify that there are no other event with same (eid, sid)
-                    constructor = i.IEventConstructor(db)
+                    constructor = i.IEventConstructor(db, sid)
                     self.filter_data(db, data['transformed'])
-                    event = constructor.construct(data['transformed'], editors)
+                    event = constructor.construct(data['transformed'], editors, sid)
                     status = 'created'
                 except NotUnique, e:
                     # in case of not unique, it means an edit session
                     editor = i.IEventEditor(db)
-                    event = editor.edit(data['transformed'], editors)
+                    event = editor.edit(data['transformed'], editors, sid)
                     status = 'edited'
             except Exception, e:
                 status = 'failed'
@@ -397,6 +398,7 @@ class EventsImporter(grok.Adapter):
             db = i.IDatabaseGetter(self.context).database()
             if not self.context.activated:
                 raise Exception('This source is not activated')
+            sid = self.context.Creator()
             grabber = getUtility(i.IEventsGrabber, name=self.context.type)
             datas = grabber.data(self.context.source, pdb=pdb)
             if db is None:
@@ -408,7 +410,7 @@ class EventsImporter(grok.Adapter):
                     for k in ['contained', 'related']:
                         if k in cdata:
                             del cdata[k]
-                    infos, ret, event = i.IDBPusher(db).push_event(cdata, editors)
+                    infos, ret, event = i.IDBPusher(db).push_event(cdata, editors, sid)
                     if event is not None: event.reindexObject()
                     messages.extend(infos)
                 except Exception, e:
@@ -426,7 +428,7 @@ class EventsImporter(grok.Adapter):
             for data in secondpass_datas:
                 try:
                     cdata = deepcopy(data)
-                    infos, ret, event = i.IDBPusher(db).push_event(cdata, editors)
+                    infos, ret, event = i.IDBPusher(db).push_event(cdata, editors, sid)
                     if event is not None: event.reindexObject()
                     messages.extend(infos)
                 except Exception, e:
@@ -467,7 +469,8 @@ class EventConstructor(grok.Adapter):
     grok.context(i.IDatabase)
     grok.provides(i.IEventConstructor)
 
-    def construct(self, data, editors):
+    def construct(self, data, editors, sid):
+        data["sid"] = sid
         evt = None
         try:
             unique_SID_EID_check(self.context, data["sid"], data["eid"])
@@ -516,7 +519,8 @@ class EventEditor(grok.Adapter):
     grok.context(i.IDatabaseItem)
     grok.provides(i.IEventEditor)
 
-    def edit(self, data, editors):
+    def edit(self, data, editors, sid):
+        data["sid"] = sid
         db = i.IDatabaseGetter(self.context).database()
         evt = db.get_event(sid=data["sid"], eid=data["eid"])
         try:
@@ -539,10 +543,11 @@ class EventEditor(grok.Adapter):
             if not (('Editor' in roles)
                     or ('Owner' in roles)):
                 raise Unauthorized(editor)
+        # XXX: removed filter
         # we can edit an event only if it is not published
-        wf = getToolByName(evt, 'portal_workflow')
-        if wf.getInfoFor(evt, 'review_state') not in ['private', 'pending']:
-            raise CantEdit("%s is not in pending state, cant edit" % evt)
+        # wf = getToolByName(evt, 'portal_workflow')
+        # if wf.getInfoFor(evt, 'review_state') not in ['private', 'pending']:
+        #     raise CantEdit("%s is not in pending state, cant edit" % evt)
         i.IEventSetter(evt).set(data)
         return evt
 
@@ -627,7 +632,7 @@ class EventsGrabber(grok.GlobalUtility):
         return self.validate(raw_mappings, pdb=pdb)
 
 
-not_settable = ['contributors', 'creators', 'rights']
+not_settable = ['contributors', 'creators', 'rights', 'sid']
 class EventDataManager(grok.GlobalUtility):
     grok.provides(i.IEventDataManager)
     def to_event_values(self, data, **kw):
@@ -663,9 +668,17 @@ class EventDataManager(grok.GlobalUtility):
         cdata = self.to_event_values(data, pdb=pdb)
         obj = Dummy(**cdata)
         alsoProvides(obj , i.ILiberticEventMapping)
+        def filtered(value):
+            ret = False
+            fn, ferror = value
+            if fn in not_settable:
+                ret = True
+            if not i.ILiberticEventMapping[fn].required and isinstance(ferror, SchemaNotFullyImplemented):
+                ret = True
+            return ret
         errors = [a for a in
                   schema.getValidationErrors(i.ILiberticEventMapping, obj)
-                  if not a[0] in not_settable]
+                  if not filtered(a) ]
         if errors:
             raise schema.ValidationError(errors)
         return cdata

@@ -56,7 +56,6 @@ setup(
         # with_ploneproduct_datatables
         'collective.js.datatables',
         # with_ploneproduct_dexterity
-        'plone.multilingualbehavior',
         'z3c.blobfile',
         'plone.app.dexterity',
         # with_database_sa
@@ -99,11 +98,17 @@ setup(
         # dexterity
         'five.grok',
         'collective.z3cform.keywordwidget',
-        'plone.directives.dexterity',
         'chardet',
+
+        'plone.directives.dexterity',
+        'archetypes.multilingual',
+        'plone.multilingualbehavior',
         'collective.dexteritytextindexer',
         'plone.app.referenceablebehavior',
         'plone.directives.form',
+
+        'collective.datatablesviews',
+
         # -*- Extra requirements: -*-
     ],
     extras_require = {

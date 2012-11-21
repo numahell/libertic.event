@@ -3,6 +3,7 @@
 __docformat__ = 'restructuredtext en'
 import csv
 from copy import deepcopy
+import uuid as muuid
 from five import grok
 import datetime
 import traceback
@@ -103,6 +104,10 @@ def empty_data():
         'lastname': None,
         'latlong': None,
         'organiser': None,
+        'jauge': None,
+        'left_places': None,
+        'tariff_information:': None,
+        'photos1_license': None,
         'photos1_license': None,
         'photos1_url': None,
         'photos2_license': None,
@@ -148,6 +153,9 @@ def data_from_ctx(ctx, **kw):
         'lastname': ctx.lastname,
         'latlong': ctx.latlong,
         'organiser': ctx.organiser,
+        'jauge':               ctx.jauge,
+        'left_places':         ctx.left_places,
+        'tariff_information': ctx.tariff_information,
         'photos1_license': ctx.photos1_license,
         'photos1_url': ctx.photos1_url,
         'photos2_license': ctx.photos2_license,
@@ -233,23 +241,61 @@ class AddForm(dexterity.AddForm):
     grok.name('libertic_event')
     grok.require('libertic.event.Add')
 
+    def update(self):
+        dexterity.AddForm.update(self)
+        self.fields['eid'].field.required = False
+        dexterity.AddForm.updateWidgets(self)
+
+    def create(self, data):
+        obj = dexterity.AddForm.create(self, data)
+        obj.sid = data['sid']
+        return obj
+
     def extractData(self):
+        catalog = getToolByName(self.context, 'portal_catalog')
+        pm = getToolByName(self.context, 'portal_membership')
+        user = pm.getAuthenticatedMember()
+        userid = user.getId()
         data, errors = dexterity.AddForm.extractData(self)
-        sid = data.get('sid', None)
+        #sid = data.get('sid', None)
+        sid = userid
+        data['sid'] = sid
         eid = data.get('eid', None)
+        if not eid:
+            eid = muuid.uuid4().hex
+            data['eid'] = eid
         unique_SID_EID_check(self.context, sid, eid)
         return data, errors
 
 class EditForm(dexterity.EditForm):
     grok.context(lei.ILiberticEvent)
     grok.require('libertic.event.Edit')
+    def update(self):
+        dexterity.EditForm.update(self)
+        self.fields['eid'].field.required = False
+        dexterity.EditForm.updateWidgets(self)
+
+    def applyChanges(self, data):
+        if data.get("sid", None):
+            self.context.sid = data["sid"]
+        dexterity.EditForm.applyChanges(self, data)
+
     def extractData(self):
         data, errors = dexterity.EditForm.extractData(self)
-        sid = data.get('sid', None)
+        ctx_sid = getattr(self.context, 'sid', None)
+        pm = getToolByName(self.context, 'portal_membership')
+        user = pm.getAuthenticatedMember()
+        userid = user.getId()
+        sid = data.get('sid', ctx_sid)
+        if not sid:
+            sid = userid
+        data['sid'] = sid
         eid = data.get('eid', None)
+        if not eid:
+            eid = muuid.uuid4().hex
+            data['eid'] = eid
         editable_SID_EID_check(self.context, sid, eid)
         return data, errors
-
 
 def unique_SID_EID_check(context, sid, eid, request=None, form=None, *args, **kw):
     db = lei.IDatabaseGetter(context).database()
@@ -360,11 +406,13 @@ class _api(grok.View):
         catalog = getToolByName(self.context, 'portal_catalog')
         pm = getToolByName(self.context, 'portal_membership')
         user = pm.getAuthenticatedMember()
+        userid = user.getId()
+        sid = userid
         # must be supplier on context
         results = {'results': [], 'messages': [], 'status': 1}
         result = {
             'eid': None,
-            'sid': None,
+            'sid': sid,
             'status': None,
             'messages': [],
         }
@@ -385,19 +433,20 @@ class _api(grok.View):
                         res['eid'] = data['initial'].get('eid', None)
                     except Exception, ex:
                         pass
-                try:
-                    res['sid'] = data['transformed']['sid']
-                except Exception, ex:
-                    try:
-                        res['sid'] = data['initial'].get('sid', None)
-                    except Exception, ex:
-                        pass
+
+                #try:
+                #    res['sid'] = data['transformed']['sid']
+                #except Exception, ex:
+                #    try:
+                #        res['sid'] = data['initial'].get('sid', None)
+                #    except Exception, ex:
+                #        pass
                 try:
                     cdata = deepcopy(data)
                     for k in ['contained', 'related']:
                         if k in cdata:
                             del cdata[k]
-                    infos, ret, event = lei.IDBPusher(db).push_event(cdata, [user.getId()])
+                    infos, ret, event = lei.IDBPusher(db).push_event(cdata, [userid], sid=sid)
                     if event is not None: event.reindexObject()
                     if infos:
                         if isinstance(infos, list):
@@ -416,7 +465,7 @@ class _api(grok.View):
             for data in secondpass_datas:
                 try:
                     cdata = deepcopy(data)
-                    infos, ret, event = lei.IDBPusher(db).push_event(cdata, [user.getId()])
+                    infos, ret, event = lei.IDBPusher(db).push_event(cdata, [user.getId()], sid=sid)
                     if event is not None: event.reindexObject()
                 except Exception, e:
                     trace = traceback.format_exc()

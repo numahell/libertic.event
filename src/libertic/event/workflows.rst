@@ -38,6 +38,10 @@ We can add and submit for moderation an event
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ::
 
+
+..    >>> browser.getControl(name="form.widgets.sid").value = "mysid"
+
+
     >>> browser = Browser.new('http://foo/plone/fr/database', SUPPLIER_NAME, SUPPLIER_PASSWORD)
     >>> '++add++libertic_event' in browser.contents
     True
@@ -45,7 +49,6 @@ We can add and submit for moderation an event
     >>> browser.getControl(name="form.widgets.source").value = "http://foo"
     >>> browser.getControl(name="form.widgets.IDublinCore.title").value="myevent"
     >>> browser.getControl(name="form.widgets.IDublinCore.description").value="myevent desc"
-    >>> browser.getControl(name="form.widgets.sid").value = "mysid"
     >>> browser.getControl(name="form.widgets.eid").value = "123"
     >>> browser.getControl(name="form.widgets.address").value = "foo"
     >>> browser.getControl(name="form.widgets.street").value = "foo"

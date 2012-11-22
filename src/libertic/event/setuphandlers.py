@@ -209,6 +209,7 @@ def setupQi(context):
 def configure_extra(context):
     """To configure extra features not already managed by genericsetup"""
     portal_url = getToolByName(context, 'portal_url')
+    pm = getToolByName(context, 'portal_membership')
     portal = portal_url.getPortalObject()
     security = ISecuritySchema(portal)
 
@@ -220,6 +221,7 @@ def configure_extra(context):
 
     if not security.enable_user_folders:
         security.enable_user_folders = True
+    pm.memberarea_type = 'MemberFolder'
 
 
 

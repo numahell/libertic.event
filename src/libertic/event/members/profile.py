@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 __docformat__ = 'restructuredtext en'
 
-from zope.interface import implements, implementsOnly
+from zope.interface import implements, implementsOnly, Interface
 from zope import schema
 from zope.schema import vocabulary
 from zope.component import getUtility, getAdapter
@@ -155,4 +155,15 @@ class CustomizedUserDataConfiglet(UserDataConfiglet):
     def __init__(self, context, request):
         super(CustomizedUserDataConfiglet, self).__init__(context, request)
         self.form_fields = self.form_fields.omit('tgu')
+
+from five import grok
+
+class libertic_post_create(grok.View):
+    grok.context(Interface)
+
+    def render(self):
+        """."""
+        return True
+
+
 # vim:set et sts=4 ts=4 tw=80:

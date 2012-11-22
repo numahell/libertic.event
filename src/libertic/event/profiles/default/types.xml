@@ -4,5 +4,6 @@
  <object meta_type="Dexterity FTI" name="libertic_event" />
  <object meta_type="Dexterity FTI" name="libertic_source"/>
  <object meta_type="Dexterity FTI" name="libertic_database"/>
+ <object meta_type="Factory-based Type Information with dynamic views" name="MemberFolder"/>
  <!-- -*- extra stuff goes here -*- -->
 </object>

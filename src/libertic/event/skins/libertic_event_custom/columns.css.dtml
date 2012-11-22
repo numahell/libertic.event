@@ -1,3 +1,4 @@
+
 /*
  *  This is the file where you put your CSS changes.
  *  You should preferrably use this and override the
@@ -10,19 +11,6 @@
 
 /* <dtml-call "REQUEST.set('portal_url', portal_url())"> (not this either :) */
 
-#portal-footer-wrapper {
-  clear:both;
-}
-
-
-#portlets-below {
-  float:left;
-}
-
-div#socialtools {
-  float:left;
-  display:block;
-}
 
 
 /* Stylesheet for the 'libertic.event' Plone theme */

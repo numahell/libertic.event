@@ -17,7 +17,9 @@
     <javascript id="++resource++libertic.event/something.js"/>
     -->
   <javascript authenticated="False" bundle="default" cacheable="True"
-    compression="none" conditionalcomment="" cookable="True" enabled="True"
-    expression="" id="jquery-integration.js" inline="False"/> 
+      compression="none" conditionalcomment="" cookable="True" enabled="True"
+      expression="" id="jquery-integration.js" inline="False"/>
+  <javascript
+      id="++theme++libertic.event/js/theme.js"/>
 
-</object> 
+</object>

@@ -21,8 +21,12 @@ def is_grp(userid, context, grp):
     if not userid:
         userid = pm.getAuthenticatedMember().getId()
     user = pm.getMemberById(userid)
-    rls = user.getRolesInContext(context)
     ret = False
+    rls = user.getRolesInContext(context)
+    try:
+        rls = user.getRolesInContext(context)
+    except:
+        rls = []
     if 'Manager' in rls or 'Site Administrator' in rls:
         ret = True
     try:

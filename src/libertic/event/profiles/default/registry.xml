@@ -76,7 +76,7 @@
   </records>
   <records interface="plone.app.querystring.interfaces.IQueryField" prefix="plone.app.querystring.field.author_lastname">
     <value key="title" i18n:translate="">LiberticEvent: author_lastname</value>
-    <value key="description" i18n:translate="">author_lastname of the event</value>
+    <value key="description" i18n:translate="">author_lastname of the author</value>
     <value key="enabled">True</value>
     <value key="sortable">True</value>
     <value key="operations">
@@ -109,7 +109,7 @@
   </records>
   <records interface="plone.app.querystring.interfaces.IQueryField" prefix="plone.app.querystring.field.author_email">
     <value key="title" i18n:translate="">LiberticEvent: author_email</value>
-    <value key="description" i18n:translate="">author_email of the event</value>
+    <value key="description" i18n:translate="">email of the author</value>
     <value key="enabled">True</value>
     <value key="sortable">True</value>
     <value key="operations">
@@ -120,7 +120,7 @@
   </records>
   <records interface="plone.app.querystring.interfaces.IQueryField" prefix="plone.app.querystring.field.firstname">
     <value key="title" i18n:translate="">LiberticEvent: firstname</value>
-    <value key="description" i18n:translate="">firstname of the event</value>
+    <value key="description" i18n:translate="">firstname</value>
     <value key="enabled">True</value>
     <value key="sortable">True</value>
     <value key="operations">
@@ -131,7 +131,7 @@
   </records>
   <records interface="plone.app.querystring.interfaces.IQueryField" prefix="plone.app.querystring.field.lastname">
     <value key="title" i18n:translate="">LiberticEvent: lastname</value>
-    <value key="description" i18n:translate="">lastname of the event</value>
+    <value key="description" i18n:translate="">lastname</value>
     <value key="enabled">True</value>
     <value key="sortable">True</value>
     <value key="operations">
@@ -142,7 +142,7 @@
   </records>
   <records interface="plone.app.querystring.interfaces.IQueryField" prefix="plone.app.querystring.field.telephone">
     <value key="title" i18n:translate="">LiberticEvent: telephone</value>
-    <value key="description" i18n:translate="">telephone of the event</value>
+    <value key="description" i18n:translate="">telephone of the author</value>
     <value key="enabled">True</value>
     <value key="sortable">True</value>
     <value key="operations">
@@ -153,7 +153,7 @@
   </records>
   <records interface="plone.app.querystring.interfaces.IQueryField" prefix="plone.app.querystring.field.email">
     <value key="title" i18n:translate="">LiberticEvent: email</value>
-    <value key="description" i18n:translate="">email of the event</value>
+    <value key="description" i18n:translate="">email</value>
     <value key="enabled">True</value>
     <value key="sortable">True</value>
     <value key="operations">
@@ -164,7 +164,7 @@
   </records>
   <records interface="plone.app.querystring.interfaces.IQueryField" prefix="plone.app.querystring.field.organizer">
     <value key="title" i18n:translate="">LiberticEvent: organizer</value>
-    <value key="description" i18n:translate="">organizer of the event</value>
+    <value key="description" i18n:translate="">organizer of the organizer</value>
     <value key="enabled">True</value>
     <value key="sortable">True</value>
     <value key="operations">
@@ -259,6 +259,43 @@
       <element>plone.app.querystring.operation.string.contains</element>
       <element>plone.app.querystring.operation.int.largerThan</element>
       <element>plone.app.querystring.operation.int.lessThan</element>
+    </value>
+    <value key="group" i18n:translate="">Libertic</value>
+  </records>
+  <records interface="plone.app.querystring.interfaces.IQueryField" prefix="plone.app.querystring.field.jauge">
+    <value key="title" i18n:translate="">LiberticEvent: jauge</value>
+    <value key="description" i18n:translate="">For a event, the jauge</value>
+    <value key="enabled">True</value>
+    <value key="sortable">True</value>
+    <value key="operations">
+      <element>plone.app.querystring.operation.selection.is</element>
+      <element>plone.app.querystring.operation.string.contains</element>
+      <element>plone.app.querystring.operation.int.largerThan</element>
+      <element>plone.app.querystring.operation.int.lessThan</element>
+    </value>
+    <value key="group" i18n:translate="">Libertic</value>
+  </records>
+   <records interface="plone.app.querystring.interfaces.IQueryField" prefix="plone.app.querystring.field.left_places">
+    <value key="title" i18n:translate="">LiberticEvent: left_places</value>
+    <value key="description" i18n:translate="">For a event, the left place</value>
+    <value key="enabled">True</value>
+    <value key="sortable">True</value>
+    <value key="operations">
+      <element>plone.app.querystring.operation.selection.is</element>
+      <element>plone.app.querystring.operation.string.contains</element>
+      <element>plone.app.querystring.operation.int.largerThan</element>
+      <element>plone.app.querystring.operation.int.lessThan</element>
+    </value>
+    <value key="group" i18n:translate="">Libertic</value>
+  </records>
+  <records interface="plone.app.querystring.interfaces.IQueryField" prefix="plone.app.querystring.field.tariff_information">
+    <value key="title" i18n:translate="">LiberticEvent: tariff_information</value>
+    <value key="description" i18n:translate="">the tariff information</value>
+    <value key="enabled">True</value>
+    <value key="sortable">True</value>
+    <value key="operations">
+      <element>plone.app.querystring.operation.selection.is</element>
+      <element>plone.app.querystring.operation.string.contains</element>
     </value>
     <value key="group" i18n:translate="">Libertic</value>
   </records>

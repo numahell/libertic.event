@@ -125,12 +125,15 @@ def upgrade_1002(context):
     """
     """
     site = getToolByName(context, 'portal_url').getPortalObject()
+    setuphandlers.setup_catalog(site)
+    setuphandlers.full_reindex(site)
     portal_setup = site.portal_setup
     portal_setup.runImportStepFromProfile(PROFILEID, 'typeinfo', run_dependencies=False)
     setuphandlers.configure_extra(site)
     quickinstall_addons(site, ['collective.datatablesviews'], upgrades=True)
     portal_setup.runImportStepFromProfile(PROFILEID, 'workflow', run_dependencies=False)
     portal_setup.runImportStepFromProfile(PROFILEID, 'plone.app.theming', run_dependencies=False)
+    portal_setup.runImportStepFromProfile(PROFILEID, 'plone.app.registry', run_dependencies=False)
     portal_setup.runImportStepFromProfile(PROFILEID, 'portlets', run_dependencies=False)
     portal_setup.runImportStepFromProfile('profile-collective.datatablesviews:default', 'typeinfo', run_dependencies=False)
     import_js(context)

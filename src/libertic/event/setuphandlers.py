@@ -14,6 +14,8 @@ from plone.dexterity.utils import createContentInContainer
 from Products.CMFPlone.utils import _createObjectByType
 from libertic.event import interfaces as i
 
+logger = logging.getLogger('libertic.event.setuphandlers')
+
 BASE_CONTENTS_TO_INIT = [
     {'path':'/fr',
      'title':u"ODE",
@@ -39,13 +41,14 @@ INDEXES = {
         'organiser', 'get_last_source_parsingstatus',
         'source_created_events', 'source_failed_events', 'source_edited_events',
         'source_runs', 'source_fails', 'source_warns',
+        'left_places', 'jauge',
     ],
     'KeywordIndex' : [
         'latlong',
         'contained', 'related',
     ],
     'ZCTextIndex' : [
-        'address',
+        'address', 'tariff_information',
     ],
     'DateIndex' : [
         'event_start', 'event_end',
@@ -54,6 +57,7 @@ INDEXES = {
 
 METADATAS = [
     'sid', 'eid','latlong','related', 'contained',
+    'town', 'source', 'event_start', 'event_end',
 ]
 
 
@@ -101,8 +105,10 @@ def create_content(context, structure):
         page.reindexObject()
 
 def full_reindex(portal):
+    logger.info('Reindex content')
     cat = getToolByName(portal, 'portal_catalog')
     cat.refreshCatalog()
+    logger.info('Reindexed content')
 
 def install_pamultilingual(portal):
     existing = set(portal.objectIds())
@@ -121,7 +127,6 @@ def install_pamultilingual(portal):
         SetupMultilingualSite(portal).setupSite(portal)
         SetupMultilingualSite(portal).set_default_language_content()
         SetupMultilingualSite(portal).move_default_language_content()
-
 
 def install_groups(portal):
     l = logging.getLogger('libertic.install_groups')

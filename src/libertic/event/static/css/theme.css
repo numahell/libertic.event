@@ -13,3 +13,58 @@
 #portal-logo img{
     /*width: 100%;*/
 }
+
+dl.portlet-libertic-context dd,
+dl.portlet-libertic-context dd ul {
+  display:block;
+  width:100%;
+  margin:0 auto;
+}
+dl.portlet-libertic-context dd {
+  clear:both;
+}
+
+dl.portlet-libertic-context dd.portletItem p{
+  padding-top:2px;
+  padding-bottom:2px;
+  margin-top:2px;
+  margin-bottom:2px;
+}
+dl.portlet-libertic-context dd.portletItem {
+  padding-bottom: 5px;
+  padding-top: 5px;
+}
+
+dl.portlet-libertic-context a:hover,
+dl.portlet-libertic-context a:link,
+dl.portlet-libertic-context a:visited,
+dl.portlet-libertic-context a {
+  border-bottom:none;
+  text-underline:none;
+}
+dl.portlet-libertic-context dd.add-content ul,
+dl.portlet-libertic-context dd.home ul,
+dl.portlet-libertic-context dd.download ul {
+}
+dl.portlet-libertic-context dd.add-content ul li,
+dl.portlet-libertic-context dd.home ul li,
+dl.portlet-libertic-context dd.download ul li {
+  text-align:center;
+  display:inline-block;
+  margin:0 auto;
+}
+dl.portlet-libertic-context dd.download ul li { width:40px;}
+dl.portlet-libertic-context dd.home ul li { width:70px;}
+dl.portlet-libertic-context dd.add-content ul li {text-align:left;display:block;width:210px;position:relative;}
+dl.portlet-libertic-context dd.add-content ul li p,
+dl.portlet-libertic-context dd.add-content ul li img,
+dl.portlet-libertic-context dd.add-content ul li a,
+dl.portlet-libertic-context dd.add-content ul li {height:40px;}
+dl.portlet-libertic-context dd.add-content ul li img{width:32px;height:32px;}
+dl.portlet-libertic-context dd.add-content ul li p{width:160px;position:absolute;top:10px;left:32px;}
+dl.portlet-libertic-context dd.add-content ul li img,
+dl.portlet-libertic-context dd.add-content ul li a,
+dl.portlet-libertic-context dd.add-content ul li p{display:inline-block;margin:0;padding:0;}
+
+
+

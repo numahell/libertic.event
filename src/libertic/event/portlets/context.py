@@ -32,7 +32,8 @@ class Renderer(base.Renderer):
             self.pm.createMemberArea()
 
     def is_supplier(self):
-        import pdb;pdb.set_trace()  ## Breakpoint ##
+        #import pdb;pdb.set_trace()  ## Breakpoint ##
+        return True
 
 
     def db_url(self):

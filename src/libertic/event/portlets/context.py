@@ -16,6 +16,29 @@ class Assignment(base.Assignment):
     implements(IContextPortlet)
     title = u'Libertic Contextual Portlet'
 
+def is_grp(userid, context, grp):
+    pm = getToolByName(context, 'portal_membership')
+    if not userid:
+        userid = pm.getAuthenticatedMember().getId()
+    user = pm.getMemberById(userid)
+    rls = user.getRolesInContext(context)
+    ret = False
+    if 'Manager' in rls or 'Site Administrator' in rls:
+        ret = True
+    try:
+        grps = user.getGroups()
+        if grp in grps:
+            ret = True
+    except:
+        pass
+    return ret
+
+def is_supplier(userid=None, context=None):
+    return is_grp(userid, context, 'libertic_event_supplier')
+
+def is_operator(userid=None, context=None):
+    return is_grp(userid, context, 'libertic_event_operator')
+
 class Renderer(base.Renderer):
     render = ViewPageTemplateFile('context.pt')
 
@@ -32,9 +55,10 @@ class Renderer(base.Renderer):
             self.pm.createMemberArea()
 
     def is_supplier(self):
-        #import pdb;pdb.set_trace()  ## Breakpoint ##
-        return True
+        return is_supplier(context=self.context)
 
+    def is_operator(self):
+        return is_operator(context=self.context)
 
     def db_url(self):
         language = self.portal_state.language()

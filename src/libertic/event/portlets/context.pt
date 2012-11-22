@@ -40,7 +40,7 @@
       </li>
     </ul>
   </dd>
-  <dd class="portletItem download" tal:condition="not:isAnon">
+  <dd class="portletItem download" tal:condition="view/is_operator">
     <!--
     <p i18n:translate="">Download the database</p>
     -->
@@ -64,7 +64,7 @@
       <div class="visualClear"></div>
     </ul>
   </dd>
-  <dd class="portletItem add-content" tal:condition="not: isAnon">
+  <dd class="portletItem add-content" tal:condition="view/is_supplier">
     <!--
     <p i18n:translate="">Add content</p>
     -->

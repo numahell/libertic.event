@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: libertic.event 1.0\n"
 "POT-Creation-Date: 2012-11-22 14:41+0000\n"
-"PO-Revision-Date: 2012-11-22 15:42+0100\n"
+"PO-Revision-Date: 2012-11-22 16:00+0100\n"
 "Last-Translator: kiorky <kiorky@cryptelium.net>\n"
 "Language-Team: FR <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -492,7 +492,7 @@ msgstr "évenement en erreur par cette source"
 
 #: ./portlets/context.pt:38
 msgid "find"
-msgstr ""
+msgstr "Chercher"
 
 #: ./interfaces.py:184
 #: ./profiles/default/registry.xml
@@ -521,7 +521,7 @@ msgstr "Cochez cette case pour indiquer que vous acceptez les conditions génér
 
 #: ./portlets/context.pt:33
 msgid "home"
-msgstr ""
+msgstr "Dossier personnel (recherches personnalisées)"
 
 #. Default: "Audience"
 #: ./interfaces.py:162

@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: libertic.event 1.0\n"
 "POT-Creation-Date: 2012-11-22 14:41+0000\n"
-"PO-Revision-Date: 2012-11-22 16:00+0100\n"
+"PO-Revision-Date: 2012-11-22 16:50+0100\n"
 "Last-Translator: kiorky <kiorky@cryptelium.net>\n"
 "Language-Team: FR <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -303,7 +303,7 @@ msgstr "Source: nombre d'éxecutions retournant un avertissement du job de la so
 
 #: ./portlets/context.pt:26
 msgid "Login"
-msgstr "S'identifier"
+msgstr "Se connecter"
 
 #: ./profiles/default/types/MemberFolder.xml
 msgid "MemberFolder"

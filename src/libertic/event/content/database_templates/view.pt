@@ -15,10 +15,10 @@
 
       <p>Download the database</p>
       <ul>
-        <lI><a href="eventsasxml">XML</li>
-        <lI><a href="eventsasjson">JSON</li>
-        <lI><a href="eventsasical">ICAL</li>
-        <lI><a href="eventsascsv">CSV</li>
+        <lI><a href="eventsasxml">XML</a></li>
+        <lI><a href="eventsasjson">JSON</a></li>
+        <lI><a href="eventsasical">ICAL</a></li>
+        <lI><a href="eventsascsv">CSV</a></li>
       </ul>
 
       <tal:block repeat="widget view/widgets/values">

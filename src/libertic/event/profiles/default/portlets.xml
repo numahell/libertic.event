@@ -2,12 +2,27 @@
 <portlets
     xmlns:i18n="http://xml.zope.org/namespaces/i18n"
     i18n:domain="libertic.event">
-<!--
+  <assignment manager="plone.rightcolumn" key="/" name="events" category="context" type="portlets.Events" remove="true"/>
+  <assignment manager="plone.rightcolumn" key="/" name="news"   category="context" type="portlets.News" remove="true"/>
+  <!--
+    <portlet
+        addview="libertic.event.browser.portlet.Portlet"
+        title = "libertic.event portlet"
+        title = "Add a libertic.event portlet"
+        remove="True"
+      />
+  -->
   <portlet
-      addview="libertic.event.browser.portlet.Portlet"
-      title = "libertic.event portlet"
-      title = "Add a libertic.event portlet"
-      remove="True"
+      addview="libertic.portlets.context"
+      title="Libertic Contextual Portlet"
+      description=""
+      i18n:attributes="title; description"
     />
--->
+  <assignment
+      manager="plone.leftcolumn"
+      category="context"
+      key="/"
+      type="libertic.portlets.context"
+      name="libertic_portlets_context_1"
+    />
 </portlets>

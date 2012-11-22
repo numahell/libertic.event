@@ -10,8 +10,10 @@
     xmlns:plone="http://namespaces.plone.org/plone"
     i18n_domain="libertic.event">
   <grok:grok package=".interfaces"/>
+  <grok:grok package=".members"/>
   <include package="Products.Five" file="configure.zcml"/>
   <include package="Products.CMFCore" file="permissions.zcml" />
+  <include package=".portlets"/>
   <!-- Load the ZCML configuration for the libertic.event package.-->
   <!--with_ploneproduct_patransmo -->
   <include package="collective.transmogrifier" file="configure.zcml"/>
@@ -70,9 +72,9 @@
        name="libertic_event_custom"/>
 
   <include package="plone.resource" file="meta.zcml"/>
-  <plone:static directory="static" type="theme" name="libertic.event" />
 
   <includeOverrides package=".members"/>
   <includeOverrides package=".content"/>
+  <plone:static directory="static" type="theme" name="libertic.event"/>
 </configure>
 <!-- vim:set ft=xml: -->

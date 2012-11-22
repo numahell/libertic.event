@@ -116,7 +116,7 @@ def upgrade_1001(context):
     portal_setup = site.portal_setup
     portal_setup.runImportStepFromProfile('profile-libertic.event:default', 'typeinfo', run_dependencies=False)
     portal_setup.runImportStepFromProfile('profile-libertic.event:default', 'collective.cron.setupCrons', run_dependencies=False)
-    portal_setup.runImportStepFromProfile('profile-libertic.event:default', 'plone.app.registry', run_dependencies=False) 
+    portal_setup.runImportStepFromProfile('profile-libertic.event:default', 'plone.app.registry', run_dependencies=False)
     setuphandlers.setup_catalog(site)
     log('v1001 applied')
 
@@ -126,14 +126,17 @@ def upgrade_1002(context):
     """
     site = getToolByName(context, 'portal_url').getPortalObject()
     portal_setup = site.portal_setup
+    portal_setup.runImportStepFromProfile(PROFILEID, 'typeinfo', run_dependencies=False)
     setuphandlers.configure_extra(site)
     quickinstall_addons(site, ['collective.datatablesviews'], upgrades=True)
-    portal_setup.runImportStepFromProfile(PROFILEID, 'typeinfo', run_dependencies=False)
     portal_setup.runImportStepFromProfile(PROFILEID, 'workflow', run_dependencies=False)
+    portal_setup.runImportStepFromProfile(PROFILEID, 'plone.app.theming', run_dependencies=False)
+    portal_setup.runImportStepFromProfile(PROFILEID, 'portlets', run_dependencies=False)
     portal_setup.runImportStepFromProfile('profile-collective.datatablesviews:default', 'typeinfo', run_dependencies=False)
     import_js(context)
+    import_css(context)
     recook_resources(context)
     log('v1002 applied')
 
- 
+
 

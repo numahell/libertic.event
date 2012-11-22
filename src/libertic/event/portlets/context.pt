@@ -1,0 +1,53 @@
+<dl
+  tal:define="template_id template/getId;
+  portal  here/portal_url/getPortalObject;
+  normalizeString nocall:context/@@plone/normalizeString;
+  toLocalizedTime nocall:context/@@plone/toLocalizedTime;
+  portal_properties context/portal_properties;
+  site_properties context/portal_properties/site_properties;
+  here_url context/@@plone_context_state/object_url;
+  home portal/portal_membership/getHomeUrl;
+  db_url view/db_url;
+  is_supplier view/is_supplier;
+  isAnon context/@@plone_portal_state/anonymous;"
+  class="portlet portlet-libertic-context"
+  i18n:domain="libertic.event">
+  <dt class="portletHeader">
+    <span class="portletTopLeft"></span>
+    <span>
+      Actions
+    </span>
+    <span class="portletTopRight"></span>
+  </dt>
+  <dd class="portletItem" tal:condition="isAnon">
+    <div>
+      <a href="" i18n:translate=""
+        tal:attributes="href string:${portal_url}/login_form" >Login</a>
+    </div>
+  </dd>
+  <dd class="portletItem" tal:condition="python:( not isAnon  ) and home">
+      <a tal:attributes="href home" i18n:translate="">My folder</a>
+  </dd>
+  <dd class="portletItem" tal:condition="not:isAnon">
+    <p i18n:translate="">Download the database</p>
+    <ul>
+      <li><a tal:attributes="href string:${db_url}/eventsasxml">XML</a></li>
+      <li><a tal:attributes="href string:${db_url}/eventsasjson">JSON</a></li>
+      <li><a tal:attributes="href string:${db_url}/eventsasical">ICAL</a></li>
+      <li><a tal:attributes="href string:${db_url}/eventsascsv">CSV</a></li>
+    </ul>
+  </dd>
+  <dd class="portletItem" tal:condition="not: isAnon">
+    <p i18n:translate="">Add content</p>
+    <ul>
+      <li><a tal:attributes="href string:${db_url}/++add++libertic_event">Add an event</a></li>
+      <li><a tal:attributes="href string:${db_url}/++add++libertic_source">Add a source</a></li>
+      <li><a tal:attributes="href string:${home}/createObject?type_name=Collection">Add a new customized search</a></li>
+    </ul>
+  </dd>
+  <dd class="portletFooter">
+    <span class="portletBottomLeft"></span>
+    <span> </span>
+    <span class="portletBottomRight"></span>
+  </dd>
+</dl>

@@ -1,0 +1,642 @@
+<?xml version="1.0"?>
+<atcttool>
+ <topic_indexes>
+  <index name="address" description="" enabled="False" friendlyName="">
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="allowedRolesAndUsers"
+     description="The roles and users with View permission on an item"
+     enabled="False" friendlyName="Internal Security">
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="author_email" description="" enabled="True" friendlyName="">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="author_firstname" description="" enabled="True"
+     friendlyName="">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="author_lastname" description="" enabled="True"
+     friendlyName="">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="author_telephone" description="" enabled="True"
+     friendlyName="">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="cmf_uid" description="" enabled="False" friendlyName="">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="commentators"
+     description="Users who have commented on the item" enabled="True"
+     friendlyName="Commentators">
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+   <criteria>ATListCriterion</criteria>
+  </index>
+  <index name="contained" description="" enabled="False" friendlyName="">
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="country" description="" enabled="True" friendlyName="">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="created" description="The time and date an item was created"
+     enabled="True" friendlyName="Creation Date">
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+  </index>
+  <index name="Creator" description="" enabled="True" friendlyName="Creator">
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+   <criteria>ATListCriterion</criteria>
+  </index>
+  <index name="Date" description="The time and date an item was last modified"
+     enabled="False" friendlyName="Modification Date">
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+  </index>
+  <index name="Description" description="" enabled="True"
+     friendlyName="Description">
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="effective"
+     description="The time and date an item becomes publicly available"
+     enabled="True" friendlyName="Effective Date">
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+  </index>
+  <index name="effectiveRange"
+     description="All items publicly available on a certain date"
+     enabled="False" friendlyName="Effective Range">
+   <criteria>ATFriendlyDateCriteria</criteria>
+  </index>
+  <index name="eid" description="" enabled="True" friendlyName="">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="email" description="" enabled="True" friendlyName="">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="end" description="The end date and time of an event"
+     enabled="True" friendlyName="End Date">
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+  </index>
+  <index name="event_end" description="" enabled="True" friendlyName="">
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+  </index>
+  <index name="event_start" description="" enabled="True" friendlyName="">
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+  </index>
+  <index name="expires"
+     description="The time and date an item is no longer publicly available"
+     enabled="True" friendlyName="Expiration Date">
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+  </index>
+  <index name="firstname" description="" enabled="False" friendlyName="">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="get_last_source_parsingstatus" description="" enabled="False"
+     friendlyName="">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="getId"
+     description="The short name of an item (used in the url)" enabled="True"
+     friendlyName="Short Name">
+   <criteria>ATSimpleStringCriterion</criteria>
+   <criteria>ATListCriterion</criteria>
+  </index>
+  <index name="getObjPositionInParent"
+     description="The order of an item in its parent folder" enabled="True"
+     friendlyName="Order in folder">
+   <criteria>ATSimpleIntCriterion</criteria>
+  </index>
+  <index name="getRawRelatedItems"
+     description="Find items related to the selected items" enabled="True"
+     friendlyName="Related To">
+   <criteria>ATReferenceCriterion</criteria>
+  </index>
+  <index name="id" description="The short name of an item (used in the url)"
+     enabled="False" friendlyName="Short Name">
+   <criteria>ATSimpleStringCriterion</criteria>
+   <criteria>ATListCriterion</criteria>
+  </index>
+  <index name="in_reply_to" description="" enabled="False" friendlyName="">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="is_default_page"
+     description="Find items that are the default view for their containing folder."
+     enabled="False" friendlyName="Default Page">
+   <criteria>ATBooleanCriterion</criteria>
+  </index>
+  <index name="is_folderish"
+     description="Find items that can contain other objects" enabled="False"
+     friendlyName="Folder-like">
+   <criteria>ATBooleanCriterion</criteria>
+  </index>
+  <index name="jauge" description="" enabled="True" friendlyName="">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="Language" description="" enabled="False" friendlyName="">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="lastname" description="" enabled="True" friendlyName="">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="latlong" description="" enabled="True" friendlyName="">
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="left_places" description="" enabled="True" friendlyName="">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="meta_type" description="" enabled="False" friendlyName="">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="modified"
+     description="The time and date an item was last modified" enabled="True"
+     friendlyName="Modification Date">
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+  </index>
+  <index name="object_provides" description="" enabled="False"
+     friendlyName="">
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="organiser" description="" enabled="True" friendlyName="">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="path" description="The location of an item in the site (path)"
+     enabled="True" friendlyName="Location">
+   <criteria>ATPathCriterion</criteria>
+   <criteria>ATRelativePathCriterion</criteria>
+  </index>
+  <index name="portal_type" description="" enabled="False"
+     friendlyName="Item Type (internal)">
+   <criteria>ATPortalTypeCriterion</criteria>
+  </index>
+  <index name="related" description="" enabled="True" friendlyName="">
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="review_state"
+     description="An item's workflow state (e.g.published)" enabled="True"
+     friendlyName="State">
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+   <criteria>ATListCriterion</criteria>
+  </index>
+  <index name="SearchableText" description="Text search of an item's contents"
+     enabled="True" friendlyName="Search Text">
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="sid" description="" enabled="True" friendlyName="">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="sortable_title"
+     description="An item's title transformed for sorting" enabled="True"
+     friendlyName="Sortable Title">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="source" description="" enabled="True" friendlyName="">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="source_created_events" description="" enabled="True"
+     friendlyName="">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="source_edited_events" description="" enabled="True"
+     friendlyName="">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="source_failed_events" description="" enabled="True"
+     friendlyName="">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="source_fails" description="" enabled="True" friendlyName="">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="source_runs" description="" enabled="True" friendlyName="">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="source_warns" description="" enabled="True" friendlyName="">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="start" description="The start date and time of an event"
+     enabled="True" friendlyName="Start Date">
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+  </index>
+  <index name="Subject"
+     description="Tags are used for ad-hoc organization of content"
+     enabled="True" friendlyName="Tags">
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+   <criteria>ATListCriterion</criteria>
+  </index>
+  <index name="tariff_information" description="" enabled="True"
+     friendlyName="">
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="telephone" description="" enabled="True" friendlyName="">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="Title" description="Text search of an item's title"
+     enabled="True" friendlyName="Title">
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="total_comments"
+     description="Total number of comments on this item." enabled="False"
+     friendlyName="Total number of comments">
+   <criteria>ATSimpleIntCriterion</criteria>
+  </index>
+  <index name="town" description="" enabled="True" friendlyName="">
+   <criteria>ATBooleanCriterion</criteria>
+   <criteria>ATCurrentAuthorCriterion</criteria>
+   <criteria>ATDateRangeCriterion</criteria>
+   <criteria>ATFriendlyDateCriteria</criteria>
+   <criteria>ATListCriterion</criteria>
+   <criteria>ATPortalTypeCriterion</criteria>
+   <criteria>ATReferenceCriterion</criteria>
+   <criteria>ATSelectionCriterion</criteria>
+   <criteria>ATSimpleIntCriterion</criteria>
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+  <index name="Type" description="An item's type (e.g. Event)" enabled="True"
+     friendlyName="Item Type">
+   <criteria>ATPortalTypeCriterion</criteria>
+  </index>
+  <index name="UID" description="" enabled="False" friendlyName="">
+   <criteria>ATSimpleStringCriterion</criteria>
+  </index>
+ </topic_indexes>
+ <topic_metadata>
+  <metadata name="author_name" description="Author name" enabled="True"
+     friendlyName=""/>
+  <metadata name="cmf_uid" description="" enabled="False" friendlyName=""/>
+  <metadata name="commentators" description="" enabled="False"
+     friendlyName=""/>
+  <metadata name="contained" description="" enabled="False" friendlyName=""/>
+  <metadata name="created" description="The time and date an item was created"
+     enabled="False" friendlyName="Creation Date"/>
+  <metadata name="CreationDate"
+     description="The time and date an item was created" enabled="True"
+     friendlyName="Creation Date"/>
+  <metadata name="Creator" description="" enabled="True" friendlyName=""/>
+  <metadata name="Date" description="" enabled="False" friendlyName=""/>
+  <metadata name="Description" description="" enabled="True" friendlyName=""/>
+  <metadata name="effective"
+     description="The time and date an item becomes publicly available"
+     enabled="False" friendlyName="Effective Date"/>
+  <metadata name="EffectiveDate"
+     description="The time and date an item becomes publicly available"
+     enabled="True" friendlyName="Effective Date"/>
+  <metadata name="eid" description="event identifier" enabled="True" friendlyName=""/>
+  <metadata name="end" description="The end date and time of an event"
+     enabled="True" friendlyName="End Date"/>
+  <metadata name="event_end" description="Event start" enabled="True" friendlyName=""/>
+  <metadata name="event_start" description="Event end" enabled="True"
+     friendlyName=""/>
+  <metadata name="exclude_from_nav"
+     description="Is this item visible in the site navigation" enabled="False"
+     friendlyName="Exclude from navigation"/>
+  <metadata name="ExpirationDate"
+     description="The time and date an item is no longer publicly available"
+     enabled="True" friendlyName="Expiration Date"/>
+  <metadata name="expires"
+     description="The time and date an item is no longer publicly available"
+     enabled="False" friendlyName="Expiration Date"/>
+  <metadata name="getIcon" description="The icon for an item" enabled="False"
+     friendlyName="Icon"/>
+  <metadata name="getId"
+     description="The short name of an item (used in the url)" enabled="True"
+     friendlyName="Short Name"/>
+  <metadata name="getObjSize" description="The size of an item" enabled="True"
+     friendlyName="Size"/>
+  <metadata name="getRemoteUrl" description="The url of a Link item"
+     enabled="False" friendlyName="Remote Url"/>
+  <metadata name="id" description="" enabled="False"
+     friendlyName="Short Name"/>
+  <metadata name="in_response_to" description="" enabled="False"
+     friendlyName=""/>
+  <metadata name="is_folderish"
+     description="Find items that can contain other objects" enabled="False"
+     friendlyName="Folder-like"/>
+  <metadata name="Language" description="" enabled="False" friendlyName=""/>
+  <metadata name="last_comment_date" description="" enabled="False"
+     friendlyName=""/>                    
+  <metadata name="latlong" description="lat long of the event" enabled="True" friendlyName=""/>
+  <metadata name="listCreators" description="" enabled="False"
+     friendlyName=""/>
+  <metadata name="location" description="" enabled="True"
+     friendlyName="Location"/>
+  <metadata name="meta_type" description="" enabled="False" friendlyName=""/>
+  <metadata name="ModificationDate"
+     description="The time and date an item was last modified" enabled="True"
+     friendlyName="Modification Date"/>
+  <metadata name="modified"
+     description="The time and date an item was last modified" enabled="False"
+     friendlyName="Modification Date"/>
+  <metadata name="portal_type" description="" enabled="False"
+     friendlyName="Item Type (internal)"/>
+  <metadata name="related" description="" enabled="False" friendlyName=""/>
+  <metadata name="review_state"
+     description="An item's workflow state (e.g.published)" enabled="True"
+     friendlyName="State"/>
+  <metadata name="sid" description="" enabled="False" friendlyName=""/>
+  <metadata name="source" description="" enabled="False" friendlyName=""/>
+  <metadata name="start" description="The start date and time of an event"
+     enabled="True" friendlyName="Start Date"/>
+  <metadata name="Subject"
+     description="Tags are used for ad-hoc organization of content"
+     enabled="True" friendlyName="Tags"/>
+  <metadata name="Title" description="" enabled="True" friendlyName="Title"/>
+  <metadata name="total_comments"
+     description="Total number of comments on this item." enabled="True"
+     friendlyName="Total number of comments"/>
+  <metadata name="town" description="Town" enabled="True" friendlyName=""/>
+  <metadata name="Type" description="An item's type (e.g. Event)"
+     enabled="True" friendlyName="Item Type"/>
+  <metadata name="UID" description="" enabled="True" friendlyName=""/>
+ </topic_metadata>
+ <property name="title">Collection and image scales settings</property>
+ <property name="image_types">
+  <element value="Image"/>
+  <element value="News Item"/>
+ </property>
+ <property name="folder_types">
+  <element value="Image"/>
+ </property>
+ <property name="album_batch_size">30</property>
+ <property name="album_image_scale">thumb</property>
+ <property name="single_image_scale">preview</property>
+</atcttool>

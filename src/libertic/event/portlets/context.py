@@ -22,7 +22,6 @@ def is_grp(userid, context, grp):
         userid = pm.getAuthenticatedMember().getId()
     user = pm.getMemberById(userid)
     ret = False
-    rls = user.getRolesInContext(context)
     try:
         rls = user.getRolesInContext(context)
     except:

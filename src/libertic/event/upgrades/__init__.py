@@ -135,7 +135,7 @@ def upgrade_1002(context):
     portal_setup.runImportStepFromProfile(PROFILEID, 'plone.app.theming', run_dependencies=False)
     portal_setup.runImportStepFromProfile(PROFILEID, 'plone.app.registry', run_dependencies=False)
     portal_setup.runImportStepFromProfile(PROFILEID, 'portlets', run_dependencies=False)
-    portal_setup.runImportStepFromProfile(PROFILEID, 'portal_atct', run_dependencies=False)
+    portal_setup.runImportStepFromProfile(PROFILEID, 'portal_atcttool', run_dependencies=False)
     portal_setup.runImportStepFromProfile('profile-collective.datatablesviews:default', 'typeinfo', run_dependencies=False)
     import_js(context)
     import_css(context)

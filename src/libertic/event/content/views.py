@@ -26,6 +26,11 @@ except ImportError:
     from simplejson import json
 
 
+from libertic.event.utils import (
+    ical_string, 
+    magicstring
+)
+
 class IEventsCollection(Interface):
     """Marker interface for views"""
 
@@ -80,12 +85,6 @@ class EventsAsXml(EventsViewMixin):
 
 
 class EventsAsJson(EventsViewMixin):
-    events = ViewPageTemplateFile('views_templates/xml.pt')
-    _macros = ViewPageTemplateFile('liberticevent_templates/xmacros.pt')
-    @property
-    def xmacros(self):
-        return self._macros.macros
-
     def render(self):
         sdata = {'events': []}
         for i in self.items:
@@ -124,5 +123,20 @@ class EventsAsCsv(EventsViewMixin):
             titles = rows[0].keys()
             titles.sort()
             export_csv(self.request, titles, rows)
+
+class EventsAsIcal(EventsViewMixin):
+    def render(self):
+        events = []
+        for i in self.items:
+            event = i.getObject()
+            icalv = event.restrictedTraverse('@@ical')
+            events.append(icalv.ical_event())
+        resp = magicstring(ical_string(events))
+        self.request.response.setHeader('Content-Type','text/calendar')
+        self.request.response.addHeader(
+            "Content-Disposition","filename=%s.ics" % (
+                self.context.getId()))
+        self.request.response.setHeader('Content-Length', len(resp))
+        self.request.response.write(resp)
 
 # vim:set et sts=4 ts=4 tw=80:

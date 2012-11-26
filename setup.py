@@ -100,6 +100,7 @@ setup(
         'collective.z3cform.keywordwidget',
         'chardet',
 
+        'icalendar',
         'plone.directives.dexterity',
         'archetypes.multilingual',
         'plone.multilingualbehavior',

@@ -24,8 +24,18 @@ from plone.directives import form, dexterity
 from Products.CMFCore.utils import getToolByName
 from zope.component import getUtility
 from plone.app.uuid.utils import uuidToObject
+from icalendar import (
+    Calendar as iCal,
+    Event as iE,
+    vCalAddress,
+    vText,
+)
 
 
+from libertic.event.utils import (
+    magicstring,
+    ical_string,
+)
 
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
@@ -382,6 +392,46 @@ class Csv(grok.View):
             self.request,
             titles,
             [sdata])
+
+
+class Ical(grok.View):
+    grok.context(lei.ILiberticEvent)
+    grok.require('libertic.event.View')
+
+    def ical_event(self):
+        sdata = data_from_ctx(self.context)
+        event = iE()
+        sdata['ltitle'] = sdata['title']
+        if sdata['source']:
+            event['URL'] = sdata['source']
+            sdata['ltitle'] += u' %(source)s' % sdata
+        sub = sdata['subjects']
+        desc = ['%(title)s', '%(source)s', '%(description)s']
+        ssub = ''
+        if sub:
+            ssub = ', '.join([a.strip() for a in sub if a.strip()]) 
+            desc.append(ssub)
+        desc = [(a%sdata).strip() for a in desc if (a%sdata).strip()]
+        if sdata['latlong']: event['GEO'] = sdata['latlong']
+        if ssub: event['CATEGORIES'] = ssub
+        event['UID'] = IUUID(self.context)
+        event['SUMMARY'] = vText(sdata['ltitle'])
+        event['DESCRIPTION'] = vText('; '.join(desc))
+        event['LOCATION'] = vText(u'%(address)s %(address_details)s %(street)s, %(country)s' % sdata)
+        event['DTSTART'] = sdata['event_start']
+        event['DTEND'] = sdata['event_end']
+        return event
+
+    def render(self):
+        sdata = magicstring(ical_string(self.ical_event()))
+        resp = magicstring(sdata)
+        lresp = len(resp)
+        self.request.response.setHeader('Content-Type','text/calendar')
+        self.request.response.addHeader(
+            "Content-Disposition","filename=%s.ics" % (
+                self.context.getId()))
+        self.request.response.setHeader('Content-Length', len(resp))
+        self.request.response.write(resp)
 
 
 class _api(grok.View):

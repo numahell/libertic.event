@@ -64,7 +64,7 @@ from libertic.event.content.liberticevent import (
     unique_SID_EID_check,
     editable_SID_EID_check,
 )
-from libertic.event.utils import Browser
+from libertic.event.utils import Browser, magicstring
 
 _marker = object()
 class NotUnique(Exception):pass
@@ -77,36 +77,6 @@ class SourceMapping(object):
     def __init__(self, sid=None, eid=None):
         self.sid = sid
         self.eid = eid
-
-
-def magicstring(string):
-    try:
-        detectedenc = chardet.detect(string).get('encoding')
-    except Exception,e:
-        detectedenc = None
-    if detectedenc.lower().startswith('iso-8859'):
-        detectedenc = 'ISO-8859-15'
-    found_encodings = [
-        'ISO-8859-15', 'TIS-620', 'EUC-KR',
-        'EUC-JP', 'SHIFT_JIS', 'GB2312', 'utf-8', 'ascii',
-    ]
-    if detectedenc.lower() not in ('utf-8', 'ascii'):
-        try:
-            string = string.decode(detectedenc).encode(
-                detectedenc)
-        except:
-            for idx, i in enumerate(found_encodings):
-                try:
-                    string = string.decode(i).encode(i)
-                    break
-                except:
-                    if idx == (len(found_encodings)-1):
-                        raise
-    if isinstance(string, unicode):
-        string = string.encode('utf-8')
-    string = string.decode('utf-8').encode('utf-8')
-    return string
-
 
 def to_unicode(value):
     if not isinstance(value, unicode):
@@ -126,6 +96,7 @@ def to_string(value):
 
 
 def smart_type(field, value):
+
     if isinstance(value, basestring):
         # char / unicodes
         if si.IBytes.providedBy(field):

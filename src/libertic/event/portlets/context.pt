@@ -53,7 +53,7 @@
         <img tal:attributes="src string:${img_url}/json_36.png" alt="JSON" title="Download as JSON" i18n:attributes="title"/>
         <p>json</p>
       </a></li>
-      <li class="ical"><a al:attributes="href string:${db_url}/eventsasical">
+      <li class="ical"><a  tal:attributes="href string:${db_url}/eventsasical">
         <img tal:attributes="src string:${img_url}/ical_36.png" alt="ICAL" title="Downloas as ICAL" i18n:attributes="title"/>
         <p>ical</p>
       </a></li>

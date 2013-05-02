@@ -1,6 +1,15 @@
 /* Sunburst Theme fixes to works with 960css */
 #portal-globalnav{
     margin: 0 10px 1em 10px;
+    background: transparent;
+    li,
+    li.selected {
+        a:hover,
+        a {
+            background: transparent;
+            color: white;
+        }
+    }
 }
 #portal-searchbox{
     position: relative;
@@ -9,6 +18,16 @@
 #portal-personaltools{
     z-index: 15;
 }
+
+#portal-footer {
+    padding: 0;
+}
+#portal-siteactions {
+    clear: none;
+}
+
+
+
 /* THEME */
 #portal-logo img{
     /*width: 100%;*/
@@ -70,14 +89,6 @@ dl.portlet-libertic-context dd.add-content ul li p{display:inline-block;margin:0
 
 /* Layout *
  * ------ */
-
-/* resets sunburst */
-#portal-footer {
-    padding: 0;
-}
-#portal-siteactions {
-    clear: none;
-}
 
 
 #header-wrapper, #footer-wrapper {

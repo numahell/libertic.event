@@ -1,16 +1,31 @@
+@import 'theme-variables.less';
+
 /* Sunburst Theme fixes to works with 960css */
 #portal-globalnav{
-    margin: 0 10px 1em 10px;
+    margin: 80px 10px 1em 10px;
     background: transparent;
+    border-bottom: 1px solid @grayLighter;
     li,
     li.selected {
         a:hover,
         a {
             background: transparent;
             color: white;
+            border-bottom: 5px solid @black;
         }
     }
+    li a {
+        border: none;
+        min-width: auto;
+        padding: 0.5em 0;
+        margin-right: 2em;
+        font-weight: bold;
+        margin-bottom: -4px;
+    }
 }
+
+#portal-globalnav li a:hover, #portal-globalnav li.selected a:hover, #portal-globalnav li a, #portal-globalnav li.selected a
+
 #portal-searchbox{
     position: relative;
     z-index: 10;

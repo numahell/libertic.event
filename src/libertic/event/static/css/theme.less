@@ -1,6 +1,46 @@
 @import 'theme-variables.less';
 
-/* Sunburst Theme fixes to works with 960css */
+
+/* Resets *
+ * ------ */
+
+a:link, a:visited {
+    color: @linkColor;
+}
+a:hover {
+    color: @linkColorHover;
+}
+#content, dl.portlet {
+    a:link, a:visited {
+        color: @linkColor;
+        text-decoration: underline;
+        border-bottom: none;
+    }
+    a:hover {
+        color: @linkColorHover !important;
+    }
+}
+footer,
+#portal-footer,
+#portal-colophon,
+#portal-siteactions li {
+    a:link, &:visited {
+        color: @whiteGray;
+        text-decoration: underline;
+    }
+    a:hover {
+        color: darken(@whiteGray, 15%);
+    }
+}
+
+
+/* HEADER *
+ * ------ */
+ 
+#header-wrapper, #footer-wrapper {
+    background: url('../images/bg-motif-jacq.png') repeat center center;
+}
+
 #portal-globalnav{
     margin: 80px 10px 1em 10px;
     background: transparent;
@@ -24,8 +64,7 @@
     }
 }
 
-#portal-globalnav li a:hover, #portal-globalnav li.selected a:hover, #portal-globalnav li a, #portal-globalnav li.selected a
-
+/* Sunburst Theme fixes to works with 960css */
 #portal-searchbox{
     position: relative;
     z-index: 10;
@@ -101,11 +140,3 @@ dl.portlet-libertic-context dd.add-content ul li a,
 dl.portlet-libertic-context dd.add-content ul li p{display:inline-block;margin:0;padding:0;}
 
 
-
-/* Layout *
- * ------ */
-
-
-#header-wrapper, #footer-wrapper {
-    background: url('../images/bg-motif-jacq.png') repeat center center;
-}

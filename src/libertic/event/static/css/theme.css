@@ -1,5 +1,7 @@
 /* Resets *
- * ------ */
+ * ****** */
+/* Links *
+ * ----- */
 a:link,
 a:visited {
   color: #363339;
@@ -19,6 +21,10 @@ dl.portlet a:visited {
 dl.portlet a:hover {
   color: #5c5761 !important;
 }
+footer a,
+#portal-footer a,
+#portal-colophon a,
+#portal-siteactions li a,
 footer a:link,
 #portal-footer a:link,
 #portal-colophon a:link,
@@ -36,8 +42,16 @@ footer a:hover,
 #portal-siteactions li a:hover {
   color: #c6c6c6;
 }
+/* Basic classes *
+ * ------------- */
+.align-right {
+  float: right;
+}
+.align-left {
+  float: left;
+}
 /* HEADER *
- * ------ */
+ * ****** */
 #header-wrapper,
 #footer-wrapper {
   background: url('../images/bg-motif-jacq.png') repeat center center;
@@ -72,27 +86,40 @@ footer a:hover,
   z-index: 15;
 }
 /* FOOTER *
- * ------ */
+ * ****** */
 footer {
   color: #fefefe;
+  padding-top: 1em;
 }
-#portal-footer {
-  padding: 0;
-  margin: 10px;
-  background: transparent;
-}
-#portal-siteactions {
-  clear: none;
-  padding-bottom: 0;
-  text-align: left;
+footer .clear {
+  margin-bottom: 10px;
 }
 #portal-footer,
 #portal-colophon,
 #portal-siteactions {
   font-size: 85%;
 }
+#portal-footer {
+  padding: 0;
+  margin: 0 10px;
+  background: transparent;
+}
+#portal-siteactions {
+  clear: none;
+  padding-bottom: 0;
+  text-align: left;
+  line-height: 2em;
+}
+#portal-siteactions li {
+  display: block;
+}
+#portal-colophon {
+  padding: 1em;
+  background-color: rgba(255, 255, 255, 0.1);
+  text-align: left;
+}
 /* PORTLETS *
- * -------- */
+ * ******** */
 dl.portlet-libertic-context dd,
 dl.portlet-libertic-context dd ul {
   display: block;

@@ -2,7 +2,10 @@
 
 
 /* Resets *
- * ------ */
+ * ****** */
+
+/* Links *
+ * ----- */
 
 a:link, a:visited {
     color: @linkColor;
@@ -24,7 +27,7 @@ footer,
 #portal-footer,
 #portal-colophon,
 #portal-siteactions li {
-    a:link, &:visited {
+    a, a:link, &:visited {
         color: @whiteGray;
         text-decoration: underline;
     }
@@ -33,9 +36,18 @@ footer,
     }
 }
 
+/* Basic classes *
+ * ------------- */
+
+.align-right {
+    float: right;
+}
+.align-left {
+    float: left;
+}
 
 /* HEADER *
- * ------ */
+ * ****** */
  
 #header-wrapper, #footer-wrapper {
     background: url('../images/bg-motif-jacq.png') repeat center center;
@@ -75,32 +87,48 @@ footer,
 
 
 /* FOOTER *
- * ------ */
+ * ****** */
 
 footer {
     color: @white;
-}
-#portal-footer {
-    padding: 0;
-    margin: 10px;
-    background: transparent;
-}
-#portal-siteactions {
-    clear: none;
-    padding-bottom: 0;
-    text-align: left;
+    padding-top: 1em;
+    .clear {
+        margin-bottom: 1em;
+    }
 }
 #portal-footer,
 #portal-colophon,
 #portal-siteactions {
     font-size: 85%;
 }
+#portal-footer {
+    padding: 0;
+    margin: 0 10px;
+    background: transparent;
+}
+#portal-siteactions {
+    clear: none;
+    padding-bottom: 0;
+    text-align: left;
+    line-height: 2em;
+    li {
+        display: block;
+    }
+}
+#portal-colophon {
+    padding: 1em;
+    background-color: rgba(255,255,255,0.1);
+    text-align: left;
+}
 
 
 /* PORTLETS *
- * -------- */
+ * ******** */
 
 
+dl.portlet-libertic-context {
+
+}
 dl.portlet-libertic-context dd,
 dl.portlet-libertic-context dd ul {
   display:block;

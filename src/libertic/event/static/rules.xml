@@ -15,7 +15,21 @@
     <drop css:theme=".drop"/>
 
 <!--  RESOURCES -->
+        <!-- Replace title with Plone's page title  -->
+        <replace css:theme="html head title" css:content="html head title" />
+
+        <!-- Drop the favicon spec coming from content; we'll use the one in the theme. -->
+        <drop content="/html/head/link[@rel='shortcut icon']" />
+        <!-- Copy base tag from Plone -->
+        <before css:theme-children="html head" css:content="html head base" />
+
+        <!-- Copy link, style, meta tags from Plone head -->
+        <after css:theme-children="html head"
+               content="/html/head/link | /html/head/style | /html/head/meta" />
+               
+<!--
     <replace content='/html/head' theme='/html/head' />
+-->
     <merge attributes="class" css:content="body" css:theme="body" />
     <copy attributes="id dir" css:content="body" css:theme="body" />
 

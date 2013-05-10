@@ -1,5 +1,8 @@
 /* Resets *
  * ****** */
+body {
+  color: #555555;
+}
 /* Links *
  * ----- */
 a:link,
@@ -71,6 +74,7 @@ footer a:hover,
 }
 #portal-globalnav li a {
   border: none;
+  border-bottom: 5px solid transparent;
   min-width: auto;
   padding: 0.5em 0;
   margin-right: 2em;
@@ -92,7 +96,7 @@ footer {
   padding-top: 1em;
 }
 footer .clear {
-  margin-bottom: 10px;
+  margin-bottom: 1em;
 }
 #portal-footer,
 #portal-colophon,
@@ -187,4 +191,84 @@ dl.portlet-libertic-context dd.add-content ul li p {
   display: inline-block;
   margin: 0;
   padding: 0;
+}
+/* Content *
+ * ******** */
+/* heading */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: #555555;
+}
+h1,
+h2.tileHeadline {
+  font-size: 100%;
+  line-height: 2.5em;
+  margin-bottom: 1.5em;
+  text-transform: uppercase;
+  background: transparent url('../images/bg-heading.png') repeat-x left bottom;
+}
+h2 {
+  font-size: 100%;
+  line-height: 2em;
+  margin-bottom: 1em;
+  text-transform: uppercase;
+}
+#content h2.tileHeadline a {
+  text-decoration: none;
+}
+/* lists, description, ... */
+#content ul,
+#content ol,
+#content dl {
+  margin-bottom: 1em;
+}
+#content .documentDescription,
+#content #description {
+  font-size: 1em;
+  color: #555555;
+}
+/* Summary view *
+ * ------------ */
+/* hide main documentByLine */
+body.template-summary_view #plone-document-byline {
+  display: none;
+}
+/* Read more */
+p.tileFooter {
+  padding-left: 35px;
+  line-height: 30px;
+  background: url('../images/picto-search-30.png') no-repeat left center;
+  text-transform: uppercase;
+}
+#content p.tileFooter a {
+  border-bottom: 2px solid #c2c2c2;
+  text-decoration: none;
+}
+.tileItem {
+  margin-bottom: 2em;
+  /* Documentbyline */
+
+}
+.tileItem .documentByLine {
+  padding: 2px 5px;
+  font-style: italic;
+  font-size: 0.85em;
+  color: #fefefe;
+  background-color: #363339;
+}
+.tileItem #plone-document-byline {
+  display: none;
+}
+#content .tileItem .documentByLine a {
+  color: #fefefe;
+}
+/* Images */
+#content img.tileImage,
+#content div.newsImageContainer {
+  padding: 4px;
+  background: url('../images/bg-heading.png') repeat center center;
 }

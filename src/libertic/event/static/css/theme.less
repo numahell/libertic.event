@@ -4,6 +4,10 @@
 /* Resets *
  * ****** */
 
+body {
+    color: @textColor;
+}
+
 /* Links *
  * ----- */
 
@@ -68,6 +72,7 @@ footer,
     }
     li a {
         border: none;
+        border-bottom: 5px solid transparent;
         min-width: auto;
         padding: 0.5em 0;
         margin-right: 2em;
@@ -181,4 +186,85 @@ dl.portlet-libertic-context dd.add-content ul li img,
 dl.portlet-libertic-context dd.add-content ul li a,
 dl.portlet-libertic-context dd.add-content ul li p{display:inline-block;margin:0;padding:0;}
 
+
+/* Content *
+ * ******** */
+
+/* heading */
+
+h1, h2, h3, h4, h5, h6 {
+    color: @headingsColor;
+}
+h1, h2.tileHeadline {
+    font-size: 100%;
+    line-height: 2.5em;
+    margin-bottom: 1.5em;
+    text-transform: uppercase;
+    background: transparent url('../images/bg-heading.png') repeat-x left bottom;
+}
+h2 {
+    font-size: 100%;
+    line-height: 2em;
+    margin-bottom: 1em;
+    text-transform: uppercase;
+}
+#content h2.tileHeadline a {
+    text-decoration: none;
+}
+
+/* lists, description, ... */
+#content {
+    ul, ol, dl {
+        margin-bottom: 1em;
+    }
+    .documentDescription, #description {
+        font-size: 1em;
+        color: @textColor;
+    }
+}
+
+/* Summary view *
+ * ------------ */
+
+/* hide main documentByLine */
+body.template-summary_view #plone-document-byline {
+    display: none;
+}
+/* Read more */
+p.tileFooter {
+    padding-left: 35px;
+    line-height: 30px;
+    background: url('../images/picto-search-30.png') no-repeat left center;
+    text-transform: uppercase;
+}
+#content p.tileFooter a {
+    border-bottom: 2px solid @grayLighter;
+    text-decoration: none;
+}
+
+.tileItem {
+    margin-bottom: 2em;
+    .documentByLine {
+        padding: 2px 5px;
+        font-style: italic;
+        font-size: 0.85em;
+        color: @white;
+        background-color: @grayDark;
+    }
+    /* Documentbyline */
+    #plone-document-byline {
+        display: none;
+    }
+}
+#content .tileItem .documentByLine a {
+    color: @white;
+}
+
+/* Images */
+#content {
+    img.tileImage, div.newsImageContainer {
+        padding: 4px;
+        background: url('../images/bg-heading.png') repeat center center;
+    }
+}
 

@@ -29,13 +29,13 @@
   <dd class="portletItem home" tal:condition="python:( not isAnon  ) and home">
     <ul>
       <li>
-        <a class="homeurl" tal:attributes="href home">
-          <img width="64" height="64" title="home" i18n:attributes="title" tal:attributes="src string:${img_url}/home_3-20110811104203-00007.png" />
+        <a class="homeurl" tal:attributes="href ${home}/my-events">
+          <img width="64" height="64" title="home" i18n:attributes="title" tal:attributes="src string:${img_url}/picto-home-30.png" />
         </a>
       </li>
-      <li class="seek" >
-        <a tal:attributes="href string:${home}/createObject?type_name=Collection">
-          <img width="64" height="64" title="find" i18n:attributes="title" tal:attributes="src string:${img_url}/magnifying-glass_4-20110811150802-00023.png" />
+      <li >
+        <a class="seek" tal:attributes="href string:db_url">
+          <img width="64" height="64" title="find" i18n:attributes="title" tal:attributes="src string:${img_url}/picto-search-30.png" />
         </a>
       </li>
     </ul>
@@ -45,20 +45,20 @@
     <p i18n:translate="">Download the database</p>
     -->
     <ul>
-      <li class="xml" ><a tal:attributes="href string:${db_url}/eventsasxml"  >
-        <img tal:attributes="src string:${img_url}/xml_36.png" alt="XML" title="Download as XML" i18n:attributes="title"/>
+      <li><a class="xml" tal:attributes="href string:${db_url}/eventsasxml"  >
+        <img tal:attributes="src string:${img_url}/icon-xml.png" alt="XML" title="Download as XML" i18n:attributes="title"/>
         <p>xml</p>
       </a></li>
-      <li class="json"><a  tal:attributes="href string:${db_url}/eventsasjson">
-        <img tal:attributes="src string:${img_url}/json_36.png" alt="JSON" title="Download as JSON" i18n:attributes="title"/>
+      <li><a class="json" tal:attributes="href string:${db_url}/eventsasjson">
+        <img tal:attributes="src string:${img_url}/icon-json.png" alt="JSON" title="Download as JSON" i18n:attributes="title"/>
         <p>json</p>
       </a></li>
-      <li class="ical"><a  tal:attributes="href string:${db_url}/eventsasical">
-        <img tal:attributes="src string:${img_url}/ical_36.png" alt="ICAL" title="Downloas as ICAL" i18n:attributes="title"/>
+      <li><a  class="ical icon-calendar" tal:attributes="href string:${db_url}/eventsasical">
+        <img tal:attributes="src string:${img_url}/icon-ical.png" alt="ICAL" title="Downloas as ICAL" i18n:attributes="title"/>
         <p>ical</p>
       </a></li>
-      <li class="csv" ><a tal:attributes="href string:${db_url}/eventsascsv"  >
-        <img tal:attributes="src string:${img_url}/csv_36.png" alt="CSV" title="Download as CSV" i18n:attributes="title"/>
+      <li><a class="csv" tal:attributes="href string:${db_url}/eventsascsv"  >
+        <img tal:attributes="src string:${img_url}/icon-csv.png" alt="CSV" title="Download as CSV" i18n:attributes="title"/>
         <p>csv</p>
       </a></li>
       <div class="visualClear"></div>
@@ -71,13 +71,13 @@
     <ul>
       <li class="event">
         <a tal:attributes="href string:${db_url}/++add++libertic_event" title="Add an event" >
-          <img width="32" height="32" title="add" i18n:attributes="title" tal:attributes="src string:${img_url}/plus_k03-20111007231454-00022.png" />
+          <img width="32" height="32" title="add" i18n:attributes="title" tal:attributes="src string:${img_url}/picto-add-30.png" />
           <p i18n:translate="">portlet_add_event</p>
         </a>
       </li>
       <li class="source">
         <a tal:attributes="href string:${db_url}/++add++libertic_source" title="Add a source" >
-          <img width="32" height="32" title="add" i18n:attributes="title" tal:attributes="src string:${img_url}/plus_k03-20111007231454-00022.png" />
+          <img width="32" height="32" title="add" i18n:attributes="title" tal:attributes="src string:${img_url}/picto-add-30.png" />
           <p i18n:translate="">portlet_add_source</p>
         </a>
       </li>

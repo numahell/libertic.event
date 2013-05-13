@@ -158,10 +158,8 @@ dl.portlet-libertic-context .json {
 dl.portlet-static-libertic-context dd.add-content li a,
 dl.portlet-libertic-context dd.add-content li a {
   padding-left: 40px;
-}
-dl.portlet-static-libertic-context .json,
-dl.portlet-libertic-context .json {
-  background: transparent url('../images/icon-json.png') repeat-x center bottom;
+  height: 36px;
+  background: transparent url('../images/picto-add.png') repeat-x left bottom;
 }
 /*
 dl.portlet-libertic-context dd,

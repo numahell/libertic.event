@@ -17,8 +17,8 @@
   i18n:domain="libertic.event">
   <dt class="portletHeader">
     <span class="portletTopLeft"></span>
-    <span>
-      Actions
+    <span i18n:translate="">
+      Find
     </span>
     <span class="portletTopRight"></span>
   </dt>
@@ -29,63 +29,53 @@
   <dd class="portletItem home" tal:condition="python:( not isAnon  ) and home">
     <ul>
       <li>
-        <a class="homeurl" tal:attributes="href string:home">
-          <img width="64" height="64" title="home" i18n:attributes="title" tal:attributes="src string:${img_url}/picto-home-30.png" />
-        </a>
+        <a class="all-events" tal:attributes="href string:tous-les-evenements" i18n:translate="">All events</a>
       </li>
-      <li >
-        <a class="seek" tal:attributes="href string:db_url">
-          <img width="64" height="64" title="find" i18n:attributes="title" tal:attributes="src string:${img_url}/picto-search-30.png" />
-        </a>
+      <li>
+        <a class="all-events" tal:attributes="href string:mes-evenements" i18n:translate="">My events</a>
       </li>
     </ul>
   </dd>
+  <dt class="portletHeader">
+    <span class="portletTopLeft"></span>
+    <span i18n:translate="">
+      Actions
+    </span>
+    <span class="portletTopRight"></span>
+  </dt>
   <dd class="portletItem download" tal:condition="view/is_operator">
-    <!--
-    <p i18n:translate="">Download the database</p>
-    -->
+    <p i18n:translate="">Export the whole database as...</p>
     <ul>
-      <li><a class="xml" tal:attributes="href string:${db_url}/eventsasxml"  >
-        <img tal:attributes="src string:${img_url}/icon-xml.png" alt="XML" title="Download as XML" i18n:attributes="title"/>
-        <p>xml</p>
+      <li><a class="xml" tal:attributes="href string:${db_url}/eventsasxml"  alt="XML" title="Download as XML" i18n:attributes="title" >
+          xml
       </a></li>
-      <li><a class="json" tal:attributes="href string:${db_url}/eventsasjson">
-        <img tal:attributes="src string:${img_url}/icon-json.png" alt="JSON" title="Download as JSON" i18n:attributes="title"/>
-        <p>json</p>
+      <li><a class="json" tal:attributes="href string:${db_url}/eventsasjson" alt="JSON" title="Download as JSON" i18n:attributes="title">
+        json
       </a></li>
-      <li><a  class="ical icon-calendar" tal:attributes="href string:${db_url}/eventsasical">
-        <img tal:attributes="src string:${img_url}/icon-ical.png" alt="ICAL" title="Downloas as ICAL" i18n:attributes="title"/>
-        <p>ical</p>
+      <li><a  class="ical" tal:attributes="href string:${db_url}/eventsasical" alt="ICAL" title="Downloas as ICAL" i18n:attributes="title">
+          ical
       </a></li>
-      <li><a class="csv" tal:attributes="href string:${db_url}/eventsascsv"  >
-        <img tal:attributes="src string:${img_url}/icon-csv.png" alt="CSV" title="Download as CSV" i18n:attributes="title"/>
-        <p>csv</p>
+      <li><a class="csv" tal:attributes="href string:${db_url}/eventsascsv" alt="CSV" title="Download as CSV" i18n:attributes="title">
+        csv
       </a></li>
       <div class="visualClear"></div>
     </ul>
   </dd>
   <dd class="portletItem add-content" tal:condition="view/is_supplier">
-    <!--
     <p i18n:translate="">Add content</p>
-    -->
     <ul>
       <li class="event">
-        <a tal:attributes="href string:${db_url}/++add++libertic_event" title="Add an event" >
-          <img width="32" height="32" title="add" i18n:attributes="title" tal:attributes="src string:${img_url}/picto-add-30.png" />
-          <p i18n:translate="">portlet_add_event</p>
-        </a>
+        <a tal:attributes="href string:${db_url}/++add++libertic_event" title="Add an event" i18n:translate="">
+            portlet_add_event</a>
       </li>
       <li class="source">
-        <a tal:attributes="href string:${db_url}/++add++libertic_source" title="Add a source" >
-          <img width="32" height="32" title="add" i18n:attributes="title" tal:attributes="src string:${img_url}/picto-add-30.png" />
-          <p i18n:translate="">portlet_add_source</p>
-        </a>
+        <a tal:attributes="href string:${db_url}/++add++libertic_source" title="Add a source" i18n:translate="">
+            portlet_add_source</a>
+      </li>
+      <li class="export">
+        <a tal:attributes="href string:${db_url}/++add++libertic_source" title="Add a source" i18n:translate="">
+            portlet_export</a>
       </li>
     </ul>
-  </dd>
-  <dd class="portletFooter">
-    <span class="portletBottomLeft"></span>
-    <span> </span>
-    <span class="portletBottomRight"></span>
   </dd>
 </dl>

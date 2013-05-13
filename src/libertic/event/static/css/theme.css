@@ -1,3 +1,5 @@
+/*
+ * <a href="http://thenounproject.com/noun/document/#icon-No5876" target="_blank">Document</a> designed by <a href="http://thenounproject.com/jamison" target="_blank">Jamison Wieser</a> from The Noun Project */
 /* Resets *
  * ****** */
 body {
@@ -124,74 +126,97 @@ footer .clear {
 }
 /* PORTLETS *
  * ******** */
+dl.portlet-static-libertic-context dd.home ul li,
+dl.portlet-libertic-context dd.home ul li,
+dl.portlet-static-libertic-context dd.download ul li,
+dl.portlet-libertic-context dd.download ul li {
+  text-align: center;
+  display: inline-block;
+  margin: 0 auto;
+  vertical-align: top;
+}
+dl.portlet-static-libertic-context dd.download li a,
+dl.portlet-libertic-context dd.download li a {
+  padding-top: 40px;
+}
+dl.portlet-static-libertic-context .xml,
+dl.portlet-libertic-context .xml {
+  background: transparent url('../images/icon-xml.png') repeat-x center bottom;
+}
+dl.portlet-static-libertic-context .csv,
+dl.portlet-libertic-context .csv {
+  background: transparent url('../images/icon-csv.png') repeat-x center bottom;
+}
+dl.portlet-static-libertic-context .ical,
+dl.portlet-libertic-context .ical {
+  background: transparent url('../images/icon-ical.png') repeat-x center bottom;
+}
+dl.portlet-static-libertic-context .json,
+dl.portlet-libertic-context .json {
+  background: transparent url('../images/icon-json.png') repeat-x center bottom;
+}
+dl.portlet-static-libertic-context dd.add-content li a,
+dl.portlet-libertic-context dd.add-content li a {
+  padding-left: 40px;
+}
+dl.portlet-static-libertic-context .json,
+dl.portlet-libertic-context .json {
+  background: transparent url('../images/icon-json.png') repeat-x center bottom;
+}
+/*
 dl.portlet-libertic-context dd,
 dl.portlet-libertic-context dd ul {
-  display: block;
-  width: 100%;
-  margin: 0 auto;
+  display:block;
+  width:100%;
+  margin:0 auto;
 }
 dl.portlet-libertic-context dd {
-  clear: both;
+  clear:both;
 }
-dl.portlet-libertic-context dd.portletItem p {
-  padding-top: 2px;
-  padding-bottom: 2px;
-  margin-top: 2px;
-  margin-bottom: 2px;
+
+dl.portlet-libertic-context dd.portletItem p{
+  padding-top:2px;
+  padding-bottom:2px;
+  margin-top:2px;
+  margin-bottom:2px;
 }
 dl.portlet-libertic-context dd.portletItem {
   padding-bottom: 5px;
   padding-top: 5px;
 }
+
 dl.portlet-libertic-context a:hover,
 dl.portlet-libertic-context a:link,
 dl.portlet-libertic-context a:visited,
 dl.portlet-libertic-context a {
-  border-bottom: none;
-  text-underline: none;
+  border-bottom:none;
+  text-underline:none;
+}
+dl.portlet-libertic-context dd.add-content ul,
+dl.portlet-libertic-context dd.home ul,
+dl.portlet-libertic-context dd.download ul {
 }
 dl.portlet-libertic-context dd.add-content ul li,
 dl.portlet-libertic-context dd.home ul li,
 dl.portlet-libertic-context dd.download ul li {
-  text-align: center;
-  display: inline-block;
-  margin: 0 auto;
+  text-align:center;
+  display:inline-block;
+  margin:0 auto;
 }
-dl.portlet-libertic-context dd.download ul li {
-  width: 40px;
-}
-dl.portlet-libertic-context dd.home ul li {
-  width: 70px;
-}
-dl.portlet-libertic-context dd.add-content ul li {
-  text-align: left;
-  display: block;
-  width: 210px;
-  position: relative;
-}
+dl.portlet-libertic-context dd.download ul li { width:40px;}
+dl.portlet-libertic-context dd.home ul li { width:70px;}
+dl.portlet-libertic-context dd.add-content ul li {text-align:left;display:block;width:210px;position:relative;}
 dl.portlet-libertic-context dd.add-content ul li p,
 dl.portlet-libertic-context dd.add-content ul li img,
 dl.portlet-libertic-context dd.add-content ul li a,
-dl.portlet-libertic-context dd.add-content ul li {
-  height: 40px;
-}
-dl.portlet-libertic-context dd.add-content ul li img {
-  width: 32px;
-  height: 32px;
-}
-dl.portlet-libertic-context dd.add-content ul li p {
-  width: 160px;
-  position: absolute;
-  top: 10px;
-  left: 32px;
-}
+dl.portlet-libertic-context dd.add-content ul li {height:40px;}
+dl.portlet-libertic-context dd.add-content ul li img{width:32px;height:32px;}
+dl.portlet-libertic-context dd.add-content ul li p{width:160px;position:absolute;top:10px;left:32px;}
 dl.portlet-libertic-context dd.add-content ul li img,
 dl.portlet-libertic-context dd.add-content ul li a,
-dl.portlet-libertic-context dd.add-content ul li p {
-  display: inline-block;
-  margin: 0;
-  padding: 0;
-}
+dl.portlet-libertic-context dd.add-content ul li p{display:inline-block;margin:0;padding:0;}
+
+
 /* Content *
  * ******** */
 /* heading */
@@ -224,12 +249,16 @@ h2 {
 #content ul,
 #content ol,
 #content dl {
-  margin-bottom: 1em;
+  margin-bottom: 0.5em;
 }
 #content .documentDescription,
 #content #description {
   font-size: 1em;
   color: #555555;
+  margin-bottom: 0.5em;
+}
+#content p {
+  margin-bottom: 0.5em;
 }
 /* Summary view *
  * ------------ */

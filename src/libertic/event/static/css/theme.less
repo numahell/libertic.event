@@ -133,9 +133,38 @@ footer {
  * ******** */
 
 
+dl.portlet-static-libertic-context,
 dl.portlet-libertic-context {
-
+    dd.home ul li,
+    dd.download ul li {
+      text-align:center;
+      display:inline-block;
+      margin:0 auto;
+      vertical-align: top;
+    }
+    dd.download li a {
+        padding-top: 40px;
+    }
+    .xml {
+        background: transparent url('../images/icon-xml.png') repeat-x center bottom;
+    }
+    .csv {
+        background: transparent url('../images/icon-csv.png') repeat-x center bottom;
+    }
+    .ical {
+        background: transparent url('../images/icon-ical.png') repeat-x center bottom;
+    }
+    .json {
+        background: transparent url('../images/icon-json.png') repeat-x center bottom;
+    }
+    dd.add-content li a {
+        padding-left: 40px;
+    }
+    .json {
+        background: transparent url('../images/icon-json.png') repeat-x center bottom;
+    }
 }
+/*
 dl.portlet-libertic-context dd,
 dl.portlet-libertic-context dd ul {
   display:block;
@@ -217,11 +246,15 @@ h2 {
 /* lists, description, ... */
 #content {
     ul, ol, dl {
-        margin-bottom: 1em;
+        margin-bottom: 0.5em;
     }
     .documentDescription, #description {
         font-size: 1em;
         color: @textColor;
+        margin-bottom: 0.5em;
+    }
+    p {
+        margin-bottom: 0.5em;
     }
 }
 

@@ -29,7 +29,7 @@
   <dd class="portletItem home" tal:condition="python:( not isAnon  ) and home">
     <ul>
       <li>
-        <a class="homeurl" tal:attributes="href ${home}/my-events">
+        <a class="homeurl" tal:attributes="href string:home">
           <img width="64" height="64" title="home" i18n:attributes="title" tal:attributes="src string:${img_url}/picto-home-30.png" />
         </a>
       </li>

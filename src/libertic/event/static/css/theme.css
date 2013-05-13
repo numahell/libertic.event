@@ -141,19 +141,19 @@ dl.portlet-libertic-context dd.download li a {
 }
 dl.portlet-static-libertic-context .xml,
 dl.portlet-libertic-context .xml {
-  background: transparent url('../images/icon-xml.png') repeat-x center bottom;
+  background: transparent url('../images/icon-xml.png') repeat-x center top;
 }
 dl.portlet-static-libertic-context .csv,
 dl.portlet-libertic-context .csv {
-  background: transparent url('../images/icon-csv.png') repeat-x center bottom;
+  background: transparent url('../images/icon-csv.png') repeat-x center top;
 }
 dl.portlet-static-libertic-context .ical,
 dl.portlet-libertic-context .ical {
-  background: transparent url('../images/icon-ical.png') repeat-x center bottom;
+  background: transparent url('../images/icon-ical.png') repeat-x center top;
 }
 dl.portlet-static-libertic-context .json,
 dl.portlet-libertic-context .json {
-  background: transparent url('../images/icon-json.png') repeat-x center bottom;
+  background: transparent url('../images/icon-json.png') repeat-x center top;
 }
 dl.portlet-static-libertic-context dd.add-content li a,
 dl.portlet-libertic-context dd.add-content li a {
